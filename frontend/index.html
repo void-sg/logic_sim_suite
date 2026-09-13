@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Electronics | Reference Notes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="#home">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="#converter">Converter</a>
+        <a href="#multiplexer">Multiplexer</a>
+        <a href="#comparator">Comparator</a>
+        <a href="#adder">Adder</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="intro">
+      <p class="label">COMBINATIONAL LOGIC</p>
+      <h1>Digital Electronics<br>Study References</h1>
+      <p class="intro-text">
+        Reference material for code converters, multiplexers, comparators,
+        and adders. Select a topic above to view its subtopics and study links.
+      </p>
+    </section>
+
+    <!-- Converter -->
+    <section class="topic-section" id="converter">
+      <div class="section-title">
+        <span class="section-number">01</span>
+        <div>
+          <p class="label">CODE CONVERSION</p>
+          <h2>Converter</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Topics Covered</h3>
+
+          <ul class="subtopic-list">
+            <li>
+              <strong>4-bit Binary to Gray Code</strong>
+              <span>
+                Conversion using truth table, SOP/POS expression, K-map,
+                XOR gates, and logic circuit.
+              </span>
+            </li>
+
+            <li>
+              <strong>4-bit Gray to Binary Code</strong>
+              <span>
+                Reverse conversion using truth table, Boolean expression,
+                K-map, XOR gates, and logic circuit.
+              </span>
+            </li>
+
+            <li>
+              <strong>BCD to Gray Code</strong>
+              <span>
+                Conversion using BCD inputs. Invalid BCD states from 1010 to
+                1111 are treated as don't-care conditions.
+              </span>
+            </li>
+
+            <li>
+              <strong>BCD to Excess-3 Code</strong>
+              <span>
+                Conversion of 8421 BCD code into Excess-3 code with separate
+                truth table, K-map, and gate-level design.
+              </span>
+            </li>
+
+            <li>
+              <strong>Excess-3 to BCD Code</strong>
+              <span>
+                Reverse conversion from Excess-3 code to BCD code.
+              </span>
+            </li>
+          </ul>
+
+          <!-- Interactive converter tool, wired to the live FastAPI backend -->
+          <div class="convert-tool">
+            <h3>Try it live</h3>
+
+            <label>From code
+              <select id="fromCode">
+                <option>Binary</option>
+                <option>Gray</option>
+                <option>BCD</option>
+                <option>Excess-3</option>
+                <option>2's Complement</option>
+              </select>
+            </label>
+
+            <label>To code
+              <select id="toCode">
+                <option>Gray</option>
+                <option>Binary</option>
+                <option>BCD</option>
+                <option>Excess-3</option>
+                <option>2's Complement</option>
+              </select>
+            </label>
+
+            <label>Bits (4-bit, e.g. 1010)
+              <input type="text" id="bitsInput" maxlength="4" placeholder="1010">
+            </label>
+
+            <button onclick="convertBits()">Convert</button>
+
+            <p id="convertResult"></p>
+          </div>
+        </div>
+
+        <aside class="reference-area">
+          <h3>References</h3>
+          <a href="#" class="reference-link">Binary to Gray conversion <span>↗</span></a>
+          <a href="#" class="reference-link">Gray to Binary conversion <span>↗</span></a>
+          <a href="#" class="reference-link">BCD to Gray converter <span>↗</span></a>
+          <a href="#" class="reference-link">BCD to Excess-3 converter <span>↗</span></a>
+          <a href="#" class="reference-link">Excess-3 to BCD converter <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Multiplexer -->
+    <section class="topic-section" id="multiplexer">
+      <div class="section-title">
+        <span class="section-number">02</span>
+        <div>
+          <p class="label">DATA SELECTOR</p>
+          <h2>Multiplexer</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Topics Covered</h3>
+
+          <ul class="subtopic-list">
+            <li>
+              <strong>n : 1 Multiplexer</strong>
+              <span>
+                General study of an n-input multiplexer: block diagram,
+                input/output lines, select lines, truth table, Boolean
+                expression, and logic-gate circuit.
+              </span>
+            </li>
+
+            <li>
+              <strong>Select Line Requirement</strong>
+              <span>
+                The number of select lines needed for an n : 1 MUX is log₂(n).
+              </span>
+            </li>
+
+            <li>
+              <strong>Boolean Function Using n : 1 MUX</strong>
+              <span>
+                Implementation of Boolean functions in minterm form:
+                F(A, B, C...) = Σm(...).
+              </span>
+            </li>
+
+            <li>
+              <strong>n : 1 MUX Using 4 : 1 MUX</strong>
+              <span>
+                Realisation of a larger n : 1 MUX using 4 : 1 MUX blocks and
+                suitable MSB/LSB select-line connections.
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="reference-area">
+          <h3>References</h3>
+          <a href="#" class="reference-link">n : 1 MUX block diagram <span>↗</span></a>
+          <a href="#" class="reference-link">MUX truth table and select lines <span>↗</span></a>
+          <a href="#" class="reference-link">Boolean function using MUX <span>↗</span></a>
+          <a href="#" class="reference-link">n : 1 MUX using 4 : 1 MUX <span>↗</span></a>
+          <a href="#" class="reference-link">MUX logic-gate circuit <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Comparator -->
+    <section class="topic-section" id="comparator">
+      <div class="section-title">
+        <span class="section-number">03</span>
+        <div>
+          <p class="label">MAGNITUDE COMPARISON</p>
+          <h2>Comparator</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Topics Covered</h3>
+
+          <ul class="subtopic-list">
+            <li>
+              <strong>n-bit Magnitude Comparator</strong>
+              <span>
+                Comparison of two n-bit binary numbers A and B, producing
+                A &gt; B, A = B, and A &lt; B outputs.
+              </span>
+            </li>
+
+            <li>
+              <strong>Truth Table and Logic Circuit</strong>
+              <span>
+                Truth table, SOP/POS expression, K-map simplification, and
+                logic-gate design for a selected bit size.
+              </span>
+            </li>
+
+            <li>
+              <strong>MSB Priority in Comparison</strong>
+              <span>
+                The first unequal bit, starting from the most significant bit,
+                determines the final comparison output.
+              </span>
+            </li>
+
+            <li>
+              <strong>n-bit Comparator Using 4-bit Comparator</strong>
+              <span>
+                Construction of a larger comparator by cascading 4-bit
+                comparator blocks through expansion inputs.
+              </span>
+            </li>
+
+            <li>
+              <strong>IC 74LS85 Implementation</strong>
+              <span>
+                4-bit magnitude comparator IC, pinout details, and cascading
+                method for larger binary numbers.
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="reference-area">
+          <h3>References</h3>
+          <a href="#" class="reference-link">n-bit comparator truth table <span>↗</span></a>
+          <a href="#" class="reference-link">Comparator Boolean expressions <span>↗</span></a>
+          <a href="#" class="reference-link">Comparator logic-gate circuit <span>↗</span></a>
+          <a href="#" class="reference-link">Cascading 4-bit comparators <span>↗</span></a>
+          <a href="#" class="reference-link">IC 74LS85 pin diagram <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Adder -->
+    <section class="topic-section" id="adder">
+      <div class="section-title">
+        <span class="section-number">04</span>
+        <div>
+          <p class="label">BINARY ARITHMETIC</p>
+          <h2>Adder</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Topics Covered</h3>
+
+          <ul class="subtopic-list">
+            <li>
+              <strong>n-bit Binary Adder</strong>
+              <span>
+                Addition of two n-bit binary numbers with sum and carry
+                propagation between each stage.
+              </span>
+            </li>
+
+            <li>
+              <strong>Full Adder as a Basic Block</strong>
+              <span>
+                Full adder inputs are A, B, and carry input C<sub>in</sub>.
+                Outputs are Sum and carry output C<sub>out</sub>.
+              </span>
+            </li>
+
+            <li>
+              <strong>n-bit Adder Using Full Adders</strong>
+              <span>
+                Realisation of an n-bit ripple-carry or parallel adder by
+                cascading n full-adder blocks.
+              </span>
+            </li>
+
+            <li>
+              <strong>n-bit Adder-Subtractor</strong>
+              <span>
+                Addition and subtraction using XOR gates and two's complement
+                arithmetic with a mode-control input.
+              </span>
+            </li>
+
+            <li>
+              <strong>BCD Adder</strong>
+              <span>
+                BCD addition with correction logic when output exceeds 1001
+                or generates a carry.
+              </span>
+            </li>
+
+            <li>
+              <strong>IC 74LS83 Implementation</strong>
+              <span>
+                4-bit binary adder IC, pin diagram, carry logic, and use as a
+                building block for larger adders.
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="reference-area">
+          <h3>References</h3>
+          <a href="#" class="reference-link">Full adder truth table <span>↗</span></a>
+          <a href="#" class="reference-link">n-bit adder block diagram <span>↗</span></a>
+          <a href="#" class="reference-link">Ripple-carry adder circuit <span>↗</span></a>
+          <a href="#" class="reference-link">Adder-subtractor using XOR gates <span>↗</span></a>
+          <a href="#" class="reference-link">BCD adder correction logic <span>↗</span></a>
+          <a href="#" class="reference-link">IC 74LS83 pin diagram <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Study Reference Page</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4-bit Binary to/from Gray Code Converter</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    .simulator-card {
+      background: #ffffff;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .mode-toggle-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line, #e2e8f0);
+      padding-bottom: 16px;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn:hover {
+      background: #f1f5f9;
+      color: var(--navy, #14233b);
+    }
+
+    .mode-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .bit-toggles {
+      display: flex;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .bit-btn {
+      flex: 1;
+      height: 54px;
+      font-family: "DM Mono", monospace;
+      font-size: 20px;
+      font-weight: 700;
+      border: 2px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #14233b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bit-btn span:last-child {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .bit-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .bit-btn.active span:last-child {
+      color: #e2e8f0;
+    }
+
+    .convert-btn {
+      width: 100%;
+      padding: 14px;
+      background: #14233b;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: "DM Mono", monospace;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .convert-btn:hover {
+      background: #2c6ee8;
+    }
+
+    .convert-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .result-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      border-left: 4px solid #2c6ee8;
+      font-family: "DM Mono", monospace;
+      transition: all 0.2s ease;
+    }
+
+    .result-box.error {
+      border-left-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .result-header {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .result-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #14233b;
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    .result-box.error .result-value {
+      color: #dc2626;
+      font-size: 14px;
+      letter-spacing: normal;
+    }
+
+    .result-meta {
+      font-size: 12px;
+      color: #475569;
+      margin-top: 6px;
+    }
+
+    .quick-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+
+    .reset-link {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-family: "DM Mono", monospace;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .reset-link:hover {
+      color: #14233b;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html#converter">← Back to Converter</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="intro">
+    <p class="label">SIMULATOR & CONVERSION</p>
+    <h1 id="pageTitle">4-bit Binary to Gray Code</h1>
+    
+    <!-- INTERACTIVE CONVERTER SECTION -->
+    <section class="simulator-card">
+      <div class="mode-toggle-group">
+        <button class="mode-btn active" id="btnModeBinToGray" onclick="setMode('bin-to-gray')">Binary → Gray Code</button>
+        <button class="mode-btn" id="btnModeGrayToBin" onclick="setMode('gray-to-bin')">Gray → Binary Code</button>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h3 id="simSubtitle" style="margin: 0 0 8px;">Interactive Simulator (Binary to Gray)</h3>
+        <button class="reset-link" onclick="resetBits()">Reset to 0000</button>
+      </div>
+      <p id="simHelpText" style="margin: 0; font-size: 13px; color: #64748b;">
+        Click the binary bits below to toggle between 0 and 1, then click Convert.
+      </p>
+      
+      <!-- 4-Bit Input Toggles -->
+      <div class="bit-toggles">
+        <button class="bit-btn" id="b3" onclick="toggleBit('b3')">
+          <span id="b3-val">0</span>
+          <span id="b3-lbl">B3 (MSB)</span>
+        </button>
+        <button class="bit-btn" id="b2" onclick="toggleBit('b2')">
+          <span id="b2-val">0</span>
+          <span id="b2-lbl">B2</span>
+        </button>
+        <button class="bit-btn" id="b1" onclick="toggleBit('b1')">
+          <span id="b1-val">0</span>
+          <span id="b1-lbl">B1</span>
+        </button>
+        <button class="bit-btn" id="b0" onclick="toggleBit('b0')">
+          <span id="b0-val">0</span>
+          <span id="b0-lbl">B0 (LSB)</span>
+        </button>
+      </div>
+
+      <!-- Convert Action Button -->
+      <button class="convert-btn" id="convertBtn" onclick="performConversion()">Convert to Gray Code</button>
+
+      <!-- Output Display Box -->
+      <div class="result-box" id="resultBox">
+        <div class="result-header" id="resultHeader">Converted Output (Gray Bits)</div>
+        <div class="result-value" id="outputBits">----</div>
+        <div class="result-meta" id="resultMeta"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="converter-engine.js"></script>
+  <script>
+    let currentMode = "bin-to-gray"; // 'bin-to-gray' or 'gray-to-bin'
+
+    function setMode(mode) {
+      currentMode = mode;
+      
+      const btnBin = document.getElementById('btnModeBinToGray');
+      const btnGray = document.getElementById('btnModeGrayToBin');
+      const pageTitle = document.getElementById('pageTitle');
+      const simSubtitle = document.getElementById('simSubtitle');
+      const simHelpText = document.getElementById('simHelpText');
+      const convertBtn = document.getElementById('convertBtn');
+      const resultHeader = document.getElementById('resultHeader');
+      
+      if (mode === 'bin-to-gray') {
+        btnBin.classList.add('active');
+        btnGray.classList.remove('active');
+        pageTitle.textContent = "4-bit Binary to Gray Code";
+        simSubtitle.textContent = "Interactive Simulator (Binary to Gray)";
+        simHelpText.textContent = "Click the binary bits below to toggle between 0 and 1, then click Convert.";
+        convertBtn.textContent = "Convert to Gray Code";
+        resultHeader.textContent = "Converted Output (Gray Bits)";
+        
+        document.getElementById('b3-lbl').textContent = "B3 (MSB)";
+        document.getElementById('b2-lbl').textContent = "B2";
+        document.getElementById('b1-lbl').textContent = "B1";
+        document.getElementById('b0-lbl').textContent = "B0 (LSB)";
+      } else {
+        btnGray.classList.add('active');
+        btnBin.classList.remove('active');
+        pageTitle.textContent = "4-bit Gray to Binary Code";
+        simSubtitle.textContent = "Interactive Simulator (Gray to Binary)";
+        simHelpText.textContent = "Click the Gray code bits below to toggle between 0 and 1, then click Convert.";
+        convertBtn.textContent = "Convert to Binary Code";
+        resultHeader.textContent = "Converted Output (Binary Bits)";
+        
+        document.getElementById('b3-lbl').textContent = "G3 (MSB)";
+        document.getElementById('b2-lbl').textContent = "G2";
+        document.getElementById('b1-lbl').textContent = "G1";
+        document.getElementById('b0-lbl').textContent = "G0 (LSB)";
+      }
+
+      resetResultBox();
+    }
+
+    function toggleBit(id) {
+      const btn = document.getElementById(id);
+      const valSpan = document.getElementById(id + '-val');
+      
+      btn.classList.toggle('active');
+      const isActive = btn.classList.contains('active');
+      valSpan.textContent = isActive ? "1" : "0";
+      resetResultBox();
+    }
+
+    function resetBits() {
+      ['b3', 'b2', 'b1', 'b0'].forEach(id => {
+        const btn = document.getElementById(id);
+        const valSpan = document.getElementById(id + '-val');
+        btn.classList.remove('active');
+        valSpan.textContent = "0";
+      });
+      resetResultBox();
+    }
+
+    function resetResultBox() {
+      const resultBox = document.getElementById('resultBox');
+      const outputBits = document.getElementById('outputBits');
+      const resultMeta = document.getElementById('resultMeta');
+      
+      resultBox.classList.remove('error');
+      outputBits.textContent = "----";
+      resultMeta.textContent = "";
+    }
+
+    async function performConversion() {
+      const b3 = document.getElementById('b3-val').textContent;
+      const b2 = document.getElementById('b2-val').textContent;
+      const b1 = document.getElementById('b1-val').textContent;
+      const b0 = document.getElementById('b0-val').textContent;
+      const inputBits = b3 + b2 + b1 + b0;
+
+      const fromCode = (currentMode === 'bin-to-gray') ? "Binary" : "Gray";
+      const toCode = (currentMode === 'bin-to-gray') ? "Gray" : "Binary";
+
+      const convertBtn = document.getElementById('convertBtn');
+      const resultBox = document.getElementById('resultBox');
+      const outputBits = document.getElementById('outputBits');
+      const resultMeta = document.getElementById('resultMeta');
+
+      convertBtn.disabled = true;
+      convertBtn.textContent = "Converting...";
+      resultBox.classList.remove('error');
+      outputBits.textContent = "....";
+      resultMeta.textContent = "Computing...";
+
+      try {
+        const response = await universalConvert(fromCode, toCode, inputBits);
+
+        if (!response.ok) {
+          resultBox.classList.add('error');
+          outputBits.textContent = "Error";
+          resultMeta.textContent = response.data.detail || "Conversion failed.";
+          return;
+        }
+
+        const data = response.data;
+        outputBits.textContent = data.output_bits;
+        resultMeta.textContent = `Input: ${data.input_bits} (${fromCode}) | Decimal: ${data.decimal_value} | Output: ${data.output_bits} (${toCode}) · [${response.source}]`;
+      } catch (err) {
+        resultBox.classList.add('error');
+        outputBits.textContent = "Error";
+        resultMeta.textContent = err.message;
+      } finally {
+        convertBtn.disabled = false;
+        convertBtn.textContent = (currentMode === 'bin-to-gray') ? "Convert to Gray Code" : "Convert to Binary Code";
+      }
+    }
+  </script>
+
+</body>
+</html>

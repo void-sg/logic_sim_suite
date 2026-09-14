@@ -24,27 +24,41 @@ def full_adder(a: int, b: int, cin: int) -> dict:
 
 
 def add_4bit(A: str, B: str, cin: int = 0) -> dict:
-    """Ripple-carry 4-bit adder. Returns 4-bit sum string + final carry-out."""
+    """Ripple-carry 4-bit adder. Returns 4-bit sum string + final carry-out and stage trace."""
     if len(A) != 4 or any(b not in "01" for b in A):
         raise ArithmeticError_(f"A must be a 4-bit string, got '{A}'")
     if len(B) != 4 or any(b not in "01" for b in B):
         raise ArithmeticError_(f"B must be a 4-bit string, got '{B}'")
 
-    a_bits = [int(x) for x in A][::-1]  # LSB first for the ripple chain
+    a_bits = [int(x) for x in A][::-1]  # LSB first (bit 0 to bit 3)
     b_bits = [int(x) for x in B][::-1]
 
     sum_bits = []
+    stages = []
     carry = cin
-    for a_bit, b_bit in zip(a_bits, b_bits):
+    for i, (a_bit, b_bit) in enumerate(zip(a_bits, b_bits)):
+        cin_stage = carry
         result = full_adder(a_bit, b_bit, carry)
         sum_bits.append(result["sum"])
         carry = result["carry"]
+        stages.append({
+            "stage": i,
+            "a": a_bit,
+            "b": b_bit,
+            "cin": cin_stage,
+            "sum": result["sum"],
+            "cout": carry
+        })
 
     sum_bits.reverse()  # back to MSB-first
-    return {"sum": "".join(str(b) for b in sum_bits), "carry_out": carry}
+    return {
+        "sum": "".join(str(b) for b in sum_bits),
+        "carry_out": carry,
+        "stages": stages
+    }
 
 
-def add_subtract_4bit(A: str, B: str, mode: int) -> dict:
+def add_subtract_4bit(A: str, B: str, mode: int, cin: int | None = None) -> dict:
     """mode=0: A+B (addition). mode=1: A-B (subtraction via 2's complement).
 
     The trick: XOR every bit of B with `mode`. mode=0 -> B unchanged.
@@ -55,10 +69,30 @@ def add_subtract_4bit(A: str, B: str, mode: int) -> dict:
     if mode not in (0, 1):
         raise ArithmeticError_(f"mode must be 0 (add) or 1 (subtract), got {mode}")
 
+    effective_cin = mode if cin is None else cin
+
     b_bits = [int(x) for x in B]
     b_used = "".join(str(bit ^ mode) for bit in b_bits)
 
-    result = add_4bit(A, b_used, cin=mode)
+    result = add_4bit(A, b_used, cin=effective_cin)
+
+    # Attach original B bits to stage trace for UI clarity
+    b_orig_reversed = b_bits[::-1]
+    for i, stage in enumerate(result["stages"]):
+        stage["b_orig"] = b_orig_reversed[i]
+        stage["mode"] = mode
+
+    a_dec = int(A, 2)
+    b_dec = int(B, 2)
+    operation = "ADD" if mode == 0 else "SUBTRACT"
+
+    result["a"] = A
+    result["b"] = B
+    result["mode"] = mode
+    result["operation"] = operation
+    result["a_decimal"] = a_dec
+    result["b_decimal"] = b_dec
+    result["result_decimal"] = (a_dec + b_dec + (effective_cin if mode == 0 else 0)) if mode == 0 else (a_dec - b_dec)
 
     if mode == 1:
         # for subtraction, the adder's carry-out is the NOT-borrow flag:
@@ -67,6 +101,7 @@ def add_subtract_4bit(A: str, B: str, mode: int) -> dict:
         del result["carry_out"]
 
     return result
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BCD to/from Gray Code Converter | Digital Electronics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="index.html#converter">← Back to Reference Index</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="intro">
+      <p class="label">CODE CONVERSION</p>
+      <h1>BCD to/from Gray Code</h1>
+      <p class="intro-text">
+        Detailed analysis of bidirectional conversion between 8421 Binary Coded Decimal (BCD) 
+        and Gray code using truth tables, Karnaugh maps (K-maps), and logic gate circuits.
+      </p>
+    </section>
+
+    <!-- Section 1: BCD to Gray Conversion -->
+    <section class="topic-section" id="bcd-to-gray">
+      <div class="section-title">
+        <span class="section-number">01</span>
+        <div>
+          <p class="label">FORWARD CONVERSION</p>
+          <h2>BCD to Gray Code Converter</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Conversion Principle & Truth Table</h3>
+          <p>
+            BCD code represents decimal digits (0–9) using 4 bits (B₃B₂B₁B₀). States 1010 to 1111 (10 to 15) 
+            are invalid in BCD and treated as <strong>Don't Care conditions (X)</strong> during K-map simplification.
+          </p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Decimal</th>
+                <th colspan="4">BCD Inputs</th>
+                <th colspan="4">Gray Code Outputs</th>
+              </tr>
+              <tr>
+                <th>B₃</th><th>B₂</th><th>B₁</th><th>B₀</th>
+                <th>G₃</th><th>G₂</th><th>G₁</th><th>G₀</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+              <tr><td>2</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+              <tr><td>3</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+              <tr><td>4</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+              <tr><td>5</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>6</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+              <tr><td>7</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+              <tr><td>8</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+              <tr><td>9</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+              <tr><td>10–15</td><td colspan="4">Invalid BCD States (1010 to 1111)</td><td colspan="4">Don't Care (X X X X)</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Simplified Logic Expressions</h3>
+          <p>Minimizing minterms with Don't Care states (10–15) via K-maps yields:</p>
+          <ul class="subtopic-list">
+            <li><strong>G₃</strong> = B₃</li>
+            <li><strong>G₂</strong> = B₃ + B₂</li>
+            <li><strong>G₁</strong> = B₂ ⊕ B₁</li>
+            <li><strong>G₀</strong> = B₁ ⊕ B₀</li>
+          </ul>
+        </div>
+
+        <aside class="reference-area">
+          <h3>References</h3>
+          <a href="https://www.geeksforgeeks.org/bcd-to-gray-code-converter/" target="_blank" rel="noopener noreferrer" class="reference-link">
+            BCD to Gray Converter on GeeksforGeeks <span>↗</span>
+          </a>
+          <a href="binary-to-from-gray.html" class="reference-link">Binary to/from Gray Page <span>↗</span></a>
+          <a href="bcd-to-from-excess3.html" class="reference-link">BCD to/from Excess-3 Page <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Section 2: Gray to BCD Conversion -->
+    <section class="topic-section" id="gray-to-bcd">
+      <div class="section-title">
+        <span class="section-number">02</span>
+        <div>
+          <p class="label">REVERSE CONVERSION</p>
+          <h2>Gray Code to BCD Converter</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Conversion Logic</h3>
+          <p>
+            Reverse conversion takes 4-bit Gray code inputs (G₃G₂G₁G₀) and converts them back to valid 
+            BCD outputs (B₃B₂B₁B₀). 
+          </p>
+
+          <h3>Simplified Expressions</h3>
+          <ul class="subtopic-list">
+            <li><strong>B₃</strong> = G₃</li>
+            <li><strong>B₂</strong> = G₃ ⊕ G₂</li>
+            <li><strong>B₁</strong> = G₃ ⊕ G₂ ⊕ G₁ = B₂ ⊕ G₁</li>
+            <li><strong>B₀</strong> = G₃ ⊕ G₂ ⊕ G₁ ⊕ G₀ = B₁ ⊕ G₀</li>
+          </ul>
+
+          <div class="topic-card">
+            <strong>Hardware Design Note</strong>
+            <span>
+              The circuit is constructed using standard XOR gates for bits 0, 1, and 2, and an OR gate for bit 2 
+              in forward conversion due to don't-care optimization.
+            </span>
+          </div>
+        </div>
+
+        <aside class="reference-area">
+          <h3>External Links</h3>
+          <a href="https://www.geeksforgeeks.org/code-converters-digital-logic/" target="_blank" rel="noopener noreferrer" class="reference-link">
+            Digital Code Converters (GFG) <span>↗</span>
+          </a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Study Reference Page</p>
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>

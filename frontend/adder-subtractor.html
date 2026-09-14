@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4-Bit Adder & Subtractor (IC 74LS83) | Digital Simulation Suite</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .simulator-card {
+      background: #ffffff;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .mode-toggle-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line, #e2e8f0);
+      padding-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      padding: 9px 18px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn:hover {
+      background: #f1f5f9;
+      color: var(--navy, #14233b);
+    }
+
+    .mode-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .input-section {
+      margin-bottom: 20px;
+    }
+
+    .input-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .input-row-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-decimal-pill {
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .bit-toggles {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .bit-btn {
+      flex: 1;
+      height: 52px;
+      font-family: "DM Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      border: 2px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #14233b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bit-btn span:last-child {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .bit-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .bit-btn.active span:last-child {
+      color: #e2e8f0;
+    }
+
+    .cin-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+    }
+
+    .cin-btn {
+      width: 44px;
+      height: 38px;
+      font-family: "DM Mono", monospace;
+      font-size: 16px;
+      font-weight: 700;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #14233b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cin-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .compute-btn {
+      width: 100%;
+      background: var(--navy, #14233b);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-family: "DM Mono", monospace;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .compute-btn:hover {
+      background: #1e3a66;
+    }
+
+    .result-box {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 6px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .result-box.error {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .result-header {
+      font-size: 11px;
+      font-family: "DM Mono", monospace;
+      color: #64748b;
+      letter-spacing: 1px;
+    }
+
+    .result-value {
+      font-family: "DM Mono", monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: #14233b;
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+
+    .result-meta {
+      font-size: 13px;
+      color: #334155;
+      margin-top: 8px;
+      font-family: "DM Mono", monospace;
+    }
+
+    .flags-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .flag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-family: "DM Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .flag-pill.active {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #93c5fd;
+    }
+
+    .stages-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .stages-table th, .stages-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+    }
+
+    .stages-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .stages-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .domain-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      font-family: "DM Mono", monospace;
+      font-size: 12px;
+      border-radius: 4px;
+      background: #eef2f8;
+      color: #2c6ee8;
+      margin-bottom: 14px;
+    }
+
+    .reset-link {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-family: "DM Mono", monospace;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .reset-link:hover {
+      color: #14233b;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html#adder">← Back to Adder Section</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="intro">
+    <p class="label">ARITHMETIC LOGIC UNIT</p>
+    <h1>4-Bit Binary Adder / Subtractor</h1>
+    <p class="intro-text">
+      Simulate 4-bit binary addition and 2's complement subtraction using cascaded Full Adders (IC 74LS83).
+      Observe ripple-carry propagation and XOR-gate controlled mode inversion in real time.
+    </p>
+
+    <!-- SIMULATOR SECTION -->
+    <section class="simulator-card">
+      <div class="mode-toggle-group">
+        <button class="mode-btn active" id="btnModeAdd" onclick="setMode(0)">4-Bit Addition (A + B)</button>
+        <button class="mode-btn" id="btnModeSub" onclick="setMode(1)">4-Bit Subtraction (A - B via 2's Complement)</button>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+        <h3 id="simSubtitle" style="margin: 0;">Interactive 4-Bit Arithmetic</h3>
+        <button class="reset-link" onclick="resetInputs()">Reset Inputs (0000)</button>
+      </div>
+
+      <div class="domain-badge" id="modeDescription">
+        Mode M = 0: Addition (A + B + Cin). Input B bits enter unchanged.
+      </div>
+
+      <!-- Word A Input -->
+      <div class="input-section">
+        <div class="input-row-header">
+          <span class="input-row-title">Input Word A (4 bits)</span>
+          <span class="input-decimal-pill" id="aDecDisplay">Decimal: 0</span>
+        </div>
+        <div class="bit-toggles">
+          <button class="bit-btn" id="a3" onclick="toggleBit('a3')">
+            <span id="a3-val">0</span>
+            <span>A3 (MSB)</span>
+          </button>
+          <button class="bit-btn" id="a2" onclick="toggleBit('a2')">
+            <span id="a2-val">0</span>
+            <span>A2</span>
+          </button>
+          <button class="bit-btn" id="a1" onclick="toggleBit('a1')">
+            <span id="a1-val">0</span>
+            <span>A1</span>
+          </button>
+          <button class="bit-btn" id="a0" onclick="toggleBit('a0')">
+            <span id="a0-val">0</span>
+            <span>A0 (LSB)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Word B Input -->
+      <div class="input-section">
+        <div class="input-row-header">
+          <span class="input-row-title" id="bRowTitle">Input Word B (4 bits)</span>
+          <span class="input-decimal-pill" id="bDecDisplay">Decimal: 0</span>
+        </div>
+        <div class="bit-toggles">
+          <button class="bit-btn" id="b3" onclick="toggleBit('b3')">
+            <span id="b3-val">0</span>
+            <span>B3 (MSB)</span>
+          </button>
+          <button class="bit-btn" id="b2" onclick="toggleBit('b2')">
+            <span id="b2-val">0</span>
+            <span>B2</span>
+          </button>
+          <button class="bit-btn" id="b1" onclick="toggleBit('b1')">
+            <span id="b1-val">0</span>
+            <span>B1</span>
+          </button>
+          <button class="bit-btn" id="b0" onclick="toggleBit('b0')">
+            <span id="b0-val">0</span>
+            <span>B0 (LSB)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Carry-In Section -->
+      <div class="cin-toggle-wrap" id="cinWrap">
+        <button class="cin-btn" id="cinBtn" onclick="toggleCin()">0</button>
+        <div>
+          <strong style="font-size: 13px; color: #1e293b;" id="cinLabel">Carry-In (Cin / C0)</strong>
+          <div style="font-size: 11px; color: #64748b;" id="cinSubtext">
+            Toggle initial carry-in for Stage 0 addition. In subtraction, Cin is locked to Mode M = 1 (+1 for 2's complement).
+          </div>
+        </div>
+      </div>
+
+      <button class="compute-btn" id="computeBtn" onclick="computeArithmetic()">Execute Operation</button>
+
+      <!-- Result Display -->
+      <div class="result-box" id="resultBox">
+        <div class="result-header" id="resultTitle">Sum Output (S3 S2 S1 S0)</div>
+        <div class="result-value" id="resultSum">0000</div>
+        
+        <div class="flags-bar" id="flagsBar">
+          <span class="flag-pill" id="coutFlag">Carry-Out (Cout): 0</span>
+          <span class="flag-pill" id="borrowFlag" style="display: none;">Borrow: 0</span>
+        </div>
+
+        <div class="result-meta" id="resultEquation">Equation: 0 + 0 = 0</div>
+        <div class="result-meta" id="backendSource" style="color: #64748b; font-size: 11px; margin-top: 4px;"></div>
+      </div>
+
+      <!-- Stage-by-Stage Ripple Carry Chain -->
+      <div style="margin-top: 32px;" id="stagesSection">
+        <h4 style="margin: 0 0 12px; font-size: 14px;">Full Adder Ripple-Carry Stages (LSB to MSB)</h4>
+        <table class="stages-table">
+          <thead>
+            <tr>
+              <th>Stage (Bit)</th>
+              <th>Ai</th>
+              <th id="thBi">Bi</th>
+              <th>Effective Bi (Bi ⊕ M)</th>
+              <th>Cin</th>
+              <th>Sum (Si)</th>
+              <th>Cout</th>
+            </tr>
+          </thead>
+          <tbody id="stagesTableBody">
+            <tr><td colspan="7" style="color: #94a3b8;">Click "Execute Operation" to compute ripple stages.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- THEORY & REFERENCE SECTION -->
+    <section class="topic-section" style="margin-top: 48px;">
+      <div class="section-title">
+        <span class="section-number">04</span>
+        <div>
+          <p class="label">THEORY & IMPLEMENTATION</p>
+          <h2>Adder / Subtractor Architecture (IC 74LS83)</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>The 2's Complement Hardware Sharing Trick</h3>
+          <p style="font-size: 14px; line-height: 1.7; color: #475569;">
+            In computer arithmetic, subtraction is executed using the exact same adder hardware by leveraging 
+            two's complement:
+          </p>
+          <div style="background: #f1f5f9; padding: 12px 18px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 13px; margin: 12px 0;">
+            A - B = A + (2's complement of B) = A + (B' + 1)
+          </div>
+          <p style="font-size: 14px; line-height: 1.7; color: #475569;">
+            By feeding the mode bit <strong>M</strong> into an XOR gate with each bit of <strong>B</strong>, and also connecting <strong>M</strong> directly to the initial carry-in <strong>C<sub>in</sub></strong>:
+          </p>
+          <ul style="font-size: 14px; line-height: 1.8; color: #475569;">
+            <li><strong>When M = 0 (Addition):</strong> B ⊕ 0 = B (bits unchanged), and C<sub>in</sub> = 0. Output is A + B.</li>
+            <li><strong>When M = 1 (Subtraction):</strong> B ⊕ 1 = B' (bitwise NOT / 1's complement), and C<sub>in</sub> = 1 (+1). Output is A + B' + 1 = A - B.</li>
+          </ul>
+
+          <h3 style="margin-top: 24px;">Full Adder Boolean Equations</h3>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 13px;">
+            Sum (S<sub>i</sub>) = A<sub>i</sub> ⊕ B<sub>i</sub> ⊕ C<sub>in</sub><br>
+            Carry-Out (C<sub>out</sub>) = (A<sub>i</sub> · B<sub>i</sub>) + (C<sub>in</sub> · (A<sub>i</sub> ⊕ B<sub>i</sub>))
+          </div>
+        </div>
+
+        <aside class="reference-area">
+          <h3>IC 74LS83 Features</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #64748b;">
+            • 4-Bit Binary Full Adder with Fast Lookahead Carry generation.<br>
+            • Cascading: Connect C4 (Cout) of low-order stage into C0 (Cin) of high-order stage for 8-bit or 16-bit operations.<br>
+            • Subtraction Carry/Borrow rule: Cout = 1 indicates positive result (no borrow needed), while Cout = 0 indicates a borrow occurred (result is negative in 2's complement).
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Logic Simulation Suite</p>
+  </footer>
+
+  <script src="converter-engine.js"></script>
+  <script>
+    let currentMode = 0; // 0 = Add, 1 = Subtract
+    let cinValue = 0;
+
+    function setMode(mode) {
+      currentMode = mode;
+      const btnAdd = document.getElementById("btnModeAdd");
+      const btnSub = document.getElementById("btnModeSub");
+      const modeDesc = document.getElementById("modeDescription");
+      const resultTitle = document.getElementById("resultTitle");
+      const cinBtn = document.getElementById("cinBtn");
+      const cinSubtext = document.getElementById("cinSubtext");
+      const coutFlag = document.getElementById("coutFlag");
+      const borrowFlag = document.getElementById("borrowFlag");
+
+      if (mode === 0) {
+        btnAdd.classList.add("active");
+        btnSub.classList.remove("active");
+        modeDesc.textContent = "Mode M = 0: Addition (A + B + Cin). Input B bits enter unchanged.";
+        resultTitle.textContent = "Sum Output (S3 S2 S1 S0)";
+        cinBtn.disabled = false;
+        cinBtn.style.opacity = "1";
+        cinSubtext.textContent = "Toggle initial carry-in for Stage 0 addition.";
+        coutFlag.style.display = "inline-flex";
+        borrowFlag.style.display = "none";
+      } else {
+        btnSub.classList.add("active");
+        btnAdd.classList.remove("active");
+        modeDesc.textContent = "Mode M = 1: Subtraction (A - B). Input B bits inverted via XOR; Cin locked to 1.";
+        resultTitle.textContent = "Difference Output (D3 D2 D1 D0)";
+        cinValue = 1;
+        cinBtn.textContent = "1";
+        cinBtn.classList.add("active");
+        cinBtn.disabled = true;
+        cinBtn.style.opacity = "0.7";
+        cinSubtext.textContent = "Locked to 1 in subtraction (provides the +1 for 2's complement).";
+        coutFlag.style.display = "none";
+        borrowFlag.style.display = "inline-flex";
+      }
+
+      computeArithmetic();
+    }
+
+    function toggleBit(id) {
+      const btn = document.getElementById(id);
+      const valSpan = document.getElementById(id + "-val");
+      btn.classList.toggle("active");
+      const isActive = btn.classList.contains("active");
+      valSpan.textContent = isActive ? "1" : "0";
+      updateDecimalPills();
+      computeArithmetic();
+    }
+
+    function toggleCin() {
+      if (currentMode === 1) return; // locked in subtraction
+      const cinBtn = document.getElementById("cinBtn");
+      cinValue = cinValue === 0 ? 1 : 0;
+      cinBtn.textContent = cinValue;
+      if (cinValue === 1) cinBtn.classList.add("active");
+      else cinBtn.classList.remove("active");
+      computeArithmetic();
+    }
+
+    function resetInputs() {
+      ["a3", "a2", "a1", "a0", "b3", "b2", "b1", "b0"].forEach(id => {
+        const btn = document.getElementById(id);
+        const valSpan = document.getElementById(id + "-val");
+        btn.classList.remove("active");
+        valSpan.textContent = "0";
+      });
+      if (currentMode === 0) {
+        cinValue = 0;
+        const cinBtn = document.getElementById("cinBtn");
+        cinBtn.textContent = "0";
+        cinBtn.classList.remove("active");
+      }
+      updateDecimalPills();
+      computeArithmetic();
+    }
+
+    function getBits(prefix) {
+      return (
+        document.getElementById(prefix + "3-val").textContent +
+        document.getElementById(prefix + "2-val").textContent +
+        document.getElementById(prefix + "1-val").textContent +
+        document.getElementById(prefix + "0-val").textContent
+      );
+    }
+
+    function updateDecimalPills() {
+      const aBits = getBits("a");
+      const bBits = getBits("b");
+      document.getElementById("aDecDisplay").textContent = `Decimal: ${parseInt(aBits, 2)}`;
+      document.getElementById("bDecDisplay").textContent = `Decimal: ${parseInt(bBits, 2)}`;
+    }
+
+    async function computeArithmetic() {
+      const a = getBits("a");
+      const b = getBits("b");
+      const effectiveCin = currentMode === 1 ? 1 : cinValue;
+
+      const resultSum = document.getElementById("resultSum");
+      const resultBox = document.getElementById("resultBox");
+      const coutFlag = document.getElementById("coutFlag");
+      const borrowFlag = document.getElementById("borrowFlag");
+      const resultEq = document.getElementById("resultEquation");
+      const backendSource = document.getElementById("backendSource");
+      const stagesTableBody = document.getElementById("stagesTableBody");
+
+      try {
+        const response = await universalAddSubtract(a, b, currentMode, effectiveCin);
+
+        if (!response.ok) {
+          resultBox.classList.add("error");
+          resultSum.textContent = "Error";
+          resultEq.textContent = response.data.detail || "Operation failed.";
+          return;
+        }
+
+        resultBox.classList.remove("error");
+        const data = response.data;
+        resultSum.textContent = data.sum;
+        backendSource.textContent = `Source: ${response.source}`;
+
+        const aDec = parseInt(a, 2);
+        const bDec = parseInt(b, 2);
+
+        if (currentMode === 0) {
+          coutFlag.textContent = `Carry-Out (Cout): ${data.carry_out}`;
+          if (data.carry_out === 1) coutFlag.classList.add("active");
+          else coutFlag.classList.remove("active");
+
+          const total = aDec + bDec + effectiveCin;
+          resultEq.textContent = `Calculation: ${aDec} + ${bDec}${effectiveCin ? " + 1 (Cin)" : ""} = ${total} (Decimal) | 4-bit Sum: ${parseInt(data.sum, 2)}`;
+        } else {
+          borrowFlag.textContent = `Borrow: ${data.borrow}`;
+          if (data.borrow === 1) borrowFlag.classList.add("active");
+          else borrowFlag.classList.remove("active");
+
+          const diff = aDec - bDec;
+          resultEq.textContent = `Calculation: ${aDec} - ${bDec} = ${diff} (Decimal) | 2's Complement Sum: ${data.sum}${diff < 0 ? " (Negative)" : ""}`;
+        }
+
+        // Render ripple-carry stages
+        if (data.stages && Array.isArray(data.stages)) {
+          stagesTableBody.innerHTML = "";
+          data.stages.forEach(st => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td><strong>Stage ${st.stage} (Bit ${st.stage})</strong></td>
+              <td>${st.a}</td>
+              <td>${st.b_orig !== undefined ? st.b_orig : st.b}</td>
+              <td>${st.b}</td>
+              <td>${st.cin}</td>
+              <td><strong style="color: #2c6ee8;">${st.sum}</strong></td>
+              <td><strong style="color: ${st.cout ? '#16a34a' : '#64748b'};">${st.cout}</strong></td>
+            `;
+            stagesTableBody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        resultBox.classList.add("error");
+        resultSum.textContent = "Error";
+        resultEq.textContent = err.message;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateDecimalPills();
+      computeArithmetic();
+    });
+  </script>
+</body>
+</html>

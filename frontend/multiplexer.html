@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiplexer Simulator (IC 74LS153) | Digital Simulation Suite</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .simulator-card {
+      background: #ffffff;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .mode-toggle-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line, #e2e8f0);
+      padding-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn:hover {
+      background: #f1f5f9;
+      color: var(--navy, #14233b);
+    }
+
+    .mode-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .select-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .select-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .bit-toggles {
+      display: flex;
+      gap: 12px;
+    }
+
+    .bit-btn {
+      flex: 1;
+      height: 52px;
+      font-family: "DM Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      border: 2px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #ffffff;
+      color: #14233b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bit-btn span:last-child {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .bit-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .bit-btn.active span:last-child {
+      color: #e2e8f0;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .data-btn {
+      height: 56px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "DM Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .data-btn span:last-child {
+      font-size: 10px;
+      font-weight: 400;
+      color: #64748b;
+    }
+
+    .data-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    .data-btn.active span:last-child {
+      color: #cbd5e1;
+    }
+
+    .data-btn.selected-channel {
+      border: 2px solid #2563eb !important;
+      outline: 2px solid #93c5fd;
+      background: #eff6ff;
+    }
+
+    .data-btn.selected-channel.active {
+      background: #2563eb;
+      color: white;
+      border-color: #1d4ed8 !important;
+    }
+
+    .strobe-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: #f1f5f9;
+      padding: 10px 16px;
+      border-radius: 6px;
+    }
+
+    .strobe-btn {
+      width: 44px;
+      height: 36px;
+      font-family: "DM Mono", monospace;
+      font-size: 15px;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .strobe-btn.active {
+      background: #ef4444;
+      color: white;
+      border-color: #dc2626;
+    }
+
+    .compute-btn {
+      width: 100%;
+      background: var(--navy, #14233b);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-family: "DM Mono", monospace;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .compute-btn:hover {
+      background: #1e3a66;
+    }
+
+    .result-box {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .result-header {
+      font-size: 11px;
+      font-family: "DM Mono", monospace;
+      color: #64748b;
+      letter-spacing: 1px;
+    }
+
+    .result-value {
+      font-family: "DM Mono", monospace;
+      font-size: 36px;
+      font-weight: 800;
+      color: #14233b;
+      margin-top: 4px;
+    }
+
+    .result-meta {
+      font-size: 13px;
+      color: #334155;
+      margin-top: 8px;
+      font-family: "DM Mono", monospace;
+    }
+
+    .section-breakdown-card {
+      margin-top: 24px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 16px;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .breakdown-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .breakdown-box.active-section {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .reset-link {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-family: "DM Mono", monospace;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .reset-link:hover {
+      color: #14233b;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html#multiplexer">← Back to Multiplexer Section</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="intro">
+    <p class="label">DATA SELECTOR</p>
+    <h1>Multiplexer Simulator (IC 74LS153)</h1>
+    <p class="intro-text">
+      Simulate 8:1, 4:1, and 2:1 Multiplexers. Inspect how an 8:1 MUX is constructed by cascading 
+      two 4:1 MUX sections of IC 74LS153 with shared select lines and enable gating.
+    </p>
+
+    <!-- SIMULATOR SECTION -->
+    <section class="simulator-card">
+      <div class="mode-toggle-group">
+        <button class="mode-btn active" id="btnMux8" onclick="setMuxSize('8:1')">8 : 1 MUX (IC 74LS153 Dual Composite)</button>
+        <button class="mode-btn" id="btnMux4" onclick="setMuxSize('4:1')">4 : 1 MUX (Single 74LS153 Section)</button>
+        <button class="mode-btn" id="btnMux2" onclick="setMuxSize('2:1')">2 : 1 MUX (Basic 1-Select Block)</button>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+        <h3 id="simSubtitle" style="margin: 0;">8:1 Multiplexer Configuration</h3>
+        <button class="reset-link" onclick="resetInputs()">Reset All Inputs</button>
+      </div>
+
+      <!-- Active-low Strobe / Enable toggle -->
+      <div class="strobe-bar">
+        <button class="strobe-btn" id="strobeBtn" onclick="toggleStrobe()">0</button>
+        <div>
+          <strong style="font-size: 13px; color: #1e293b;">Active-Low Strobe / Enable (<span style="text-decoration: overline;">G</span>)</strong>
+          <div style="font-size: 11px; color: #64748b;">
+            When <span style="text-decoration: overline;">G</span> = 0: MUX is enabled. When <span style="text-decoration: overline;">G</span> = 1: Output is forced LOW (0).
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Lines Inputs -->
+      <div class="select-section">
+        <div class="select-header">
+          <span style="font-size: 13px; font-weight: 700; color: #334155;">Select Lines (Address Lines)</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 11px; background: #e2e8f0; padding: 2px 8px; border-radius: 4px;" id="selectedChannelPill">
+            Routes: D0
+          </span>
+        </div>
+        <div class="bit-toggles" id="selectBitToggles">
+          <button class="bit-btn" id="sel_s2" onclick="toggleSelectBit('s2')">
+            <span id="sel_s2_val">0</span>
+            <span>S2 (MSB)</span>
+          </button>
+          <button class="bit-btn" id="sel_s1" onclick="toggleSelectBit('s1')">
+            <span id="sel_s1_val">0</span>
+            <span>S1</span>
+          </button>
+          <button class="bit-btn" id="sel_s0" onclick="toggleSelectBit('s0')">
+            <span id="sel_s0_val">0</span>
+            <span>S0 (LSB)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Inputs -->
+      <div>
+        <div style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px;">
+          Data Inputs (D0 to D7)
+        </div>
+        <div class="data-grid" id="dataInputGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <button class="compute-btn" id="computeBtn" onclick="computeMux()">Route Data</button>
+
+      <!-- Output Result Box -->
+      <div class="result-box" id="resultBox">
+        <div class="result-header">MULTIPLEXER OUTPUT (Y)</div>
+        <div class="result-value" id="resultOut">0</div>
+        <div class="result-meta" id="resultMeta">Active Channel: D0 (Data = 0)</div>
+        <div class="result-meta" id="backendSource" style="color: #64748b; font-size: 11px; margin-top: 4px;"></div>
+      </div>
+
+      <!-- IC 74LS153 Internal Dual Section Breakdown (Visible for 8:1) -->
+      <div class="section-breakdown-card" id="dualSectionBreakdown">
+        <h4 style="margin: 0; font-size: 14px;">IC 74LS153 Dual Section Breakdown</h4>
+        <div class="breakdown-grid">
+          <div class="breakdown-box active-section" id="boxSec1">
+            <strong style="font-size: 12px; color: #1e293b;">Section 1 (D0–D3)</strong>
+            <div style="font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 700; margin-top: 4px;" id="valSec1">1Y = 0</div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px;" id="gateSec1">Enabled (S2' = 1)</div>
+          </div>
+          <div class="breakdown-box" id="boxSec2">
+            <strong style="font-size: 12px; color: #1e293b;">Section 2 (D4–D7)</strong>
+            <div style="font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 700; margin-top: 4px;" id="valSec2">2Y = 0</div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px;" id="gateSec2">Disabled (S2 = 0)</div>
+          </div>
+        </div>
+        <div style="font-size: 12px; color: #64748b; text-align: center; margin-top: 10px; font-family: 'DM Mono', monospace;">
+          Y = (1Y · S2') + (2Y · S2)
+        </div>
+      </div>
+    </section>
+
+    <!-- THEORY & REFERENCE SECTION -->
+    <section class="topic-section" style="margin-top: 48px;">
+      <div class="section-title">
+        <span class="section-number">02</span>
+        <div>
+          <p class="label">THEORY & CIRCUIT DESIGN</p>
+          <h2>Multiplexer Architecture (IC 74LS153)</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>The 8:1 MUX from IC 74LS153 (Dual 4:1)</h3>
+          <p style="font-size: 14px; line-height: 1.7; color: #475569;">
+            The IC 74LS153 contains two independent 4:1 multiplexers that share common select lines (A and B), 
+            each having its own active-low strobe pin (\(\bar{1G}\) and \(\bar{2G}\)).
+          </p>
+          <p style="font-size: 14px; line-height: 1.7; color: #475569;">
+            To form an 8:1 multiplexer without extra control logic:
+          </p>
+          <ul style="font-size: 14px; line-height: 1.8; color: #475569;">
+            <li>Inputs <strong>D0–D3</strong> connect to Section 1 (\(1C0–1C3\)).</li>
+            <li>Inputs <strong>D4–D7</strong> connect to Section 2 (\(2C0–2C3\)).</li>
+            <li>Select lines <strong>S1, S0</strong> connect to the shared select inputs.</li>
+            <li><strong>S2</strong> drives the section enable pins: Section 1 is enabled when \(S_2 = 0\), and Section 2 is enabled when \(S_2 = 1\).</li>
+            <li>The outputs are combined with an OR gate: \(Y = 1Y + 2Y\).</li>
+          </ul>
+
+          <h3 style="margin-top: 24px;">Boolean Expression for 8:1 MUX</h3>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.8;">
+            Y = S2'S1'S0'·D0 + S2'S1'S0·D1 + S2'S1S0'·D2 + S2'S1S0·D3 +<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;S2·S1'S0'·D4 + S2·S1'S0·D5 + S2·S1S0'·D6 + S2·S1S0·D7
+          </div>
+        </div>
+
+        <aside class="reference-area">
+          <h3>Select Line Rule</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #64748b;">
+            For any \(n\)-input multiplexer, the number of select lines \(m\) required is:
+          </p>
+          <div style="background: #eef2f8; padding: 10px 14px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 13px; color: #2c6ee8; margin-top: 8px;">
+            m = log₂(n)<br>
+            • 2 : 1 MUX → 1 select line<br>
+            • 4 : 1 MUX → 2 select lines<br>
+            • 8 : 1 MUX → 3 select lines<br>
+            • 16: 1 MUX → 4 select lines
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Logic Simulation Suite</p>
+  </footer>
+
+  <script src="converter-engine.js"></script>
+  <script>
+    let currentMuxSize = "8:1";
+    let strobeState = 0; // 0 = enabled, 1 = disabled
+    let selectBits = { s2: 0, s1: 0, s0: 0 };
+    let dataInputs = [0, 0, 0, 0, 0, 0, 0, 0];
+
+    function setMuxSize(size) {
+      currentMuxSize = size;
+      ["8:1", "4:1", "2:1"].forEach(s => {
+        const id = "btnMux" + s.split(":")[0];
+        const btn = document.getElementById(id);
+        if (s === size) btn.classList.add("active");
+        else btn.classList.remove("active");
+      });
+
+      document.getElementById("simSubtitle").textContent = `${size} Multiplexer Configuration`;
+      renderSelectInputs();
+      renderDataInputs();
+      computeMux();
+    }
+
+    function renderSelectInputs() {
+      const wrap = document.getElementById("selectBitToggles");
+      wrap.innerHTML = "";
+
+      if (currentMuxSize === "8:1") {
+        wrap.innerHTML = `
+          <button class="bit-btn ${selectBits.s2 ? 'active' : ''}" id="sel_s2" onclick="toggleSelectBit('s2')">
+            <span id="sel_s2_val">${selectBits.s2}</span>
+            <span>S2 (MSB)</span>
+          </button>
+          <button class="bit-btn ${selectBits.s1 ? 'active' : ''}" id="sel_s1" onclick="toggleSelectBit('s1')">
+            <span id="sel_s1_val">${selectBits.s1}</span>
+            <span>S1</span>
+          </button>
+          <button class="bit-btn ${selectBits.s0 ? 'active' : ''}" id="sel_s0" onclick="toggleSelectBit('s0')">
+            <span id="sel_s0_val">${selectBits.s0}</span>
+            <span>S0 (LSB)</span>
+          </button>
+        `;
+        document.getElementById("dualSectionBreakdown").style.display = "block";
+      } else if (currentMuxSize === "4:1") {
+        wrap.innerHTML = `
+          <button class="bit-btn ${selectBits.s1 ? 'active' : ''}" id="sel_s1" onclick="toggleSelectBit('s1')">
+            <span id="sel_s1_val">${selectBits.s1}</span>
+            <span>S1 (MSB)</span>
+          </button>
+          <button class="bit-btn ${selectBits.s0 ? 'active' : ''}" id="sel_s0" onclick="toggleSelectBit('s0')">
+            <span id="sel_s0_val">${selectBits.s0}</span>
+            <span>S0 (LSB)</span>
+          </button>
+        `;
+        document.getElementById("dualSectionBreakdown").style.display = "none";
+      } else {
+        wrap.innerHTML = `
+          <button class="bit-btn ${selectBits.s0 ? 'active' : ''}" id="sel_s0" onclick="toggleSelectBit('s0')">
+            <span id="sel_s0_val">${selectBits.s0}</span>
+            <span>S0</span>
+          </button>
+        `;
+        document.getElementById("dualSectionBreakdown").style.display = "none";
+      }
+    }
+
+    function renderDataInputs() {
+      const grid = document.getElementById("dataInputGrid");
+      grid.innerHTML = "";
+      const count = currentMuxSize === "8:1" ? 8 : (currentMuxSize === "4:1" ? 4 : 2);
+      const selIdx = getSelectIndex();
+
+      for (let i = 0; i < count; i++) {
+        const isSelected = i === selIdx;
+        const isActive = dataInputs[i] === 1;
+        const btn = document.createElement("button");
+        btn.className = `data-btn ${isActive ? 'active' : ''} ${isSelected ? 'selected-channel' : ''}`;
+        btn.id = `data_btn_${i}`;
+        btn.onclick = () => toggleDataBit(i);
+        btn.innerHTML = `
+          <span id="data_val_${i}">${dataInputs[i]}</span>
+          <span>D${i}</span>
+        `;
+        grid.appendChild(btn);
+      }
+      document.getElementById("selectedChannelPill").textContent = `Routes: D${selIdx}`;
+    }
+
+    function getSelectIndex() {
+      if (currentMuxSize === "8:1") {
+        return (selectBits.s2 << 2) | (selectBits.s1 << 1) | selectBits.s0;
+      } else if (currentMuxSize === "4:1") {
+        return (selectBits.s1 << 1) | selectBits.s0;
+      } else {
+        return selectBits.s0;
+      }
+    }
+
+    function getSelectString() {
+      if (currentMuxSize === "8:1") {
+        return `${selectBits.s2}${selectBits.s1}${selectBits.s0}`;
+      } else if (currentMuxSize === "4:1") {
+        return `${selectBits.s1}${selectBits.s0}`;
+      } else {
+        return `${selectBits.s0}`;
+      }
+    }
+
+    function toggleSelectBit(key) {
+      selectBits[key] = selectBits[key] === 1 ? 0 : 1;
+      renderSelectInputs();
+      renderDataInputs();
+      computeMux();
+    }
+
+    function toggleDataBit(index) {
+      dataInputs[index] = dataInputs[index] === 1 ? 0 : 1;
+      renderDataInputs();
+      computeMux();
+    }
+
+    function toggleStrobe() {
+      strobeState = strobeState === 0 ? 1 : 0;
+      const btn = document.getElementById("strobeBtn");
+      btn.textContent = strobeState;
+      btn.classList.toggle("active", strobeState === 1);
+      computeMux();
+    }
+
+    function resetInputs() {
+      selectBits = { s2: 0, s1: 0, s0: 0 };
+      dataInputs = [0, 0, 0, 0, 0, 0, 0, 0];
+      strobeState = 0;
+      document.getElementById("strobeBtn").textContent = "0";
+      document.getElementById("strobeBtn").classList.remove("active");
+      renderSelectInputs();
+      renderDataInputs();
+      computeMux();
+    }
+
+    async function computeMux() {
+      const selectStr = getSelectString();
+      const count = currentMuxSize === "8:1" ? 8 : (currentMuxSize === "4:1" ? 4 : 2);
+      const inputs = dataInputs.slice(0, count);
+
+      const resultOut = document.getElementById("resultOut");
+      const resultMeta = document.getElementById("resultMeta");
+      const backendSource = document.getElementById("backendSource");
+
+      try {
+        const response = await universalMux(selectStr, inputs, strobeState);
+
+        if (!response.ok) {
+          resultOut.textContent = "Err";
+          resultMeta.textContent = response.data.detail || "Error routing multiplexer.";
+          return;
+        }
+
+        const data = response.data;
+        resultOut.textContent = data.output;
+        backendSource.textContent = `Source: ${response.source}`;
+
+        const selChannel = data.selected_channel || `D${parseInt(selectStr, 2)}`;
+        const channelValue = inputs[parseInt(selectStr, 2)];
+
+        if (strobeState === 1) {
+          resultMeta.textContent = `Output forced LOW (0) by Strobe G = 1 (Disabled) | Routed ${selChannel} = ${channelValue}`;
+        } else {
+          resultMeta.textContent = `Active Channel: ${selChannel} (Data Value = ${channelValue}) → Output Y = ${data.output}`;
+        }
+
+        // If 8:1 MUX, update internal IC 74LS153 sections
+        if (currentMuxSize === "8:1" && data.details) {
+          const det = data.details;
+          document.getElementById("valSec1").textContent = `1Y = ${det.section1_out}`;
+          document.getElementById("valSec2").textContent = `2Y = ${det.section2_out}`;
+
+          const boxSec1 = document.getElementById("boxSec1");
+          const boxSec2 = document.getElementById("boxSec2");
+
+          if (det.active_section === 1) {
+            boxSec1.classList.add("active-section");
+            boxSec2.classList.remove("active-section");
+            document.getElementById("gateSec1").textContent = "Active (S2' = 1)";
+            document.getElementById("gateSec2").textContent = "Forced 0 (S2 = 0)";
+          } else {
+            boxSec2.classList.add("active-section");
+            boxSec1.classList.remove("active-section");
+            document.getElementById("gateSec1").textContent = "Forced 0 (S2' = 0)";
+            document.getElementById("gateSec2").textContent = "Active (S2 = 1)";
+          }
+        }
+      } catch (err) {
+        resultOut.textContent = "Err";
+        resultMeta.textContent = err.message;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderSelectInputs();
+      renderDataInputs();
+      computeMux();
+    });
+  </script>
+</body>
+</html>

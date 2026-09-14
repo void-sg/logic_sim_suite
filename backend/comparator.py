@@ -66,7 +66,47 @@ def compare_4bit(A: str, B: str, cascade_in: dict | None = None) -> dict:
     out_lt = own_lt | (own_eq & cascade_in["lt"])
     out_eq = own_eq & cascade_in["eq"]
 
-    return {"a_gt_b": out_gt, "a_lt_b": out_lt, "a_eq_b": out_eq}
+    a_dec = int(A, 2)
+    b_dec = int(B, 2)
+
+    # Determine decision stage
+    if a3 != b3:
+        decision_stage = "Determined at Bit 3 (MSB)"
+    elif a2 != b2:
+        decision_stage = "Determined at Bit 2"
+    elif a1 != b1:
+        decision_stage = "Determined at Bit 1"
+    elif a0 != b0:
+        decision_stage = "Determined at Bit 0 (LSB)"
+    else:
+        if cascade_in.get("gt", 0):
+            decision_stage = "Bits are equal; resolved to A > B by cascade input (IA>B)"
+        elif cascade_in.get("lt", 0):
+            decision_stage = "Bits are equal; resolved to A < B by cascade input (IA<B)"
+        else:
+            decision_stage = "All 4 bits equal (A = B)"
+
+    relation = "A > B" if out_gt else ("A < B" if out_lt else "A = B")
+
+    bit_comparisons = [
+        {"bit": 3, "a": a3, "b": b3, "eq": eq3, "gt": a3 & (1 - b3), "lt": (1 - a3) & b3},
+        {"bit": 2, "a": a2, "b": b2, "eq": eq2, "gt": a2 & (1 - b2), "lt": (1 - a2) & b2},
+        {"bit": 1, "a": a1, "b": b1, "eq": eq1, "gt": a1 & (1 - b1), "lt": (1 - a1) & b1},
+        {"bit": 0, "a": a0, "b": b0, "eq": eq0, "gt": a0 & (1 - b0), "lt": (1 - a0) & b0},
+    ]
+
+    return {
+        "a_gt_b": out_gt,
+        "a_lt_b": out_lt,
+        "a_eq_b": out_eq,
+        "a": A,
+        "b": B,
+        "a_decimal": a_dec,
+        "b_decimal": b_dec,
+        "relation": relation,
+        "decision_stage": decision_stage,
+        "bit_comparisons": bit_comparisons,
+    }
 
 
 if __name__ == "__main__":
@@ -75,14 +115,11 @@ if __name__ == "__main__":
         for b in range(16):
             A, B = format(a, "04b"), format(b, "04b")
             result = compare_4bit(A, B)
-            expected = {
-                "a_gt_b": int(a > b),
-                "a_lt_b": int(a < b),
-                "a_eq_b": int(a == b),
-            }
-            if result != expected:
+            expected = (int(a > b), int(a < b), int(a == b))
+            actual = (result["a_gt_b"], result["a_lt_b"], result["a_eq_b"])
+            if actual != expected:
                 fails += 1
-                print(f"MISMATCH A={A} B={B} got={result} expected={expected}")
+                print(f"MISMATCH A={A} B={B} got={actual} expected={expected}")
     print(f"compare_4bit: {fails} mismatches out of 256 pairs")
 
     # sanity check the 1-bit base case too

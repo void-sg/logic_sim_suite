@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Converters - BCD to/from Excess-3 Code | Study Notes</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .meta-tag {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #1e293b;
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .badge {
+      background: #eef2f8;
+      color: #2563eb;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: "DM Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+    }
+
+    .data-table th, 
+    .data-table td {
+      padding: 9px 12px;
+      text-align: center;
+      border: 1px solid #cbd5e1;
+    }
+
+    .data-table th {
+      background: #0f172a;
+      color: white;
+      font-weight: 500;
+    }
+
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    /* K-Map Layout */
+    .kmap-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+      margin-bottom: 24px;
+    }
+
+    .kmap-card {
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      text-align: center;
+    }
+
+    .kmap-wrapper {
+      display: inline-block;
+      margin: 0 auto;
+    }
+
+    .kmap-table {
+      border-collapse: collapse;
+      font-family: "DM Mono", monospace;
+      font-size: 14px;
+      text-align: center;
+      border: 2px solid #333333;
+      background: #ffffff;
+    }
+
+    .kmap-table th, 
+    .kmap-table td {
+      border: 1px solid #333333;
+      width: 45px;
+      height: 45px;
+      padding: 0;
+      position: relative;
+      vertical-align: middle;
+      font-weight: 600;
+      color: #333333;
+    }
+
+    .kmap-table th {
+      background: #ffffff;
+      color: #2e7d32;
+      font-weight: 700;
+    }
+
+    /* Diagonal Split Header Cell */
+    .kmap-diag {
+      position: relative;
+      background: linear-gradient(to top right, #ffffff 47%, #333333 49%, #333333 51%, #ffffff 53%) !important;
+      width: 52px !important;
+    }
+
+    .kmap-diag .row-var {
+      position: absolute;
+      bottom: 2px;
+      left: 4px;
+      font-size: 11px;
+      color: #2e7d32;
+    }
+
+    .kmap-diag .col-var {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: 11px;
+      color: #2e7d32;
+    }
+
+    /* OUTLINE BOX OVERLAY SYSTEM */
+    .box-overlay {
+      position: absolute;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Color Palette */
+    .b-pink   { border-color: #ec4899; }
+    .b-blue   { border-color: #3b82f6; }
+    .b-orange { border-color: #f97316; }
+    .b-green  { border-color: #16a34a; }
+    .b-grey   { border-color: #64748b; }
+
+    /* Closed Rectangles (Placed in top-left cell of the group) */
+    .box-single { top: 3px; left: 3px; right: 3px; bottom: 3px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-2x1-v { top: 3px; left: 3px; right: 3px; bottom: -43px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-4x1-v { top: 3px; left: 3px; right: 3px; bottom: -135px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-1x2-h { top: 3px; left: 3px; right: -43px; bottom: 3px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-1x3-h { top: 3px; left: 3px; right: -89px; bottom: 3px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-1x4-h { top: 3px; left: 3px; right: -135px; bottom: 3px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-2x2   { top: 3px; left: 3px; right: -43px; bottom: -43px; border-width: 2px; border-style: solid; border-radius: 4px; }
+    .box-2x4   { top: 3px; left: 3px; right: -135px; bottom: -43px; border-width: 2px; border-style: solid; border-radius: 4px; }
+
+    /* Open Wrap-Around Outlines (Open edges extending past map boundaries) */
+    .wrap-left  { left: -6px; border-left-width: 0 !important; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+    .wrap-right { right: -6px; border-right-width: 0 !important; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    .wrap-top   { top: -6px; border-top-width: 0 !important; border-top-left-radius: 0; border-top-right-radius: 0; }
+    .wrap-bot   { bottom: -6px; border-bottom-width: 0 !important; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+    .equation-label {
+      margin-top: 14px;
+      font-family: "DM Mono", monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e7d32;
+    }
+
+    .subtopic-list {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+
+    .subtopic-list li {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="index.html#converter">← Back to Converter</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="intro">
+    <span class="meta-tag">ARTICLE CONTENT · UPDATED 2026</span>
+    <p class="label">CODE CONVERSION</p>
+    <h1>Code Converters - BCD to/from Excess-3 Code</h1>
+    
+    <p class="intro-text">
+      BCD (Binary Coded Decimal) and Excess-3 are numeric representations used in digital arithmetic circuits. This guide details truth tables, K-map simplifications using don't-care conditions (X), minimized logic expressions, and circuit designs.
+    </p>
+
+    <!-- SECTION 1: DEFINITIONS -->
+    <section class="topic-section">
+      <h3>1. Overview of BCD and Excess-3 Codes</h3>
+      
+      <div class="grid-2col">
+        <div>
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: #0f172a;">What is BCD (8421 Code)?</h4>
+          <p class="intro-text" style="margin: 0; font-size: 13px;">
+            Binary Coded Decimal (BCD) represents decimal digits 0 through 9 using 4-bit binary values (0000 to 1001). Bit combinations from 1010 to 1111 (10 to 15) are invalid in BCD and treated as <strong>don't-care conditions (X)</strong> in K-maps.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: #0f172a;">What is Excess-3 Code?</h4>
+          <p class="intro-text" style="margin: 0; font-size: 13px;">
+            Excess-3 is an unweighted, self-complementing code derived by adding 3 (0011 in binary) to each decimal digit's BCD representation. Self-complementing means taking the 1's complement of an Excess-3 code yields the 9's complement of the corresponding decimal digit.
+          </p>
+        </div>
+      </div>
+
+      <h4 style="margin-top: 20px; font-size: 13px; color: #64748b;">Key Characteristics:</h4>
+      <div class="badge-group">
+        <span class="badge">Unweighted Code</span>
+        <span class="badge">Self-Complementing</span>
+        <span class="badge">Don't-Care States (10–15 in BCD)</span>
+      </div>
+    </section>
+
+    <!-- SECTION 2: BCD TO EXCESS-3 CONVERSION -->
+    <section class="topic-section">
+      <h3>2. Converting BCD to Excess-3 Code</h3>
+      <p class="intro-text" style="margin-top: 0;">
+        Let B<sub>3</sub>, B<sub>2</sub>, B<sub>1</sub>, B<sub>0</sub> (or A, B, C, D) be the 4 BCD input bits and E<sub>3</sub>, E<sub>2</sub>, E<sub>1</sub>, E<sub>0</sub> (or w, x, y, z) be the 4 Excess-3 output bits.
+      </p>
+
+      <!-- Truth Table -->
+      <h4 style="margin: 20px 0 8px; font-size: 14px;">Truth Table</h4>
+      <table class="data-table" style="max-width: 580px;">
+        <thead>
+          <tr>
+            <th>Decimal Digit</th>
+            <th>BCD Input (B<sub>3</sub> B<sub>2</sub> B<sub>1</sub> B<sub>0</sub>)</th>
+            <th>Excess-3 Output (E<sub>3</sub> E<sub>2</sub> E<sub>1</sub> E<sub>0</sub>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>0000</td><td>0011</td></tr>
+          <tr><td>1</td><td>0001</td><td>0100</td></tr>
+          <tr><td>2</td><td>0010</td><td>0101</td></tr>
+          <tr><td>3</td><td>0011</td><td>0110</td></tr>
+          <tr><td>4</td><td>0100</td><td>0111</td></tr>
+          <tr><td>5</td><td>0101</td><td>1000</td></tr>
+          <tr><td>6</td><td>0110</td><td>1001</td></tr>
+          <tr><td>7</td><td>0111</td><td>1010</td></tr>
+          <tr><td>8</td><td>1000</td><td>1011</td></tr>
+          <tr><td>9</td><td>1001</td><td>1100</td></tr>
+          <tr><td>10–15</td><td>1010 to 1111</td><td>XXXX (Don't Care)</td></tr>
+        </tbody>
+      </table>
+
+      <!-- K-Maps for BCD to Excess-3 -->
+      <h4 style="margin-top: 28px; font-size: 14px;">K-Map Simplifications</h4>
+      <div class="kmap-container">
+        
+        <!-- z = E0 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">CD</span><span class="row-var">AB</span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr>
+                <th>00</th>
+                <td>1 <div class="box-overlay b-pink box-4x1-v wrap-left"></div></td>
+                <td>0</td>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-pink box-4x1-v wrap-right"></div></td>
+              </tr>
+              <tr><th>01</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+              <tr><th>11</th><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+              <tr><th>10</th><td>1</td><td>0</td><td>X</td><td>X</td></tr>
+            </table>
+          </div>
+          <div class="equation-label">z = D'</div>
+        </div>
+
+        <!-- y = E1 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">CD</span><span class="row-var">AB</span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr>
+                <th>00</th>
+                <td>1 <div class="box-overlay b-pink box-4x1-v"></div></td>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-blue box-4x1-v"></div></td>
+                <td>0</td>
+              </tr>
+              <tr><th>01</th><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+              <tr><th>11</th><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+              <tr><th>10</th><td>1</td><td>0</td><td>X</td><td>X</td></tr>
+            </table>
+          </div>
+          <div class="equation-label">y = CD + C'D'</div>
+        </div>
+
+        <!-- x = E2 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">CD</span><span class="row-var">AB</span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr>
+                <th>00</th>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-pink box-1x3-h"></div></td>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <th>01</th>
+                <td>1 <div class="box-overlay b-blue box-2x1-v"></div></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>11</th>
+                <td>X</td>
+                <td>X <div class="box-overlay b-orange box-2x2"></div></td>
+                <td>X</td>
+                <td>X</td>
+              </tr>
+              <tr><th>10</th><td>0</td><td>1</td><td>X</td><td>X</td></tr>
+            </table>
+          </div>
+          <div class="equation-label">x = B'C + B'D + BC'D'</div>
+        </div>
+
+        <!-- w = E3 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">CD</span><span class="row-var">AB</span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr><th>00</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr>
+                <th>01</th>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-orange box-1x3-h"></div></td>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <th>11</th>
+                <td>X <div class="box-overlay b-blue box-2x4"></div></td>
+                <td>X</td>
+                <td>X</td>
+                <td>X</td>
+              </tr>
+              <tr><th>10</th><td>1</td><td>1</td><td>X</td><td>X</td></tr>
+            </table>
+          </div>
+          <div class="equation-label">w = A + BC + BD</div>
+        </div>
+
+      </div>
+
+      <!-- Minimized Expressions -->
+      <h4 style="margin: 0 0 12px; font-size: 14px;">Minimized Boolean Expressions</h4>
+      <ul class="subtopic-list">
+        <li><strong>E<sub>0</sub> (z) = B<sub>0</sub>'</strong></li>
+        <li><strong>E<sub>1</sub> (y) = B<sub>1</sub> B<sub>0</sub> + B<sub>1</sub>' B<sub>0</sub>' = (B<sub>1</sub> ⊕ B<sub>0</sub>)'</strong></li>
+        <li><strong>E<sub>2</sub> (x) = B<sub>2</sub>' B<sub>1</sub> + B<sub>2</sub>' B<sub>0</sub> + B<sub>2</sub> B<sub>1</sub>' B<sub>0</sub>' = B<sub>2</sub> ⊕ (B<sub>1</sub> + B<sub>0</sub>)</strong></li>
+        <li><strong>E<sub>3</sub> (w) = B<sub>3</sub> + B<sub>2</sub> B<sub>1</sub> + B<sub>2</sub> B<sub>0</sub> = B<sub>3</sub> + B<sub>2</sub>(B<sub>1</sub> + B<sub>0</sub>)</strong></li>
+      </ul>
+    </section>
+
+    <!-- SECTION 3: EXCESS-3 TO BCD CONVERSION -->
+    <section class="topic-section">
+      <h3>3. Converting Excess-3 to BCD Code</h3>
+      <p class="intro-text" style="margin-top: 0;">
+        Reverse conversion processes 4-bit Excess-3 inputs (E<sub>3</sub>, E<sub>2</sub>, E<sub>1</sub>, E<sub>0</sub>) to produce BCD outputs (B<sub>3</sub>, B<sub>2</sub>, B<sub>1</sub>, B<sub>0</sub>). Excess-3 input states 0000, 0001, 0010 (0 to 2) and 1101, 1110, 1111 (13 to 15) are invalid states, marked as don't-care conditions (X).
+      </p>
+
+      <!-- Truth Table -->
+      <h4 style="margin: 20px 0 8px; font-size: 14px;">Truth Table</h4>
+      <table class="data-table" style="max-width: 580px;">
+        <thead>
+          <tr>
+            <th>Decimal Digit</th>
+            <th>Excess-3 Input (E<sub>3</sub> E<sub>2</sub> E<sub>1</sub> E<sub>0</sub>)</th>
+            <th>BCD Output (B<sub>3</sub> B<sub>2</sub> B<sub>1</sub> B<sub>0</sub>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0–2 (Invalid)</td><td>0000 to 0010</td><td>XXXX (Don't Care)</td></tr>
+          <tr><td>0</td><td>0011</td><td>0000</td></tr>
+          <tr><td>1</td><td>0100</td><td>0001</td></tr>
+          <tr><td>2</td><td>0101</td><td>0010</td></tr>
+          <tr><td>3</td><td>0110</td><td>0011</td></tr>
+          <tr><td>4</td><td>0111</td><td>0100</td></tr>
+          <tr><td>5</td><td>1000</td><td>0101</td></tr>
+          <tr><td>6</td><td>1001</td><td>0110</td></tr>
+          <tr><td>7</td><td>1010</td><td>0111</td></tr>
+          <tr><td>8</td><td>1011</td><td>1000</td></tr>
+          <tr><td>9</td><td>1100</td><td>1001</td></tr>
+          <tr><td>13–15 (Invalid)</td><td>1101 to 1111</td><td>XXXX (Don't Care)</td></tr>
+        </tbody>
+      </table>
+
+      <!-- K-Maps for Excess-3 to BCD -->
+      <h4 style="margin-top: 28px; font-size: 14px;">K-Map Simplifications</h4>
+      <div class="kmap-container">
+        
+        <!-- B0 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">E<sub>1</sub>E<sub>0</sub></span><span class="row-var">E<sub>3</sub>E<sub>2</sub></span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr>
+                <th>00</th>
+                <td>X <div class="box-overlay b-blue box-4x1-v wrap-left"></div></td>
+                <td>X</td>
+                <td>0</td>
+                <td>X <div class="box-overlay b-blue box-4x1-v wrap-right"></div></td>
+              </tr>
+              <tr><th>01</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+              <tr><th>11</th><td>1</td><td>X</td><td>X</td><td>X</td></tr>
+              <tr><th>10</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            </table>
+          </div>
+          <div class="equation-label">B<sub>0</sub> = E<sub>0</sub>'</div>
+        </div>
+
+        <!-- B1 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">E<sub>1</sub>E<sub>0</sub></span><span class="row-var">E<sub>3</sub>E<sub>2</sub></span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr>
+                <th>00</th>
+                <td>X <div class="box-overlay b-grey wrap-bot"></div></td>
+                <td>X <div class="box-overlay b-blue wrap-bot"></div></td>
+                <td>1 <div class="box-overlay b-pink box-2x1-v"></div></td>
+                <td>X <div class="box-overlay b-pink wrap-right"></div></td>
+              </tr>
+              <tr>
+                <th>01</th>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>11</th>
+                <td>X <div class="box-overlay b-grey wrap-top"></div></td>
+                <td>X <div class="box-overlay b-blue wrap-top"></div></td>
+                <td>X</td>
+                <td>X <div class="box-overlay b-pink wrap-right"></div></td>
+              </tr>
+              <tr>
+                <th>10</th>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-blue box-2x1-v"></div></td>
+                <td>1</td>
+                <td>0</td>
+              </tr>
+            </table>
+          </div>
+          <div class="equation-label">B<sub>1</sub> = (E<sub>1</sub> ⊕ E<sub>0</sub>)'</div>
+        </div>
+
+        <!-- B2 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">E<sub>1</sub>E<sub>0</sub></span><span class="row-var">E<sub>3</sub>E<sub>2</sub></span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr>
+                <th>00</th>
+                <td>X <div class="box-overlay b-grey wrap-bot"></div></td>
+                <td>X <div class="box-overlay b-grey wrap-bot"></div></td>
+                <td>0</td>
+                <td>X <div class="box-overlay b-grey wrap-bot"></div></td>
+              </tr>
+              <tr>
+                <th>01</th>
+                <td>1 <div class="box-overlay b-pink box-1x2-h"></div></td>
+                <td>1</td>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-pink box-single"></div></td>
+              </tr>
+              <tr>
+                <th>11</th>
+                <td>0</td>
+                <td>X <div class="box-overlay b-grey wrap-top"></div></td>
+                <td>X</td>
+                <td>X <div class="box-overlay b-grey wrap-top"></div></td>
+              </tr>
+              <tr>
+                <th>10</th>
+                <td>1 <div class="box-overlay b-grey wrap-top"></div></td>
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+              </tr>
+            </table>
+          </div>
+          <div class="equation-label">B<sub>2</sub> = E<sub>2</sub> ⊕ (E<sub>1</sub> + E<sub>0</sub>)'</div>
+        </div>
+
+        <!-- B3 -->
+        <div class="kmap-card">
+          <div class="kmap-wrapper">
+            <table class="kmap-table">
+              <tr>
+                <th class="kmap-diag"><span class="col-var">E<sub>1</sub>E<sub>0</sub></span><span class="row-var">E<sub>3</sub>E<sub>2</sub></span></th>
+                <th>00</th><th>01</th><th>11</th><th>10</th>
+              </tr>
+              <tr><th>00</th><td>X</td><td>X</td><td>0</td><td>X</td></tr>
+              <tr><th>01</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr>
+                <th>11</th>
+                <td>1 <div class="box-overlay b-blue box-1x4-h"></div></td>
+                <td>X</td>
+                <td>X</td>
+                <td>X</td>
+              </tr>
+              <tr>
+                <th>10</th>
+                <td>0</td>
+                <td>0</td>
+                <td>1 <div class="box-overlay b-orange box-single"></div></td>
+                <td>0</td>
+              </tr>
+            </table>
+          </div>
+          <div class="equation-label">B<sub>3</sub> = E<sub>3</sub>E<sub>2</sub> + E<sub>3</sub>E<sub>1</sub>E<sub>0</sub></div>
+        </div>
+
+      </div>
+
+      <!-- Minimized Expressions -->
+      <h4 style="margin: 0 0 12px; font-size: 14px;">Minimized Boolean Expressions</h4>
+      <ul class="subtopic-list">
+        <li><strong>B<sub>0</sub> = E<sub>0</sub>'</strong></li>
+        <li><strong>B<sub>1</sub> = E<sub>1</sub>' E<sub>0</sub>' + E<sub>1</sub> E<sub>0</sub> = (E<sub>1</sub> ⊕ E<sub>0</sub>)'</strong></li>
+        <li><strong>B<sub>2</sub> = E<sub>2</sub> ⊕ (E<sub>1</sub> + E<sub>0</sub>)'</strong></li>
+        <li><strong>B<sub>3</sub> = E<sub>3</sub> E<sub>2</sub> + E<sub>3</sub> E<sub>1</sub> E<sub>0</sub></strong></li>
+      </ul>
+    </section>
+
+    <!-- SECTION 4: APPLICATIONS -->
+    <section class="topic-section">
+      <h3>4. Applications of BCD and Excess-3 Converters</h3>
+      <ul class="subtopic-list">
+        <li>
+          <strong>Decimal Arithmetic Units:</strong>
+          <span>Simplifies 9's complement subtraction algorithms in digital calculators and financial computing hardware.</span>
+        </li>
+        <li>
+          <strong>Seven-Segment Display Controllers:</strong>
+          <span>Facilitates digital display driving where decimal inputs must be encoded into self-complementing logic formats.</span>
+        </li>
+        <li>
+          <strong>Legacy Computing & Counters:</strong>
+          <span>Used in multi-digit decimal counters and early electronic data processing systems.</span>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Study Reference Page</p>
+  </footer>
+
+</body>
+</html>

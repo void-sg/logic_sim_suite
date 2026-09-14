@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Converters - Binary to/from Gray Code | Study Notes</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- KaTeX for rendering mathematical symbols seamlessly -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+  <style>
+    .meta-tag {
+      display: inline-block;
+      background: #e2e8f0;
+      color: var(--navy);
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .badge {
+      background: #eef2f8;
+      color: var(--blue);
+      border: 1px solid var(--line);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: "DM Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+    }
+
+    .data-table th, 
+    .data-table td {
+      padding: 9px 12px;
+      text-align: center;
+      border: 1px solid var(--line);
+    }
+
+    .data-table th {
+      background: var(--navy);
+      color: white;
+      font-weight: 500;
+    }
+
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    /* K-Map Styles (Matching Reference) */
+    .kmap-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kmap-card {
+      border: 1px solid var(--line);
+      background: var(--white);
+      padding: 16px;
+      border-radius: 6px;
+    }
+
+    .kmap-card h4 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: var(--blue);
+      font-family: "DM Mono", monospace;
+    }
+
+    .kmap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      text-align: center;
+      border: 1.5px solid #2e7d32;
+    }
+
+    .kmap-table th, .kmap-table td {
+      border: 1px solid #4ea854;
+      padding: 6px 4px;
+      width: 20%;
+      color: #2e7d32;
+      position: relative;
+    }
+
+    .kmap-table th {
+      background: #f4fdf5;
+      font-weight: 600;
+    }
+
+    /* Diagonal Split Header Cell */
+    .kmap-diag {
+      position: relative;
+      background: linear-gradient(to top right, #f4fdf5 48%, #4ea854 49%, #4ea854 51%, #f4fdf5 52%) !important;
+      padding: 0 !important;
+      height: 38px;
+    }
+
+    .kmap-diag .row-var {
+      position: absolute;
+      bottom: 2px;
+      left: 4px;
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    .kmap-diag .col-var {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    /* Grouping Highlights */
+    .grp-red {
+      background: rgba(255, 112, 67, 0.3) !important;
+      color: #d84315 !important;
+      font-weight: 700;
+      outline: 2px solid #ff7043;
+      outline-offset: -2px;
+      border-radius: 4px;
+    }
+
+    .grp-blue {
+      background: rgba(66, 165, 245, 0.3) !important;
+      color: #1565c0 !important;
+      font-weight: 700;
+      outline: 2px solid #42a5f5;
+      outline-offset: -2px;
+      border-radius: 4px;
+    }
+
+    .schematic-box {
+      margin-top: 16px;
+      padding: 24px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .schematic-box svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="index.html#converter">← Back to Converter</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="intro">
+    <span class="meta-tag">ARTICLE CONTENT · UPDATED 14 JAN, 2026</span>
+    <p class="label">CODE CONVERSION</p>
+    <h1>Code Converters - Binary to/from Gray Code</h1>
+    
+    <p class="intro-text">
+      Code Converters are digital combinational circuits that translate data representation from one format to another. This article covers the concepts, truth tables, K-maps, Boolean expressions, and logic circuits for converting binary code to Gray code and vice versa.
+    </p>
+
+    <!-- SECTION 1: DEFINITIONS -->
+    <section class="topic-section">
+      <h3>1. What are Code Converters?</h3>
+      <p class="intro-text" style="margin-top: 0;">
+        Code Converters are digital circuits or algorithms designed to translate data representation from one format to another format. The binary-to-Gray code converter takes binary input and translates it into its corresponding Gray code representation.
+      </p>
+
+      <div class="grid-2col">
+        <div>
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--navy);">What is Binary Code?</h4>
+          <p class="intro-text" style="margin: 0; font-size: 13px;">
+            Binary code is the numerical system used in digital electronics consisting of symbols 0 and 1. Each bit position represents a power of 2 starting from the rightmost bit (2<sup>0</sup>, 2<sup>1</sup>, 2<sup>2</sup> ...). It serves as the basis for encoding text and numbers in digital systems.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--navy);">What is Gray Code?</h4>
+          <p class="intro-text" style="margin: 0; font-size: 13px;">
+            Gray Code is an unweighted binary system where every successive pair of numbers differs by <strong>only one bit</strong>. It eliminates multi-bit switching errors when hardware transitions between states.
+          </p>
+        </div>
+      </div>
+
+      <h4 style="margin-top: 20px; font-size: 13px; color: var(--muted);">Alternative Names for Gray Code:</h4>
+      <div class="badge-group">
+        <span class="badge">Unit Hamming Distance Code</span>
+        <span class="badge">Cyclic Code</span>
+        <span class="badge">Reflecting Code</span>
+      </div>
+    </section>
+
+    <!-- SECTION 2: BINARY TO GRAY CONVERSION -->
+    <section class="topic-section">
+      <h3>2. Converting Binary to Gray Code</h3>
+      <p class="intro-text" style="margin-top: 0;">
+        Let b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, b<sub>3</sub> be the binary bits (b<sub>0</sub> = LSB, b<sub>3</sub> = MSB) and g<sub>0</sub>, g<sub>1</sub>, g<sub>2</sub>, g<sub>3</sub> be the Gray code bits (g<sub>0</sub> = LSB, g<sub>3</sub> = MSB).
+      </p>
+
+      <!-- Truth Table -->
+      <h4 style="margin: 20px 0 8px; font-size: 14px;">Truth Table</h4>
+      <table class="data-table" style="max-width: 500px;">
+        <thead>
+          <tr>
+            <th>Binary (b<sub>3</sub>b<sub>2</sub>b<sub>1</sub>b<sub>0</sub>)</th>
+            <th>Gray Code (g<sub>3</sub>g<sub>2</sub>g<sub>1</sub>g<sub>0</sub>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0000</td><td>0000</td></tr>
+          <tr><td>0001</td><td>0001</td></tr>
+          <tr><td>0010</td><td>0011</td></tr>
+          <tr><td>0011</td><td>0010</td></tr>
+          <tr><td>0100</td><td>0110</td></tr>
+          <tr><td>0101</td><td>0111</td></tr>
+          <tr><td>0110</td><td>0101</td></tr>
+          <tr><td>0111</td><td>0100</td></tr>
+          <tr><td>1000</td><td>1100</td></tr>
+          <tr><td>1001</td><td>1101</td></tr>
+          <tr><td>1010</td><td>1111</td></tr>
+          <tr><td>1011</td><td>1110</td></tr>
+          <tr><td>1100</td><td>1010</td></tr>
+          <tr><td>1101</td><td>1011</td></tr>
+          <tr><td>1110</td><td>1001</td></tr>
+          <tr><td>1111</td><td>1000</td></tr>
+        </tbody>
+      </table>
+
+      <!-- K-Maps for Binary to Gray -->
+      <h4 style="margin-top: 28px; font-size: 14px;">K-Map Simplifications</h4>
+      <div class="kmap-container">
+        <!-- g3 -->
+        <div class="kmap-card">
+          <h4>K-Map for g<sub>3</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">b<sub>1</sub>,b<sub>0</sub></span><span class="row-var">b<sub>3</sub>,b<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>01</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>11</th><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>10</th><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+          </table>
+        </div>
+
+        <!-- g2 -->
+        <div class="kmap-card">
+          <h4>K-Map for g<sub>2</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">b<sub>1</sub>,b<sub>0</sub></span><span class="row-var">b<sub>3</sub>,b<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>01</th><td class="grp-red">1</td><td class="grp-red">1</td><td class="grp-red">1</td><td class="grp-red">1</td></tr>
+            <tr><th>11</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>10</th><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+          </table>
+        </div>
+
+        <!-- g1 -->
+        <div class="kmap-card">
+          <h4>K-Map for g<sub>1</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">b<sub>1</sub>,b<sub>0</sub></span><span class="row-var">b<sub>3</sub>,b<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td>0</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>01</th><td>0</td><td>0</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>11</th><td>0</td><td>0</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>10</th><td>0</td><td>0</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+          </table>
+        </div>
+
+        <!-- g0 -->
+        <div class="kmap-card">
+          <h4>K-Map for g<sub>0</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">b<sub>1</sub>,b<sub>0</sub></span><span class="row-var">b<sub>3</sub>,b<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td class="grp-red">1</td><td>0</td><td class="grp-blue">1</td></tr>
+            <tr><th>01</th><td>0</td><td class="grp-red">1</td><td>0</td><td class="grp-blue">1</td></tr>
+            <tr><th>11</th><td>0</td><td class="grp-red">1</td><td>0</td><td class="grp-blue">1</td></tr>
+            <tr><th>10</th><td>0</td><td class="grp-red">1</td><td>0</td><td class="grp-blue">1</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Boolean Expressions -->
+      <h4 style="margin: 0 0 12px; font-size: 14px;">Minimized Boolean Expressions</h4>
+      <ul class="subtopic-list">
+        <li>
+          <strong>g<sub>3</sub> = b<sub>3</sub></strong>
+          <span>MSB bit passes through directly.</span>
+        </li>
+        <li>
+          <strong>g<sub>2</sub> = b<sub>3</sub>'b<sub>2</sub> + b<sub>3</sub>b<sub>2</sub>' = b<sub>3</sub> ⊕ b<sub>2</sub></strong>
+        </li>
+        <li>
+          <strong>g<sub>1</sub> = b<sub>2</sub>'b<sub>1</sub> + b<sub>2</sub>b<sub>1</sub>' = b<sub>2</sub> ⊕ b<sub>1</sub></strong>
+        </li>
+        <li>
+          <strong>g<sub>0</sub> = b<sub>1</sub>'b<sub>0</sub> + b<sub>1</sub>b<sub>0</sub>' = b<sub>1</sub> ⊕ b<sub>0</sub></strong>
+        </li>
+      </ul>
+
+      <!-- Vector Schematic -->
+      <h4 style="margin-top: 28px; font-size: 14px;">Logic Circuit (Binary to Gray)</h4>
+      <div class="schematic-box">
+        <svg width="500" height="220" viewBox="0 0 500 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Wires and Dots -->
+          <text x="20" y="35" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">b3</text>
+          <line x1="45" y1="30" x2="450" y2="30" stroke="#14233b" stroke-width="2"/>
+          <circle cx="120" cy="30" r="4" fill="#14233b"/>
+          <text x="460" y="35" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">g3</text>
+
+          <text x="20" y="85" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">b2</text>
+          <line x1="45" y1="80" x2="260" y2="80" stroke="#14233b" stroke-width="2"/>
+          <circle cx="180" cy="80" r="4" fill="#14233b"/>
+
+          <text x="20" y="135" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">b1</text>
+          <line x1="45" y1="130" x2="260" y2="130" stroke="#14233b" stroke-width="2"/>
+          <circle cx="210" cy="130" r="4" fill="#14233b"/>
+
+          <text x="20" y="185" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">b0</text>
+          <line x1="45" y1="180" x2="260" y2="180" stroke="#14233b" stroke-width="2"/>
+
+          <!-- Tap Wires to Gates -->
+          <path d="M 120 30 L 120 68 L 260 68" stroke="#14233b" stroke-width="2" fill="none"/>
+          <path d="M 180 80 L 180 118 L 260 118" stroke="#14233b" stroke-width="2" fill="none"/>
+          <path d="M 210 130 L 210 168 L 260 168" stroke="#14233b" stroke-width="2" fill="none"/>
+
+          <!-- Gate 1 (XOR g2) -->
+          <path d="M 255 60 C 265 60 270 65 270 74 C 270 83 265 88 255 88" stroke="#2c6ee8" stroke-width="2" fill="none"/>
+          <path d="M 260 60 C 275 60 295 62 310 74 C 295 86 275 88 260 88 C 270 80 270 68 260 60 Z" fill="#2c6ee8"/>
+          <line x1="310" y1="74" x2="450" y2="74" stroke="#14233b" stroke-width="2"/>
+          <text x="460" y="79" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">g2</text>
+
+          <!-- Gate 2 (XOR g1) -->
+          <path d="M 255 110 C 265 110 270 115 270 124 C 270 133 265 138 255 138" stroke="#2c6ee8" stroke-width="2" fill="none"/>
+          <path d="M 260 110 C 275 110 295 112 310 124 C 295 136 275 138 260 138 C 270 130 270 118 260 110 Z" fill="#2c6ee8"/>
+          <line x1="310" y1="124" x2="450" y2="124" stroke="#14233b" stroke-width="2"/>
+          <text x="460" y="129" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">g1</text>
+
+          <!-- Gate 3 (XOR g0) -->
+          <path d="M 255 160 C 265 160 270 165 270 174 C 270 183 265 188 255 188" stroke="#2c6ee8" stroke-width="2" fill="none"/>
+          <path d="M 260 160 C 275 160 295 162 310 174 C 295 186 275 188 260 188 C 270 180 270 168 260 160 Z" fill="#2c6ee8"/>
+          <line x1="310" y1="174" x2="450" y2="174" stroke="#14233b" stroke-width="2"/>
+          <text x="460" y="179" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">g0</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- SECTION 3: GRAY TO BINARY CONVERSION -->
+    <section class="topic-section">
+      <h3>3. Converting Gray Code to Binary</h3>
+      <p class="intro-text" style="margin-top: 0;">
+        Converting Gray code back to binary uses feedback logic from the calculated binary outputs:
+      </p>
+
+      <!-- Truth Table -->
+      <h4 style="margin: 20px 0 8px; font-size: 14px;">Truth Table</h4>
+      <table class="data-table" style="max-width: 500px;">
+        <thead>
+          <tr>
+            <th>Gray Code (g<sub>3</sub>g<sub>2</sub>g<sub>1</sub>g<sub>0</sub>)</th>
+            <th>Binary (b<sub>3</sub>b<sub>2</sub>b<sub>1</sub>b<sub>0</sub>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0000</td><td>0000</td></tr>
+          <tr><td>0001</td><td>0001</td></tr>
+          <tr><td>0011</td><td>0010</td></tr>
+          <tr><td>0010</td><td>0011</td></tr>
+          <tr><td>0110</td><td>0100</td></tr>
+          <tr><td>0111</td><td>0101</td></tr>
+          <tr><td>0101</td><td>0110</td></tr>
+          <tr><td>0100</td><td>0111</td></tr>
+          <tr><td>1100</td><td>1000</td></tr>
+          <tr><td>1101</td><td>1001</td></tr>
+          <tr><td>1111</td><td>1010</td></tr>
+          <tr><td>1110</td><td>1011</td></tr>
+          <tr><td>1010</td><td>1100</td></tr>
+          <tr><td>1011</td><td>1101</td></tr>
+          <tr><td>1001</td><td>1110</td></tr>
+          <tr><td>1000</td><td>1111</td></tr>
+        </tbody>
+      </table>
+
+      <!-- K-Maps for Gray to Binary -->
+      <h4 style="margin-top: 28px; font-size: 14px;">K-Map Simplifications</h4>
+      <div class="kmap-container">
+        <!-- b3 -->
+        <div class="kmap-card">
+          <h4>K-Map for b<sub>3</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">g<sub>1</sub>,g<sub>0</sub></span><span class="row-var">g<sub>3</sub>,g<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>01</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>11</th><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>10</th><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+          </table>
+        </div>
+
+        <!-- b2 -->
+        <div class="kmap-card">
+          <h4>K-Map for b<sub>2</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">g<sub>1</sub>,g<sub>0</sub></span><span class="row-var">g<sub>3</sub>,g<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>01</th><td class="grp-red">1</td><td class="grp-red">1</td><td class="grp-red">1</td><td class="grp-red">1</td></tr>
+            <tr><th>11</th><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th>10</th><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+          </table>
+        </div>
+
+        <!-- b1 -->
+        <div class="kmap-card">
+          <h4>K-Map for b<sub>1</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">g<sub>1</sub>,g<sub>0</sub></span><span class="row-var">g<sub>3</sub>,g<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td>0</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>01</th><td class="grp-red">1</td><td class="grp-red">1</td><td>0</td><td>0</td></tr>
+            <tr><th>11</th><td>0</td><td>0</td><td class="grp-blue">1</td><td class="grp-blue">1</td></tr>
+            <tr><th>10</th><td class="grp-red">1</td><td class="grp-red">1</td><td>0</td><td>0</td></tr>
+          </table>
+        </div>
+
+        <!-- b0 -->
+        <div class="kmap-card">
+          <h4>K-Map for b<sub>0</sub></h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">g<sub>1</sub>,g<sub>0</sub></span><span class="row-var">g<sub>3</sub>,g<sub>2</sub></span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr><th>00</th><td>0</td><td class="grp-blue">1</td><td>0</td><td class="grp-blue">1</td></tr>
+            <tr><th>01</th><td class="grp-red">1</td><td>0</td><td class="grp-red">1</td><td>0</td></tr>
+            <tr><th>11</th><td>0</td><td class="grp-blue">1</td><td>0</td><td class="grp-blue">1</td></tr>
+            <tr><th>10</th><td class="grp-red">1</td><td>0</td><td class="grp-red">1</td><td>0</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Boolean Expressions -->
+      <h4 style="margin: 0 0 12px; font-size: 14px;">Minimized Boolean Expressions</h4>
+      <ul class="subtopic-list">
+        <li>
+          <strong>b<sub>3</sub> = g<sub>3</sub></strong>
+        </li>
+        <li>
+          <strong>b<sub>2</sub> = b<sub>3</sub> ⊕ g<sub>2</sub> = g<sub>3</sub> ⊕ g<sub>2</sub></strong>
+        </li>
+        <li>
+          <strong>b<sub>1</sub> = b<sub>2</sub> ⊕ g<sub>1</sub> = g<sub>3</sub> ⊕ g<sub>2</sub> ⊕ g<sub>1</sub></strong>
+        </li>
+        <li>
+          <strong>b<sub>0</sub> = b<sub>1</sub> ⊕ g<sub>0</sub> = g<sub>3</sub> ⊕ g<sub>2</sub> ⊕ g<sub>1</sub> ⊕ g<sub>0</sub></strong>
+        </li>
+      </ul>
+
+      <!-- Vector Schematic (Cascaded Gray to Binary with Feedback) -->
+      <h4 style="margin-top: 28px; font-size: 14px;">Logic Circuit (Gray to Binary)</h4>
+      <div class="schematic-box">
+        <svg width="500" height="220" viewBox="0 0 500 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Input Wires -->
+          <text x="20" y="35" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">g3</text>
+          <line x1="45" y1="30" x2="450" y2="30" stroke="#14233b" stroke-width="2"/>
+          <circle cx="120" cy="30" r="4" fill="#14233b"/>
+          <text x="460" y="35" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">b3</text>
+
+          <text x="20" y="85" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">g2</text>
+          <line x1="45" y1="80" x2="260" y2="80" stroke="#14233b" stroke-width="2"/>
+
+          <text x="20" y="135" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">g1</text>
+          <line x1="45" y1="130" x2="260" y2="130" stroke="#14233b" stroke-width="2"/>
+
+          <text x="20" y="185" fill="#14233b" font-family="DM Mono" font-size="13" font-weight="700">g0</text>
+          <line x1="45" y1="180" x2="260" y2="180" stroke="#14233b" stroke-width="2"/>
+
+          <!-- Cascaded Feedback Lines -->
+          <path d="M 120 30 L 120 68 L 260 68" stroke="#2c6ee8" stroke-width="2" fill="none"/>
+          <path d="M 350 74 L 350 118 L 260 118" stroke="#2c6ee8" stroke-width="2" fill="none"/>
+          <circle cx="350" cy="74" r="4" fill="#2c6ee8"/>
+          
+          <path d="M 380 124 L 380 168 L 260 168" stroke="#2c6ee8" stroke-width="2" fill="none"/>
+          <circle cx="380" cy="124" r="4" fill="#2c6ee8"/>
+
+          <!-- Gate 1 (XOR b2) -->
+          <path d="M 255 60 C 265 60 270 65 270 74 C 270 83 265 88 255 88" stroke="#14233b" stroke-width="2" fill="none"/>
+          <path d="M 260 60 C 275 60 295 62 310 74 C 295 86 275 88 260 88 C 270 80 270 68 260 60 Z" fill="#14233b"/>
+          <line x1="310" y1="74" x2="450" y2="74" stroke="#14233b" stroke-width="2"/>
+          <text x="460" y="79" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">b2</text>
+
+          <!-- Gate 2 (XOR b1) -->
+          <path d="M 255 110 C 265 110 270 115 270 124 C 270 133 265 138 255 138" stroke="#14233b" stroke-width="2" fill="none"/>
+          <path d="M 260 110 C 275 110 295 112 310 124 C 295 136 275 138 260 138 C 270 130 270 118 260 110 Z" fill="#14233b"/>
+          <line x1="310" y1="124" x2="450" y2="124" stroke="#14233b" stroke-width="2"/>
+          <text x="460" y="129" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">b1</text>
+
+          <!-- Gate 3 (XOR b0) -->
+          <path d="M 255 160 C 265 160 270 165 270 174 C 270 183 265 188 255 188" stroke="#14233b" stroke-width="2" fill="none"/>
+          <path d="M 260 160 C 275 160 295 162 310 174 C 295 186 275 188 260 188 C 270 180 270 168 260 160 Z" fill="#14233b"/>
+          <line x1="310" y1="174" x2="450" y2="174" stroke="#14233b" stroke-width="2"/>
+          <text x="460" y="179" fill="#2c6ee8" font-family="DM Mono" font-size="13" font-weight="700">b0</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- SECTION 4: APPLICATIONS -->
+    <section class="topic-section">
+      <h3>4. Applications of Code Converters</h3>
+      <ul class="subtopic-list">
+        <li>
+          <strong>Rotary Encoders</strong>
+          <span>Translates shaft rotation angles to digital signals. Gray code eliminates read errors during mechanical state changes.</span>
+        </li>
+        <li>
+          <strong>Control Systems</strong>
+          <span>Interfaces subsystems operating between binary controllers and Gray-coded hardware sensors.</span>
+        </li>
+        <li>
+          <strong>Signal Processing</strong>
+          <span>Minimizes bit transmission errors across digital communication channels.</span>
+        </li>
+        <li>
+          <strong>Analog-to-Digital Converters (ADCs)</strong>
+          <span>Serves as a reliable interface between Gray-coded ADC outputs and binary digital processing systems.</span>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Study Reference Page</p>
+  </footer>
+
+</body>
+</html>

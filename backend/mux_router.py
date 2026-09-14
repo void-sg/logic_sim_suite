@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from schemas import MuxRequest, MuxResponse
-from mux import mux_8to1, MuxError
+from mux import simulate_mux, MuxError
 
 router = APIRouter()
 
@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/mux", response_model=MuxResponse)
 def mux(req: MuxRequest):
     try:
-        output = mux_8to1(req.select, req.inputs)
+        result = simulate_mux(req.select, req.inputs, strobe=req.strobe)
     except MuxError as e:
         raise HTTPException(status_code=422, detail=str(e))
-    return {"select": req.select, "output": output}
+    return result

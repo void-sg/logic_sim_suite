@@ -9,7 +9,7 @@
   --muted: #667387;
   --line: #dce1e6;
   --yellow: #e9bd4f;
-  --error: #c0392b;
+  --hover-bg: #f0f5fe;
 }
 
 * {
@@ -195,33 +195,67 @@ h3 {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .subtopic-list li {
-  position: relative;
-  padding: 0 0 19px 22px;
+  margin: 0;
+  padding: 0;
 }
 
-.subtopic-list li::before {
+.topic-card {
+  position: relative;
+  display: block;
+  padding: 12px 16px 14px 28px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.topic-card::before {
   position: absolute;
-  top: 8px;
-  left: 0;
+  top: 18px;
+  left: 12px;
   width: 7px;
   height: 7px;
   border: 2px solid var(--blue);
   content: "";
+  transition: transform 0.25s ease, background-color 0.25s ease;
 }
 
-.subtopic-list strong {
+.topic-card strong {
   display: block;
   margin-bottom: 4px;
   font-size: 14px;
+  color: var(--ink);
+  transition: color 0.2s ease;
 }
 
-.subtopic-list span {
+.topic-card span {
+  display: block;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.65;
+}
+
+/* Card Hover Logic */
+.topic-card:hover {
+  background: var(--hover-bg);
+  border-color: #d0e0fd;
+  transform: translateX(6px);
+}
+
+.topic-card:hover::before {
+  background-color: var(--blue);
+  transform: scale(1.15);
+}
+
+.topic-card:hover strong {
+  color: var(--blue);
 }
 
 .reference-link {
@@ -259,84 +293,6 @@ footer {
 footer p {
   margin: 0;
   font-size: 12px;
-}
-
-/* ===================================================================
-   Interactive converter tool — new, matches the existing design tokens
-   (same --navy/--blue/--paper/--line variables, same DM Mono for
-   monospace elements, same border/spacing conventions as topic-section)
-   =================================================================== */
-
-.convert-tool {
-  margin-top: 28px;
-  padding: 24px;
-  border: 1px solid var(--line);
-  background: var(--paper);
-}
-
-.convert-tool h3 {
-  color: var(--navy);
-}
-
-.convert-tool label {
-  display: block;
-  margin-bottom: 16px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.convert-tool select,
-.convert-tool input[type="text"] {
-  display: block;
-  width: 100%;
-  max-width: 280px;
-  margin-top: 6px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  background: var(--white);
-  color: var(--ink);
-  font-family: "DM Mono", monospace;
-  font-size: 13px;
-}
-
-.convert-tool select:focus,
-.convert-tool input[type="text"]:focus {
-  border-color: var(--blue);
-  outline: none;
-}
-
-.convert-tool button {
-  margin-top: 4px;
-  padding: 11px 26px;
-  border: none;
-  background: var(--blue);
-  color: white;
-  font-family: "Manrope", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.convert-tool button:hover {
-  background: var(--navy);
-}
-
-#convertResult {
-  margin: 18px 0 0;
-  padding: 13px 14px;
-  border: 1px solid var(--line);
-  background: var(--white);
-  color: var(--navy);
-  font-family: "DM Mono", monospace;
-  font-size: 14px;
-  min-height: 18px;
-}
-
-#convertResult.error {
-  border-color: var(--error);
-  color: var(--error);
 }
 
 @media (max-width: 760px) {
@@ -385,10 +341,5 @@ footer p {
 
   h2 {
     font-size: 25px;
-  }
-
-  .convert-tool select,
-  .convert-tool input[type="text"] {
-    max-width: 100%;
   }
 }

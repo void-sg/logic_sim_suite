@@ -12,6 +12,18 @@ class MuxError(Exception):
     pass
 
 
+def mux_2to1(select: str, inputs: list[int]) -> int:
+    """2:1 MUX. select is a 1-bit string 'S0'. inputs = [D0, D1]."""
+    if len(select) != 1 or select not in ("0", "1"):
+        raise MuxError(f"select must be a 1-bit string, got '{select}'")
+    if len(inputs) != 2 or any(b not in (0, 1) for b in inputs):
+        raise MuxError(f"inputs must be exactly 2 bits (0/1), got {inputs}")
+
+    s0 = int(select[0])
+    D0, D1 = inputs
+    return ((1 - s0) & D0) | (s0 & D1)
+
+
 def mux_4to1(select: str, inputs: list[int]) -> int:
     """4:1 MUX. select is a 2-bit string 'S1S0'. inputs = [D0, D1, D2, D3]."""
     if len(select) != 2 or any(b not in "01" for b in select):
@@ -52,6 +64,83 @@ def mux_8to1(select: str, inputs: list[int]) -> int:
     Y2_gated = Y2 & s2
 
     return Y1_gated | Y2_gated
+
+
+def simulate_mux(select: str, inputs: list[int], strobe: int = 0) -> dict:
+    """Unified MUX simulator supporting 2:1, 4:1, and 8:1 MUX with active-low strobe/enable.
+
+    strobe=0: MUX enabled (normal operation)
+    strobe=1: MUX disabled (output forced to 0, per IC 74LS153 active-low G pin)
+    """
+    if strobe not in (0, 1):
+        raise MuxError(f"strobe must be 0 (active) or 1 (disabled), got {strobe}")
+
+    if len(inputs) == 2 and len(select) == 1:
+        out = mux_2to1(select, inputs)
+        sel_idx = int(select, 2)
+        output = 0 if strobe == 1 else out
+        return {
+            "select": select,
+            "inputs": inputs,
+            "output": output,
+            "mux_type": "2:1",
+            "selected_channel": f"D{sel_idx}",
+            "selected_index": sel_idx,
+            "details": {"s0": int(select[0]), "strobe": strobe, "raw_output": out}
+        }
+    elif len(inputs) == 4 and len(select) == 2:
+        out = mux_4to1(select, inputs)
+        sel_idx = int(select, 2)
+        output = 0 if strobe == 1 else out
+        return {
+            "select": select,
+            "inputs": inputs,
+            "output": output,
+            "mux_type": "4:1",
+            "selected_channel": f"D{sel_idx}",
+            "selected_index": sel_idx,
+            "details": {"s1": int(select[0]), "s0": int(select[1]), "strobe": strobe, "raw_output": out}
+        }
+    elif len(inputs) == 8 and len(select) == 3:
+        if any(b not in "01" for b in select):
+            raise MuxError(f"select must contain only 0 and 1, got '{select}'")
+        if any(b not in (0, 1) for b in inputs):
+            raise MuxError(f"inputs must contain only 0 and 1, got {inputs}")
+
+        s2 = int(select[0])
+        shared_select = select[1:]
+        Y1 = mux_4to1(shared_select, inputs[0:4])
+        Y2 = mux_4to1(shared_select, inputs[4:8])
+        Y1_gated = Y1 & (1 - s2)
+        Y2_gated = Y2 & s2
+        raw_out = Y1_gated | Y2_gated
+        output = 0 if strobe == 1 else raw_out
+        sel_idx = int(select, 2)
+
+        return {
+            "select": select,
+            "inputs": inputs,
+            "output": output,
+            "mux_type": "8:1",
+            "selected_channel": f"D{sel_idx}",
+            "selected_index": sel_idx,
+            "details": {
+                "s2": s2,
+                "s1": int(select[1]),
+                "s0": int(select[2]),
+                "strobe": strobe,
+                "section1_out": Y1,
+                "section2_out": Y2,
+                "active_section": 2 if s2 == 1 else 1,
+                "raw_output": raw_out
+            }
+        }
+    else:
+        raise MuxError(
+            f"Unsupported configuration: select '{select}' (length {len(select)}) "
+            f"with {len(inputs)} inputs. Expected 1 select bit for 2 inputs, "
+            f"2 select bits for 4 inputs, or 3 select bits for 8 inputs."
+        )
 
 
 if __name__ == "__main__":

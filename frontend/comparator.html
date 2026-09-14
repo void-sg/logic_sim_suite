@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4-Bit Magnitude Comparator (IC 74LS85) | Digital Simulation Suite</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .simulator-card {
+      background: #ffffff;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .input-section {
+      margin-bottom: 20px;
+    }
+
+    .input-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .input-row-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-decimal-pill {
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .bit-toggles {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .bit-btn {
+      flex: 1;
+      height: 52px;
+      font-family: "DM Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      border: 2px solid var(--line, #cbd5e1);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #14233b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bit-btn span:last-child {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .bit-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .bit-btn.active span:last-child {
+      color: #e2e8f0;
+    }
+
+    .cascade-panel {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+
+    .cascade-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .cascade-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .cascade-toggles {
+      display: flex;
+      gap: 12px;
+    }
+
+    .cascade-btn {
+      flex: 1;
+      height: 40px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .cascade-btn.active {
+      background: #2c6ee8;
+      border-color: #2c6ee8;
+      color: #ffffff;
+    }
+
+    .compute-btn {
+      width: 100%;
+      background: var(--navy, #14233b);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-family: "DM Mono", monospace;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .compute-btn:hover {
+      background: #1e3a66;
+    }
+
+    .result-box {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1px solid var(--line, #e2e8f0);
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .result-box.error {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .comparator-outputs {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    .comp-pill {
+      flex: 1;
+      max-width: 160px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-family: "DM Mono", monospace;
+      font-size: 18px;
+      font-weight: 700;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      color: #94a3b8;
+      transition: all 0.25s ease;
+    }
+
+    .comp-pill.active {
+      background: #10b981;
+      border-color: #059669;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .result-meta {
+      font-size: 13px;
+      color: #334155;
+      margin-top: 12px;
+      font-family: "DM Mono", monospace;
+    }
+
+    .stages-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .stages-table th, .stages-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+    }
+
+    .stages-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .stages-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .stages-table tr.decisive-row {
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    .reset-link {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-family: "DM Mono", monospace;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .reset-link:hover {
+      color: #14233b;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html#comparator">← Back to Comparator Section</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="intro">
+    <p class="label">MAGNITUDE COMPARISON</p>
+    <h1>4-Bit Magnitude Comparator (IC 74LS85)</h1>
+    <p class="intro-text">
+      Compare two 4-bit unsigned binary numbers A and B. Inspect MSB-priority logic, bit-by-bit XNOR equality 
+      gates, and cascade expansion inputs ($I_{A>B}, I_{A<B}, I_{A=B}$) in real time.
+    </p>
+
+    <!-- SIMULATOR SECTION -->
+    <section class="simulator-card">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+        <h3 style="margin: 0;">Interactive 4-Bit Magnitude Comparator</h3>
+        <button class="reset-link" onclick="resetInputs()">Reset Inputs (0000)</button>
+      </div>
+
+      <!-- Word A Input -->
+      <div class="input-section">
+        <div class="input-row-header">
+          <span class="input-row-title">Input Word A (A3 A2 A1 A0)</span>
+          <span class="input-decimal-pill" id="aDecDisplay">Decimal: 0</span>
+        </div>
+        <div class="bit-toggles">
+          <button class="bit-btn" id="a3" onclick="toggleBit('a3')">
+            <span id="a3-val">0</span>
+            <span>A3 (MSB)</span>
+          </button>
+          <button class="bit-btn" id="a2" onclick="toggleBit('a2')">
+            <span id="a2-val">0</span>
+            <span>A2</span>
+          </button>
+          <button class="bit-btn" id="a1" onclick="toggleBit('a1')">
+            <span id="a1-val">0</span>
+            <span>A1</span>
+          </button>
+          <button class="bit-btn" id="a0" onclick="toggleBit('a0')">
+            <span id="a0-val">0</span>
+            <span>A0 (LSB)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Word B Input -->
+      <div class="input-section">
+        <div class="input-row-header">
+          <span class="input-row-title">Input Word B (B3 B2 B1 B0)</span>
+          <span class="input-decimal-pill" id="bDecDisplay">Decimal: 0</span>
+        </div>
+        <div class="bit-toggles">
+          <button class="bit-btn" id="b3" onclick="toggleBit('b3')">
+            <span id="b3-val">0</span>
+            <span>B3 (MSB)</span>
+          </button>
+          <button class="bit-btn" id="b2" onclick="toggleBit('b2')">
+            <span id="b2-val">0</span>
+            <span>B2</span>
+          </button>
+          <button class="bit-btn" id="b1" onclick="toggleBit('b1')">
+            <span id="b1-val">0</span>
+            <span>B1</span>
+          </button>
+          <button class="bit-btn" id="b0" onclick="toggleBit('b0')">
+            <span id="b0-val">0</span>
+            <span>B0 (LSB)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cascade Inputs (IC 74LS85 expansion) -->
+      <div class="cascade-panel">
+        <div class="cascade-header">
+          <span class="cascade-title">Cascade Inputs (Expansion from Lower Stage)</span>
+          <span style="font-size: 11px; color: #64748b; font-family: 'DM Mono', monospace;">Standalone default: IA=B = 1</span>
+        </div>
+        <div class="cascade-toggles">
+          <button class="cascade-btn" id="casc_gt" onclick="toggleCascade('gt')">
+            <span>IA > B:</span>
+            <strong id="casc_gt_val">0</strong>
+          </button>
+          <button class="cascade-btn" id="casc_lt" onclick="toggleCascade('lt')">
+            <span>IA < B:</span>
+            <strong id="casc_lt_val">0</strong>
+          </button>
+          <button class="cascade-btn active" id="casc_eq" onclick="toggleCascade('eq')">
+            <span>IA = B:</span>
+            <strong id="casc_eq_val">1</strong>
+          </button>
+        </div>
+      </div>
+
+      <button class="compute-btn" id="computeBtn" onclick="computeComparison()">Compare Words</button>
+
+      <!-- Result Display Box -->
+      <div class="result-box" id="resultBox">
+        <div style="font-size: 11px; font-family: 'DM Mono', monospace; color: #64748b; letter-spacing: 1px;">
+          COMPARISON OUTPUT STATUS
+        </div>
+
+        <div class="comparator-outputs">
+          <div class="comp-pill" id="pillGt">A &gt; B</div>
+          <div class="comp-pill active" id="pillEq">A = B</div>
+          <div class="comp-pill" id="pillLt">A &lt; B</div>
+        </div>
+
+        <div class="result-meta" id="decisionText">Decision: All 4 bits equal (A = B)</div>
+        <div class="result-meta" id="equationText" style="color: #64748b;">A (0) = B (0)</div>
+        <div class="result-meta" id="backendSource" style="color: #64748b; font-size: 11px; margin-top: 4px;"></div>
+      </div>
+
+      <!-- Bit-by-bit XNOR and priority analysis -->
+      <div style="margin-top: 32px;">
+        <h4 style="margin: 0 0 12px; font-size: 14px;">Bit-by-Bit Priority &amp; Equality Analysis (MSB to LSB)</h4>
+        <table class="stages-table">
+          <thead>
+            <tr>
+              <th>Bit Position</th>
+              <th>Ai</th>
+              <th>Bi</th>
+              <th>EQi = XNOR(Ai, Bi)</th>
+              <th>Ai · Bi' (Ai &gt; Bi)</th>
+              <th>Ai' · Bi (Ai &lt; Bi)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="analysisTableBody">
+            <tr><td colspan="7" style="color: #94a3b8;">Click "Compare Words" to evaluate bit stages.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- THEORY & REFERENCE SECTION -->
+    <section class="topic-section" style="margin-top: 48px;">
+      <div class="section-title">
+        <span class="section-number">03</span>
+        <div>
+          <p class="label">THEORY & EQUATIONS</p>
+          <h2>Magnitude Comparator Architecture (IC 74LS85)</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>MSB-Priority Logic</h3>
+          <p style="font-size: 14px; line-height: 1.7; color: #475569;">
+            Binary magnitude comparison evaluates bits starting strictly from the <strong>Most Significant Bit (MSB, Bit 3)</strong> down to the LSB (Bit 0).
+            The first pair of bits where \(A_i \neq B_i\) conclusively establishes the inequality, rendering all lower-order bits irrelevant.
+          </p>
+
+          <h3 style="margin-top: 24px;">74LS85 Boolean Logic Equations</h3>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.8;">
+            EQ<sub>i</sub> = A<sub>i</sub> XNOR B<sub>i</sub> = (A<sub>i</sub>·B<sub>i</sub>) + (A<sub>i</sub>'·B<sub>i</sub>')<br><br>
+            A &gt; B = (A3·B3') + (EQ3·A2·B2') + (EQ3·EQ2·A1·B1') + (EQ3·EQ2·EQ1·A0·B0')<br>
+            A &lt; B = (A3'·B3) + (EQ3·A2'·B2) + (EQ3·EQ2·A1'·B1) + (EQ3·EQ2·EQ1·A0'·B0)<br>
+            A = B = EQ3 · EQ2 · EQ1 · EQ0
+          </div>
+
+          <h3 style="margin-top: 24px;">Multi-Stage Cascading (8-Bit / 12-Bit Expansion)</h3>
+          <p style="font-size: 14px; line-height: 1.7; color: #475569;">
+            To compare words larger than 4 bits, multiple IC 74LS85s are chained together. The outputs of the less significant stage connect directly to the cascade inputs of the next higher stage:
+          </p>
+          <div style="background: #f1f5f9; padding: 12px 18px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.6;">
+            OA<sub>&gt;B</sub> = (A &gt; B) + ((A = B) · IA<sub>&gt;B</sub>)<br>
+            OA<sub>&lt;B</sub> = (A &lt; B) + ((A = B) · IA<sub>&lt;B</sub>)<br>
+            OA<sub>=B</sub> = (A = B) · IA<sub>=B</sub>
+          </div>
+        </div>
+
+        <aside class="reference-area">
+          <h3>IC 74LS85 Standalone Tie-Off</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #64748b;">
+            When used as a standalone single-stage 4-bit comparator (no lower-order stage), the datasheet specifies:
+          </p>
+          <div style="background: #eef2f8; padding: 10px 14px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 12px; color: #2c6ee8; margin-top: 8px;">
+            IA &gt; B = 0<br>
+            IA &lt; B = 0<br>
+            IA = B = 1 (Tied HIGH)
+          </div>
+          <p style="font-size: 13px; line-height: 1.6; color: #64748b; margin-top: 12px;">
+            This ensures that if all 4 bits match, the IC correctly concludes \(A = B\).
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Digital Electronics Laboratory · Logic Simulation Suite</p>
+  </footer>
+
+  <script src="converter-engine.js"></script>
+  <script>
+    let cascadeState = { gt: 0, lt: 0, eq: 1 };
+
+    function toggleBit(id) {
+      const btn = document.getElementById(id);
+      const valSpan = document.getElementById(id + "-val");
+      btn.classList.toggle("active");
+      const isActive = btn.classList.contains("active");
+      valSpan.textContent = isActive ? "1" : "0";
+      updateDecimalPills();
+      computeComparison();
+    }
+
+    function toggleCascade(key) {
+      cascadeState[key] = cascadeState[key] === 1 ? 0 : 1;
+      const btn = document.getElementById("casc_" + key);
+      const val = document.getElementById("casc_" + key + "_val");
+      val.textContent = cascadeState[key];
+      if (cascadeState[key] === 1) btn.classList.add("active");
+      else btn.classList.remove("active");
+      computeComparison();
+    }
+
+    function resetInputs() {
+      ["a3", "a2", "a1", "a0", "b3", "b2", "b1", "b0"].forEach(id => {
+        const btn = document.getElementById(id);
+        const valSpan = document.getElementById(id + "-val");
+        btn.classList.remove("active");
+        valSpan.textContent = "0";
+      });
+      cascadeState = { gt: 0, lt: 0, eq: 1 };
+      ["gt", "lt"].forEach(k => {
+        const b = document.getElementById("casc_" + k);
+        b.classList.remove("active");
+        document.getElementById("casc_" + k + "_val").textContent = "0";
+      });
+      const eqBtn = document.getElementById("casc_eq");
+      eqBtn.classList.add("active");
+      document.getElementById("casc_eq_val").textContent = "1";
+
+      updateDecimalPills();
+      computeComparison();
+    }
+
+    function getBits(prefix) {
+      return (
+        document.getElementById(prefix + "3-val").textContent +
+        document.getElementById(prefix + "2-val").textContent +
+        document.getElementById(prefix + "1-val").textContent +
+        document.getElementById(prefix + "0-val").textContent
+      );
+    }
+
+    function updateDecimalPills() {
+      const a = getBits("a");
+      const b = getBits("b");
+      document.getElementById("aDecDisplay").textContent = `Decimal: ${parseInt(a, 2)}`;
+      document.getElementById("bDecDisplay").textContent = `Decimal: ${parseInt(b, 2)}`;
+    }
+
+    async function computeComparison() {
+      const a = getBits("a");
+      const b = getBits("b");
+
+      const pillGt = document.getElementById("pillGt");
+      const pillEq = document.getElementById("pillEq");
+      const pillLt = document.getElementById("pillLt");
+      const decisionText = document.getElementById("decisionText");
+      const equationText = document.getElementById("equationText");
+      const backendSource = document.getElementById("backendSource");
+      const tableBody = document.getElementById("analysisTableBody");
+
+      try {
+        const response = await universalCompare(a, b, cascadeState);
+
+        if (!response.ok) {
+          decisionText.textContent = "Error: " + (response.data.detail || "Comparison failed");
+          return;
+        }
+
+        const data = response.data;
+        backendSource.textContent = `Source: ${response.source}`;
+
+        pillGt.classList.toggle("active", data.a_gt_b === 1);
+        pillEq.classList.toggle("active", data.a_eq_b === 1);
+        pillLt.classList.toggle("active", data.a_lt_b === 1);
+
+        decisionText.textContent = `Decision: ${data.decision_stage || data.relation}`;
+        equationText.textContent = `Word A (${parseInt(a, 2)}) ${data.a_gt_b ? '>' : (data.a_lt_b ? '<' : '=')} Word B (${parseInt(b, 2)})`;
+
+        // Render bit-by-bit stages
+        if (data.bit_comparisons && Array.isArray(data.bit_comparisons)) {
+          tableBody.innerHTML = "";
+          let decisionMade = false;
+
+          data.bit_comparisons.forEach(row => {
+            const tr = document.createElement("tr");
+            let status = "Equal (Pass down)";
+            if (!decisionMade && row.eq === 0) {
+              decisionMade = true;
+              tr.classList.add("decisive-row");
+              status = row.gt === 1 ? "★ Decisive (A > B)" : "★ Decisive (A < B)";
+            } else if (decisionMade) {
+              status = "Don't Care (Overridden)";
+            }
+
+            tr.innerHTML = `
+              <td><strong>Bit ${row.bit}${row.bit === 3 ? " (MSB)" : (row.bit === 0 ? " (LSB)" : "")}</strong></td>
+              <td>${row.a}</td>
+              <td>${row.b}</td>
+              <td><strong style="color: ${row.eq ? '#16a34a' : '#dc2626'};">${row.eq}</strong></td>
+              <td>${row.gt}</td>
+              <td>${row.lt}</td>
+              <td style="color: ${row.eq === 0 && !tr.classList.contains('decisive-row') ? '#94a3b8' : '#1e293b'};">${status}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        decisionText.textContent = "Error: " + err.message;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateDecimalPills();
+      computeComparison();
+    });
+  </script>
+</body>
+</html>

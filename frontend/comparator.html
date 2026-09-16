@@ -86,76 +86,6 @@
       color: #e2e8f0;
     }
 
-    .cascade-panel {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 14px 18px;
-      margin-bottom: 20px;
-    }
-
-    .cascade-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .cascade-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: #334155;
-    }
-
-    .cascade-toggles {
-      display: flex;
-      gap: 12px;
-    }
-
-    .cascade-btn {
-      flex: 1;
-      height: 40px;
-      font-family: "DM Mono", monospace;
-      font-size: 13px;
-      font-weight: 600;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #ffffff;
-      color: #475569;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .cascade-btn.active {
-      background: #2c6ee8;
-      border-color: #2c6ee8;
-      color: #ffffff;
-    }
-
-    .compute-btn {
-      width: 100%;
-      background: var(--navy, #14233b);
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 6px;
-      font-family: "DM Mono", monospace;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      margin-top: 8px;
-    }
-
-    .compute-btn:hover {
-      background: #1e3a66;
-    }
-
     .result-box {
       margin-top: 24px;
       background: #f8fafc;
@@ -334,30 +264,6 @@
         </div>
       </div>
 
-      <!-- Cascade Inputs (IC 74LS85 expansion) -->
-      <div class="cascade-panel">
-        <div class="cascade-header">
-          <span class="cascade-title">Cascade Inputs (Expansion from Lower Stage)</span>
-          <span style="font-size: 11px; color: #64748b; font-family: 'DM Mono', monospace;">Standalone default: IA=B = 1</span>
-        </div>
-        <div class="cascade-toggles">
-          <button class="cascade-btn" id="casc_gt" onclick="toggleCascade('gt')">
-            <span>IA > B:</span>
-            <strong id="casc_gt_val">0</strong>
-          </button>
-          <button class="cascade-btn" id="casc_lt" onclick="toggleCascade('lt')">
-            <span>IA < B:</span>
-            <strong id="casc_lt_val">0</strong>
-          </button>
-          <button class="cascade-btn active" id="casc_eq" onclick="toggleCascade('eq')">
-            <span>IA = B:</span>
-            <strong id="casc_eq_val">1</strong>
-          </button>
-        </div>
-      </div>
-
-      <button class="compute-btn" id="computeBtn" onclick="computeComparison()">Compare Words</button>
-
       <!-- Result Display Box -->
       <div class="result-box" id="resultBox">
         <div style="font-size: 11px; font-family: 'DM Mono', monospace; color: #64748b; letter-spacing: 1px;">
@@ -391,7 +297,7 @@
             </tr>
           </thead>
           <tbody id="analysisTableBody">
-            <tr><td colspan="7" style="color: #94a3b8;">Click "Compare Words" to evaluate bit stages.</td></tr>
+            <tr><td colspan="7" style="color: #94a3b8;">Toggle input bits above to evaluate bit stages in real time.</td></tr>
           </tbody>
         </table>
       </div>
@@ -458,8 +364,6 @@
 
   <script src="converter-engine.js"></script>
   <script>
-    let cascadeState = { gt: 0, lt: 0, eq: 1 };
-
     function toggleBit(id) {
       const btn = document.getElementById(id);
       const valSpan = document.getElementById(id + "-val");
@@ -470,16 +374,6 @@
       computeComparison();
     }
 
-    function toggleCascade(key) {
-      cascadeState[key] = cascadeState[key] === 1 ? 0 : 1;
-      const btn = document.getElementById("casc_" + key);
-      const val = document.getElementById("casc_" + key + "_val");
-      val.textContent = cascadeState[key];
-      if (cascadeState[key] === 1) btn.classList.add("active");
-      else btn.classList.remove("active");
-      computeComparison();
-    }
-
     function resetInputs() {
       ["a3", "a2", "a1", "a0", "b3", "b2", "b1", "b0"].forEach(id => {
         const btn = document.getElementById(id);
@@ -487,15 +381,6 @@
         btn.classList.remove("active");
         valSpan.textContent = "0";
       });
-      cascadeState = { gt: 0, lt: 0, eq: 1 };
-      ["gt", "lt"].forEach(k => {
-        const b = document.getElementById("casc_" + k);
-        b.classList.remove("active");
-        document.getElementById("casc_" + k + "_val").textContent = "0";
-      });
-      const eqBtn = document.getElementById("casc_eq");
-      eqBtn.classList.add("active");
-      document.getElementById("casc_eq_val").textContent = "1";
 
       updateDecimalPills();
       computeComparison();
@@ -530,7 +415,7 @@
       const tableBody = document.getElementById("analysisTableBody");
 
       try {
-        const response = await universalCompare(a, b, cascadeState);
+        const response = await universalCompare(a, b, { gt: 0, lt: 0, eq: 1 });
 
         if (!response.ok) {
           decisionText.textContent = "Error: " + (response.data.detail || "Comparison failed");

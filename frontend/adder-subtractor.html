@@ -174,8 +174,8 @@
       margin-top: 24px;
       background: #f8fafc;
       border: 1px solid var(--line, #e2e8f0);
-      border-radius: 6px;
-      padding: 18px;
+      border-radius: 8px;
+      padding: 20px;
       text-align: center;
     }
 
@@ -185,25 +185,110 @@
     }
 
     .result-header {
-      font-size: 11px;
+      font-size: 12px;
       font-family: "DM Mono", monospace;
       color: #64748b;
-      letter-spacing: 1px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
     }
 
-    .result-value {
+    .output-bits-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .out-bit-card {
+      min-width: 66px;
+      padding: 10px 8px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       font-family: "DM Mono", monospace;
-      font-size: 32px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .out-bit-card .weight-label {
+      font-size: 11px;
       font-weight: 700;
-      color: #14233b;
-      letter-spacing: 3px;
-      margin-top: 4px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .out-bit-card .bit-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+    }
+
+    .out-bit-card .bit-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    .out-bit-card.active {
+      border-color: #2563eb;
+      background: #2563eb;
+    }
+
+    .out-bit-card.active .weight-label,
+    .out-bit-card.active .bit-val,
+    .out-bit-card.active .bit-tag {
+      color: #ffffff;
+    }
+
+    .out-bit-card.cout-card {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .out-bit-card.cout-card.active {
+      border-color: #16a34a;
+      background: #16a34a;
+    }
+
+    .out-bit-card.cout-card.active .weight-label,
+    .out-bit-card.cout-card.active .bit-val,
+    .out-bit-card.cout-card.active .bit-tag {
+      color: #ffffff;
+    }
+
+    .bit-divider {
+      width: 2px;
+      height: 52px;
+      background: #cbd5e1;
+      margin: 0 4px;
+    }
+
+    .math-breakdown-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      color: #1e293b;
+      margin: 14px 0 10px;
+      line-height: 1.6;
     }
 
     .result-meta {
       font-size: 13px;
       color: #334155;
-      margin-top: 8px;
+      margin-top: 6px;
       font-family: "DM Mono", monospace;
     }
 
@@ -387,19 +472,60 @@
         </div>
       </div>
 
-      <button class="compute-btn" id="computeBtn" onclick="computeArithmetic()">Execute Operation</button>
-
       <!-- Result Display -->
       <div class="result-box" id="resultBox">
-        <div class="result-header" id="resultTitle">Sum Output (S3 S2 S1 S0)</div>
-        <div class="result-value" id="resultSum">0000</div>
+        <div class="result-header" id="resultTitle">Arithmetic Output: [Carry-Out (2⁴ = 16)] + [4-Bit Sum (S3 S2 S1 S0)]</div>
         
+        <!-- 5-Bit Visual Output Cards (Carry-Out on left + S3..S0) -->
+        <div class="output-bits-container">
+          <!-- Cout / Bit 4 -->
+          <div class="out-bit-card cout-card" id="cardCout">
+            <span class="weight-label">2⁴ (16)</span>
+            <span class="bit-val" id="valCout">0</span>
+            <span class="bit-tag" id="tagCout">Cout</span>
+          </div>
+
+          <div class="bit-divider"></div>
+
+          <!-- S3 / Bit 3 -->
+          <div class="out-bit-card" id="cardS3">
+            <span class="weight-label">2³ (8)</span>
+            <span class="bit-val" id="valS3">0</span>
+            <span class="bit-tag" id="tagS3">S3</span>
+          </div>
+
+          <!-- S2 / Bit 2 -->
+          <div class="out-bit-card" id="cardS2">
+            <span class="weight-label">2² (4)</span>
+            <span class="bit-val" id="valS2">0</span>
+            <span class="bit-tag" id="tagS2">S2</span>
+          </div>
+
+          <!-- S1 / Bit 1 -->
+          <div class="out-bit-card" id="cardS1">
+            <span class="weight-label">2¹ (2)</span>
+            <span class="bit-val" id="valS1">0</span>
+            <span class="bit-tag" id="tagS1">S1</span>
+          </div>
+
+          <!-- S0 / Bit 0 -->
+          <div class="out-bit-card" id="cardS0">
+            <span class="weight-label">2⁰ (1)</span>
+            <span class="bit-val" id="valS0">0</span>
+            <span class="bit-tag" id="tagS0">S0</span>
+          </div>
+        </div>
+
+        <div class="math-breakdown-box" id="mathBreakdown">
+          <!-- Live mathematical decimal expansion -->
+        </div>
+
         <div class="flags-bar" id="flagsBar">
           <span class="flag-pill" id="coutFlag">Carry-Out (Cout): 0</span>
           <span class="flag-pill" id="borrowFlag" style="display: none;">Borrow: 0</span>
         </div>
 
-        <div class="result-meta" id="resultEquation">Equation: 0 + 0 = 0</div>
+        <div class="result-meta" id="resultEquation">Calculation: 0 + 0 = 0</div>
         <div class="result-meta" id="backendSource" style="color: #64748b; font-size: 11px; margin-top: 4px;"></div>
       </div>
 
@@ -496,7 +622,7 @@
         btnAdd.classList.add("active");
         btnSub.classList.remove("active");
         modeDesc.textContent = "Mode M = 0: Addition (A + B + Cin). Input B bits enter unchanged.";
-        resultTitle.textContent = "Sum Output (S3 S2 S1 S0)";
+        resultTitle.textContent = "Sum Output: [Carry-Out (2⁴ = 16)] + [4-Bit Sum (S3 S2 S1 S0)]";
         cinBtn.disabled = false;
         cinBtn.style.opacity = "1";
         cinSubtext.textContent = "Toggle initial carry-in for Stage 0 addition.";
@@ -506,7 +632,7 @@
         btnSub.classList.add("active");
         btnAdd.classList.remove("active");
         modeDesc.textContent = "Mode M = 1: Subtraction (A - B). Input B bits inverted via XOR; Cin locked to 1.";
-        resultTitle.textContent = "Difference Output (D3 D2 D1 D0)";
+        resultTitle.textContent = "Difference Output: [Cout (Borrow Status)] + [4-Bit Difference (D3 D2 D1 D0)]";
         cinValue = 1;
         cinBtn.textContent = "1";
         cinBtn.classList.add("active");
@@ -578,46 +704,113 @@
       const b = getBits("b");
       const effectiveCin = currentMode === 1 ? 1 : cinValue;
 
-      const resultSum = document.getElementById("resultSum");
       const resultBox = document.getElementById("resultBox");
       const coutFlag = document.getElementById("coutFlag");
       const borrowFlag = document.getElementById("borrowFlag");
       const resultEq = document.getElementById("resultEquation");
       const backendSource = document.getElementById("backendSource");
       const stagesTableBody = document.getElementById("stagesTableBody");
+      const mathBreakdown = document.getElementById("mathBreakdown");
+
+      const valCout = document.getElementById("valCout");
+      const valS3 = document.getElementById("valS3");
+      const valS2 = document.getElementById("valS2");
+      const valS1 = document.getElementById("valS1");
+      const valS0 = document.getElementById("valS0");
+
+      const cardCout = document.getElementById("cardCout");
+      const cardS3 = document.getElementById("cardS3");
+      const cardS2 = document.getElementById("cardS2");
+      const cardS1 = document.getElementById("cardS1");
+      const cardS0 = document.getElementById("cardS0");
 
       try {
         const response = await universalAddSubtract(a, b, currentMode, effectiveCin);
 
         if (!response.ok) {
           resultBox.classList.add("error");
-          resultSum.textContent = "Error";
           resultEq.textContent = response.data.detail || "Operation failed.";
           return;
         }
 
         resultBox.classList.remove("error");
         const data = response.data;
-        resultSum.textContent = data.sum;
         backendSource.textContent = `Source: ${response.source}`;
 
         const aDec = parseInt(a, 2);
         const bDec = parseInt(b, 2);
 
+        // Update 5-bit output cards
+        const cout = data.carry_out;
+        const s3 = data.sum[0];
+        const s2 = data.sum[1];
+        const s1 = data.sum[2];
+        const s0 = data.sum[3];
+
+        valCout.textContent = cout;
+        valS3.textContent = s3;
+        valS2.textContent = s2;
+        valS1.textContent = s1;
+        valS0.textContent = s0;
+
+        cardCout.classList.toggle("active", cout === 1);
+        cardS3.classList.toggle("active", s3 === "1");
+        cardS2.classList.toggle("active", s2 === "1");
+        cardS1.classList.toggle("active", s1 === "1");
+        cardS0.classList.toggle("active", s0 === "1");
+
         if (currentMode === 0) {
-          coutFlag.textContent = `Carry-Out (Cout): ${data.carry_out}`;
-          if (data.carry_out === 1) coutFlag.classList.add("active");
+          document.getElementById("tagCout").textContent = "Cout";
+          document.getElementById("tagS3").textContent = "S3";
+          document.getElementById("tagS2").textContent = "S2";
+          document.getElementById("tagS1").textContent = "S1";
+          document.getElementById("tagS0").textContent = "S0";
+
+          coutFlag.textContent = `Carry-Out (Cout): ${cout}`;
+          if (cout === 1) coutFlag.classList.add("active");
           else coutFlag.classList.remove("active");
 
           const total = aDec + bDec + effectiveCin;
           resultEq.textContent = `Calculation: ${aDec} + ${bDec}${effectiveCin ? " + 1 (Cin)" : ""} = ${total} (Decimal) | 4-bit Sum: ${parseInt(data.sum, 2)}`;
+
+          // Binary weight expansion: (1 × 16) + (1 × 8) + ... = Total
+          const terms = [
+            cout === 1 ? `<strong style="color: #16a34a;">(1 × 16)</strong>` : `<span style="color: #94a3b8;">(0 × 16)</span>`,
+            s3 === "1" ? `<strong style="color: #2563eb;">(1 × 8)</strong>` : `<span style="color: #94a3b8;">(0 × 8)</span>`,
+            s2 === "1" ? `<strong style="color: #2563eb;">(1 × 4)</strong>` : `<span style="color: #94a3b8;">(0 × 4)</span>`,
+            s1 === "1" ? `<strong style="color: #2563eb;">(1 × 2)</strong>` : `<span style="color: #94a3b8;">(0 × 2)</span>`,
+            s0 === "1" ? `<strong style="color: #2563eb;">(1 × 1)</strong>` : `<span style="color: #94a3b8;">(0 × 1)</span>`
+          ];
+
+          mathBreakdown.innerHTML = `
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 700;">BINARY PLACE VALUE EXPANSION:</div>
+            <div style="font-size: 14px;">${terms.join(" + ")} = <strong style="font-size: 17px; color: #0f172a;">${total}</strong> (Decimal)</div>
+          `;
         } else {
+          document.getElementById("tagCout").textContent = cout ? "No Borrow" : "Borrow";
+          document.getElementById("tagS3").textContent = "D3";
+          document.getElementById("tagS2").textContent = "D2";
+          document.getElementById("tagS1").textContent = "D1";
+          document.getElementById("tagS0").textContent = "D0";
+
           borrowFlag.textContent = `Borrow: ${data.borrow}`;
           if (data.borrow === 1) borrowFlag.classList.add("active");
           else borrowFlag.classList.remove("active");
 
           const diff = aDec - bDec;
           resultEq.textContent = `Calculation: ${aDec} - ${bDec} = ${diff} (Decimal) | 2's Complement Sum: ${data.sum}${diff < 0 ? " (Negative)" : ""}`;
+
+          if (diff >= 0) {
+            mathBreakdown.innerHTML = `
+              <div style="font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 700;">SUBTRACTION RESULT (A ≥ B, Positive):</div>
+              <div style="font-size: 14px;">Difference = <strong style="font-size: 17px; color: #16a34a;">${diff}</strong> (Decimal) | 4-bit Binary: <strong>${data.sum}</strong> | Cout = 1 (No Borrow)</div>
+            `;
+          } else {
+            mathBreakdown.innerHTML = `
+              <div style="font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 700;">SUBTRACTION RESULT (A < B, Negative in 2's Complement):</div>
+              <div style="font-size: 14px;">2's Complement Output = <strong>${data.sum}</strong> | Actual Decimal Result = <strong style="font-size: 17px; color: #dc2626;">${diff}</strong> | Borrow = 1</div>
+            `;
+          }
         }
 
         // Render ripple-carry stages
@@ -639,7 +832,6 @@
         }
       } catch (err) {
         resultBox.classList.add("error");
-        resultSum.textContent = "Error";
         resultEq.textContent = err.message;
       }
     }

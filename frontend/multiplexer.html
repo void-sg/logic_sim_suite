@@ -112,48 +112,28 @@
     }
 
     .data-btn {
-      height: 56px;
+      height: 48px;
       border: 2px solid #cbd5e1;
       border-radius: 6px;
       background: #f8fafc;
-      cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: "DM Mono", monospace;
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 700;
+      color: #64748b;
       transition: all 0.2s ease;
       position: relative;
-    }
-
-    .data-btn span:last-child {
-      font-size: 10px;
-      font-weight: 400;
-      color: #64748b;
-    }
-
-    .data-btn.active {
-      background: #0f172a;
-      color: #ffffff;
-      border-color: #0f172a;
-    }
-
-    .data-btn.active span:last-child {
-      color: #cbd5e1;
     }
 
     .data-btn.selected-channel {
       border: 2px solid #2563eb !important;
       outline: 2px solid #93c5fd;
       background: #eff6ff;
-    }
-
-    .data-btn.selected-channel.active {
-      background: #2563eb;
-      color: white;
-      border-color: #1d4ed8 !important;
+      color: #1d4ed8;
+      font-size: 16px;
+      font-weight: 800;
     }
 
     .strobe-bar {
@@ -353,7 +333,7 @@
 
       <!-- Data Inputs -->
       <div>
-        <div style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px;">
+        <div style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px;" id="dataInputLabel">
           Data Inputs (D0 to D7)
         </div>
         <div class="data-grid" id="dataInputGrid">
@@ -361,13 +341,11 @@
         </div>
       </div>
 
-      <button class="compute-btn" id="computeBtn" onclick="computeMux()">Route Data</button>
-
       <!-- Output Result Box -->
       <div class="result-box" id="resultBox">
         <div class="result-header">MULTIPLEXER OUTPUT (Y)</div>
-        <div class="result-value" id="resultOut">0</div>
-        <div class="result-meta" id="resultMeta">Active Channel: D0 (Data = 0)</div>
+        <div class="result-value" id="resultOut">Y = D0</div>
+        <div class="result-meta" id="resultMeta">Active Channel: D0</div>
         <div class="result-meta" id="backendSource" style="color: #64748b; font-size: 11px; margin-top: 4px;"></div>
       </div>
 
@@ -519,18 +497,15 @@
       const count = currentMuxSize === "8:1" ? 8 : (currentMuxSize === "4:1" ? 4 : 2);
       const selIdx = getSelectIndex();
 
+      document.getElementById("dataInputLabel").textContent = `Data Inputs (D0 to D${count - 1})`;
+
       for (let i = 0; i < count; i++) {
         const isSelected = i === selIdx;
-        const isActive = dataInputs[i] === 1;
-        const btn = document.createElement("button");
-        btn.className = `data-btn ${isActive ? 'active' : ''} ${isSelected ? 'selected-channel' : ''}`;
-        btn.id = `data_btn_${i}`;
-        btn.onclick = () => toggleDataBit(i);
-        btn.innerHTML = `
-          <span id="data_val_${i}">${dataInputs[i]}</span>
-          <span>D${i}</span>
-        `;
-        grid.appendChild(btn);
+        const div = document.createElement("div");
+        div.className = `data-btn ${isSelected ? 'selected-channel' : ''}`;
+        div.id = `data_channel_${i}`;
+        div.textContent = `D${i}`;
+        grid.appendChild(div);
       }
       document.getElementById("selectedChannelPill").textContent = `Routes: D${selIdx}`;
     }
@@ -562,12 +537,6 @@
       computeMux();
     }
 
-    function toggleDataBit(index) {
-      dataInputs[index] = dataInputs[index] === 1 ? 0 : 1;
-      renderDataInputs();
-      computeMux();
-    }
-
     function toggleStrobe() {
       strobeState = strobeState === 0 ? 1 : 0;
       const btn = document.getElementById("strobeBtn");
@@ -578,7 +547,6 @@
 
     function resetInputs() {
       selectBits = { s2: 0, s1: 0, s0: 0 };
-      dataInputs = [0, 0, 0, 0, 0, 0, 0, 0];
       strobeState = 0;
       document.getElementById("strobeBtn").textContent = "0";
       document.getElementById("strobeBtn").classList.remove("active");
@@ -587,61 +555,55 @@
       computeMux();
     }
 
-    async function computeMux() {
+    function computeMux() {
       const selectStr = getSelectString();
-      const count = currentMuxSize === "8:1" ? 8 : (currentMuxSize === "4:1" ? 4 : 2);
-      const inputs = dataInputs.slice(0, count);
+      const selIdx = getSelectIndex();
+      const selChannel = `D${selIdx}`;
 
       const resultOut = document.getElementById("resultOut");
       const resultMeta = document.getElementById("resultMeta");
       const backendSource = document.getElementById("backendSource");
 
-      try {
-        const response = await universalMux(selectStr, inputs, strobeState);
+      if (strobeState === 1) {
+        resultOut.innerHTML = `Y = 0 <span style="font-size: 15px; color: #ef4444; font-weight: 600; vertical-align: middle;">(Disabled by Strobe G&#773;)</span>`;
+        resultMeta.textContent = `Output forced LOW (0) by Active-Low Strobe G = 1 | Selected Input Channel was ${selChannel}`;
+      } else {
+        resultOut.textContent = `Y = ${selChannel}`;
+        resultMeta.textContent = `Select code [${selectStr}] routes Data Input ${selChannel} directly to Output Y`;
+      }
 
-        if (!response.ok) {
-          resultOut.textContent = "Err";
-          resultMeta.textContent = response.data.detail || "Error routing multiplexer.";
-          return;
-        }
+      if (backendSource) {
+        backendSource.textContent = "Mode: Interactive Logic Router";
+      }
 
-        const data = response.data;
-        resultOut.textContent = data.output;
-        backendSource.textContent = `Source: ${response.source}`;
-
-        const selChannel = data.selected_channel || `D${parseInt(selectStr, 2)}`;
-        const channelValue = inputs[parseInt(selectStr, 2)];
+      // If 8:1 MUX, update internal IC 74LS153 sections
+      if (currentMuxSize === "8:1") {
+        const s2 = selectBits.s2;
+        const boxSec1 = document.getElementById("boxSec1");
+        const boxSec2 = document.getElementById("boxSec2");
 
         if (strobeState === 1) {
-          resultMeta.textContent = `Output forced LOW (0) by Strobe G = 1 (Disabled) | Routed ${selChannel} = ${channelValue}`;
+          boxSec1.classList.remove("active-section");
+          boxSec2.classList.remove("active-section");
+          document.getElementById("valSec1").textContent = `1Y = 0`;
+          document.getElementById("valSec2").textContent = `2Y = 0`;
+          document.getElementById("gateSec1").textContent = "Disabled (G = 1)";
+          document.getElementById("gateSec2").textContent = "Disabled (G = 1)";
+        } else if (s2 === 0) {
+          boxSec1.classList.add("active-section");
+          boxSec2.classList.remove("active-section");
+          document.getElementById("valSec1").textContent = `1Y = ${selChannel}`;
+          document.getElementById("valSec2").textContent = `2Y = 0`;
+          document.getElementById("gateSec1").textContent = "Active (S2' = 1)";
+          document.getElementById("gateSec2").textContent = "Forced 0 (S2 = 0)";
         } else {
-          resultMeta.textContent = `Active Channel: ${selChannel} (Data Value = ${channelValue}) → Output Y = ${data.output}`;
+          boxSec2.classList.add("active-section");
+          boxSec1.classList.remove("active-section");
+          document.getElementById("valSec1").textContent = `1Y = 0`;
+          document.getElementById("valSec2").textContent = `2Y = ${selChannel}`;
+          document.getElementById("gateSec1").textContent = "Forced 0 (S2' = 0)";
+          document.getElementById("gateSec2").textContent = "Active (S2 = 1)";
         }
-
-        // If 8:1 MUX, update internal IC 74LS153 sections
-        if (currentMuxSize === "8:1" && data.details) {
-          const det = data.details;
-          document.getElementById("valSec1").textContent = `1Y = ${det.section1_out}`;
-          document.getElementById("valSec2").textContent = `2Y = ${det.section2_out}`;
-
-          const boxSec1 = document.getElementById("boxSec1");
-          const boxSec2 = document.getElementById("boxSec2");
-
-          if (det.active_section === 1) {
-            boxSec1.classList.add("active-section");
-            boxSec2.classList.remove("active-section");
-            document.getElementById("gateSec1").textContent = "Active (S2' = 1)";
-            document.getElementById("gateSec2").textContent = "Forced 0 (S2 = 0)";
-          } else {
-            boxSec2.classList.add("active-section");
-            boxSec1.classList.remove("active-section");
-            document.getElementById("gateSec1").textContent = "Forced 0 (S2' = 0)";
-            document.getElementById("gateSec2").textContent = "Active (S2 = 1)";
-          }
-        }
-      } catch (err) {
-        resultOut.textContent = "Err";
-        resultMeta.textContent = err.message;
       }
     }
 

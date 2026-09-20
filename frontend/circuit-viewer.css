@@ -1,0 +1,542 @@
+/* ==========================================================================
+   KiCad-Style Live Schematic Viewer CSS
+   ========================================================================== */
+
+:root {
+  --kicad-canvas-bg: #faf8f5;
+  --kicad-grid-dot: #e2ded7;
+  --kicad-border-red: #8c1d1d;
+  --kicad-border-red-light: #ab2828;
+  --kicad-ref-red: #cc0000;
+  --kicad-component-outline: #111111;
+  --kicad-component-fill: #fffef2;
+  --kicad-pin-num: #888888;
+  --kicad-pin-name: #222222;
+  --kicad-wire-low: #0a8c2f;
+  --kicad-wire-high: #00d64b;
+  --kicad-wire-high-glow: rgba(0, 214, 75, 0.4);
+  --kicad-wire-high-glow-strong: rgba(0, 255, 90, 0.7);
+  --kicad-junction: #0a8c2f;
+  --kicad-junction-high: #00e650;
+  --kicad-text-dark: #1a1a1a;
+  --kicad-title-bg: #faf7f0;
+}
+
+/* Page Layout */
+.schematic-page-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 30px 40px;
+}
+
+.schematic-header-intro {
+  margin-bottom: 20px;
+}
+
+.schematic-header-intro h1 {
+  margin: 4px 0 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--navy, #14233b);
+}
+
+.schematic-header-intro p {
+  color: var(--muted, #667387);
+  margin: 0;
+  font-size: 15px;
+}
+
+/* Interactive Control Deck */
+.circuit-control-deck {
+  background: #ffffff;
+  border: 1px solid #dce1e6;
+  border-radius: 10px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.deck-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.deck-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.deck-group-label {
+  font-family: "DM Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.5px;
+  min-width: 110px;
+}
+
+/* Bit Toggle Buttons */
+.bit-btn-group {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.bit-toggle-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 48px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  font-family: "DM Mono", monospace;
+  transition: all 0.15s ease-in-out;
+  user-select: none;
+}
+
+.bit-toggle-btn .bit-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.bit-toggle-btn .bit-val {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bit-toggle-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.bit-toggle-btn.active {
+  background: #10b981;
+  border-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.bit-toggle-btn.active .bit-label {
+  color: #e6fffa;
+}
+
+/* Strobe toggle special style */
+.bit-toggle-btn.strobe-btn.active {
+  background: #ef4444;
+  border-color: #dc2626;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+.bit-toggle-btn.strobe-btn.active .bit-label {
+  color: #ffe4e6;
+}
+
+/* Live Output Display Box */
+.output-display-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  background: #0f172a;
+  border-radius: 8px;
+  color: #ffffff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.output-display-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-family: "DM Mono", monospace;
+  letter-spacing: 1px;
+}
+
+.output-led {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-family: "DM Mono", monospace;
+  font-size: 20px;
+  font-weight: 800;
+  background: #1e293b;
+  color: #64748b;
+  border: 2px solid #334155;
+  transition: all 0.2s ease;
+}
+
+.output-led.on {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #34d399;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.status-badge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #1e293b;
+  color: #38bdf8;
+  font-family: "DM Mono", monospace;
+}
+
+/* Preset & Action Bar */
+.action-presets-row {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preset-btn-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-sm:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.api-status-pill {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.status-dot.offline {
+  background: #f59e0b;
+}
+
+/* Schematic Canvas Wrapper */
+.schematic-canvas-card {
+  position: relative;
+  background: var(--kicad-canvas-bg);
+  border: 1px solid #d0c8be;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Canvas Toolbar (Pan / Zoom Controls) */
+.schematic-toolbar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tool-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s;
+}
+
+.tool-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* SVG Viewer Container */
+.schematic-viewport {
+  width: 100%;
+  height: 740px;
+  cursor: grab;
+  user-select: none;
+  display: block;
+}
+
+.schematic-viewport:active {
+  cursor: grabbing;
+}
+
+.schematic-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* KiCad SVG Elements Styling */
+.kicad-bg-grid {
+  fill: var(--kicad-canvas-bg);
+}
+
+.kicad-frame-line {
+  stroke: var(--kicad-border-red);
+  stroke-width: 1.4px;
+  fill: none;
+}
+
+.kicad-frame-line-thin {
+  stroke: var(--kicad-border-red);
+  stroke-width: 0.8px;
+  fill: none;
+}
+
+.kicad-zone-label {
+  fill: var(--kicad-border-red);
+  font-family: "DM Mono", "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* KiCad Title Block */
+.kicad-title-block-bg {
+  fill: var(--kicad-title-bg);
+  stroke: var(--kicad-border-red);
+  stroke-width: 1.5px;
+}
+
+.kicad-title-block-divider {
+  stroke: var(--kicad-border-red);
+  stroke-width: 1px;
+}
+
+.kicad-title-label {
+  fill: var(--kicad-border-red);
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.kicad-title-val {
+  fill: #000000;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.kicad-title-heading {
+  fill: #000000;
+  font-family: "DM Mono", monospace;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* Components & Gates */
+.kicad-component-body {
+  fill: var(--kicad-component-fill);
+  stroke: var(--kicad-component-outline);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
+
+.kicad-gate-symbol {
+  fill: var(--kicad-component-fill);
+  stroke: var(--kicad-component-outline);
+  stroke-width: 1.6px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.kicad-inversion-bubble {
+  fill: var(--kicad-canvas-bg);
+  stroke: var(--kicad-component-outline);
+  stroke-width: 1.4px;
+}
+
+.kicad-ref-des {
+  fill: var(--kicad-ref-red);
+  font-family: "DM Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.kicad-comp-value {
+  fill: #111111;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Pin Stubs and Labels */
+.kicad-pin-stub {
+  stroke: var(--kicad-component-outline);
+  stroke-width: 1.3px;
+  stroke-linecap: round;
+}
+
+.kicad-pin-number {
+  fill: var(--kicad-pin-num);
+  font-family: "DM Mono", monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.kicad-pin-name {
+  fill: var(--kicad-pin-name);
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Wires & Orthogonal Buses */
+.kicad-wire {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease;
+}
+
+.kicad-wire.wire-low {
+  stroke: var(--kicad-wire-low);
+  stroke-width: 1.5px;
+  opacity: 0.75;
+}
+
+.kicad-wire.wire-high {
+  stroke: var(--kicad-wire-high);
+  stroke-width: 2.8px;
+  filter: drop-shadow(0 0 4px var(--kicad-wire-high-glow-strong));
+  opacity: 1;
+}
+
+/* Junction Dots */
+.kicad-junction {
+  transition: fill 0.2s ease, filter 0.2s ease;
+}
+
+.kicad-junction.junc-low {
+  fill: var(--kicad-junction);
+  r: 3.5px;
+}
+
+.kicad-junction.junc-high {
+  fill: var(--kicad-junction-high);
+  r: 4.5px;
+  filter: drop-shadow(0 0 4px var(--kicad-wire-high-glow-strong));
+}
+
+/* Port Badges */
+.kicad-port-shape {
+  stroke-width: 1.3px;
+  stroke-linejoin: round;
+}
+
+.kicad-port-text {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Live Pin Value Badges */
+.kicad-pin-val-badge {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  font-weight: 800;
+  dominant-baseline: central;
+  text-anchor: middle;
+}
+
+/* Informative Signal Path Flow Table */
+.flow-explainer-card {
+  margin-top: 24px;
+  background: #ffffff;
+  border: 1px solid #dce1e6;
+  border-radius: 8px;
+  padding: 20px 24px;
+}
+
+.flow-explainer-card h3 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  color: var(--navy, #14233b);
+}
+
+.flow-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.flow-step-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.flow-step-title {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-step-val {
+  font-family: "DM Mono", monospace;
+  font-weight: 700;
+  color: #2563eb;
+}

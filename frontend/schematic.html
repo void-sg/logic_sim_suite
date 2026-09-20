@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KiCad Live Schematic Viewer | 8:1 Multiplexer (IC 74LS153)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="circuit-viewer.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="index.html#converter">Converter</a>
+        <a href="multiplexer.html">Multiplexer</a>
+        <a href="comparator.html">Comparator</a>
+        <a href="adder-subtractor.html">Adder</a>
+        <a href="schematic.html" style="border-bottom-color: #e9bd4f; color: #ffffff;">Schematic</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="schematic-page-container">
+    
+    <!-- Title & Description -->
+    <div class="schematic-header-intro">
+      <p class="label" style="font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 700; color: #e9bd4f; letter-spacing: 1px; margin-bottom: 4px;">
+        EDA CAD SIMULATION &bull; KICAD SCHEMATIC EDITOR STYLING
+      </p>
+      <h1>8:1 Multiplexer Live Schematic (IC 74LS153)</h1>
+      <p>
+        Data-driven schematic visualization of an 8:1 MUX composed of dual 4:1 multiplexer sections (IC 74LS153), 
+        a 74LS04 inverter for section steering, and a 74LS32 OR gate. Toggle inputs below to trace live logic flow.
+      </p>
+    </div>
+
+    <!-- Interactive Control Deck -->
+    <div class="circuit-control-deck">
+      <div class="deck-row">
+        
+        <!-- Select Lines (S2, S1, S0) -->
+        <div class="deck-group">
+          <span class="deck-group-label">SELECT (S₂ S₁ S₀)</span>
+          <div class="bit-btn-group">
+            <button class="bit-toggle-btn" data-type="select" data-index="0" title="Select Line S2 (MSB - Section Select)">
+              <span class="bit-label">S₂ (MSB)</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="select" data-index="1" title="Select Line S1 (Mid - Line B)">
+              <span class="bit-label">S₁ (B)</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="select" data-index="2" title="Select Line S0 (LSB - Line A)">
+              <span class="bit-label">S₀ (A)</span>
+              <span class="bit-val">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Strobe Enable -->
+        <div class="deck-group">
+          <span class="deck-group-label">STROBE (~G)</span>
+          <div class="bit-btn-group">
+            <button class="bit-toggle-btn strobe-btn" data-type="strobe" title="Active-Low Enable Strobe (0=Enable, 1=Disable)">
+              <span class="bit-label">~G (0=ON)</span>
+              <span class="bit-val">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Output LED Display -->
+        <div class="output-display-card">
+          <div>
+            <div class="output-display-label">OUTPUT (Y)</div>
+            <div class="status-badge" id="active-path-desc">Channel D0 routed to Y</div>
+          </div>
+          <div class="output-led" id="output-led">0</div>
+        </div>
+
+      </div>
+
+      <!-- Data Inputs (D0..D7) -->
+      <div class="deck-row" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+        <div class="deck-group" style="width: 100%;">
+          <span class="deck-group-label">DATA INPUTS (D₀..D₇)</span>
+          <div class="bit-btn-group" style="flex-wrap: wrap;">
+            <button class="bit-toggle-btn" data-type="input" data-index="0" title="Data Input D0 (Section 1)">
+              <span class="bit-label">D₀</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="1" title="Data Input D1 (Section 1)">
+              <span class="bit-label">D₁</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="2" title="Data Input D2 (Section 1)">
+              <span class="bit-label">D₂</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="3" title="Data Input D3 (Section 1)">
+              <span class="bit-label">D₃</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="4" title="Data Input D4 (Section 2)">
+              <span class="bit-label">D₄</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="5" title="Data Input D5 (Section 2)">
+              <span class="bit-label">D₅</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="6" title="Data Input D6 (Section 2)">
+              <span class="bit-label">D₆</span>
+              <span class="bit-val">0</span>
+            </button>
+            <button class="bit-toggle-btn" data-type="input" data-index="7" title="Data Input D7 (Section 2)">
+              <span class="bit-label">D₇</span>
+              <span class="bit-val">0</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Presets & Actions -->
+      <div class="action-presets-row">
+        <div class="preset-btn-list">
+          <span style="font-size: 12px; font-weight: 600; color: #64748b; align-self: center;">Quick Test:</span>
+          <button class="btn-sm" data-preset="d3-active">Select D₃=1 (S=011)</button>
+          <button class="btn-sm" data-preset="d6-active">Select D₆=1 (S=110)</button>
+          <button class="btn-sm" data-preset="all-ones">All Inputs 1</button>
+          <button class="btn-sm" data-preset="strobe-disabled">Disable Strobe (~G=1)</button>
+          <button class="btn-sm" data-preset="reset">Reset All</button>
+        </div>
+
+        <div class="api-status-pill">
+          <span class="status-dot" id="api-status-dot"></span>
+          <span id="api-status-text">Connecting...</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Schematic Canvas Container -->
+    <div class="schematic-canvas-card">
+      
+      <!-- Pan & Zoom Controls -->
+      <div class="schematic-toolbar">
+        <button class="tool-btn" id="btn-zoom-in" title="Zoom In (+)">+</button>
+        <button class="tool-btn" id="btn-zoom-out" title="Zoom Out (-)">−</button>
+        <button class="tool-btn" id="btn-zoom-reset" title="Fit to Screen (⟲)">⟲</button>
+      </div>
+
+      <!-- SVG Viewport -->
+      <div class="schematic-viewport">
+        <svg id="schematic-svg" class="schematic-svg" viewBox="0 0 1200 740" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+    </div>
+
+    <!-- Logic Explanation Card -->
+    <div class="flow-explainer-card">
+      <h3>Circuit Stage Logic & Interconnect Breakdown</h3>
+      <div class="flow-steps">
+        <div class="flow-step-item">
+          <div class="flow-step-title">
+            <span>1. Section Steering (74LS04)</span>
+          </div>
+          <div>Inverts MSB select line <span class="flow-step-val" id="flow-s2-val">S2 = 0</span> to drive active-low enables 1G and 2G.</div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="flow-step-title">
+            <span>2. Shared Select Bus</span>
+          </div>
+          <div>Address lines S1 and S0 drive inputs B and A on both 74LS153 sections: <span class="flow-step-val" id="flow-s10-val">B = 0, A = 0</span>.</div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="flow-step-title">
+            <span>3. Unit U2A (Channels D0-D3)</span>
+          </div>
+          <div>Section 1 output: <span class="flow-step-val" id="flow-u2a-val">1Y = 0</span>. Active when S2 = 0 and ~G = 0.</div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="flow-step-title">
+            <span>4. Unit U2B (Channels D4-D7)</span>
+          </div>
+          <div>Section 2 output: <span class="flow-step-val" id="flow-u2b-val">2Y = 0</span>. Active when S2 = 1 and ~G = 0.</div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="flow-step-title">
+            <span>5. Combining OR Gate (74LS32)</span>
+          </div>
+          <div>Combined output: <span class="flow-step-val" id="flow-u3-val">Y = 1Y OR 2Y = 0</span>. Transmits the active section to output port Y.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="circuit-viewer.js"></script>
+</body>
+</html>

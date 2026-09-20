@@ -35,4 +35,16 @@ app.include_router(circuit_router.router)
 
 @app.get("/")
 def root():
-    return {"status": "ok", "endpoints": ["/convert", "/add-subtract", "/compare", "/mux", "/circuit/mux-8to1"]}
+    return {
+        "status": "ok",
+        "endpoints": [
+            "/convert",
+            "/add-subtract",
+            "/compare",
+            "/mux",
+            "/circuit/mux-8to1",
+            "/circuit/mux-4to1",
+            "/circuit/comparator-4bit",
+            "/circuit/adder-subtractor-4bit",
+        ],
+    }

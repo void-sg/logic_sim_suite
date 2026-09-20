@@ -244,9 +244,22 @@ module here.
 
 ---
 
+## 7. Hardware EDA Implementation Subsystem — [IMPLEMENTED]
+
+Hardware schematic and PCB specifications corresponding to the Universal Code Converter:
+- **Subsystem:** 4-Bit Binary to Gray Code Converter hardware implementation.
+- **Hardware Files:** Located under `hardware/code_converter_4bit/`
+  - [`HARDWARE_SPEC.md`](../hardware/code_converter_4bit/HARDWARE_SPEC.md): Complete Pin Mapping Matrix, K-Maps, and PCB Layout Guidelines.
+  - [`generate_schematic.py`](../hardware/code_converter_4bit/generate_schematic.py): Automated KiCad 7/8 schematic (`.kicad_sch`) and netlist (`.net`) generator with SKiDL support and built-in ERC validation.
+  - [`code_converter_4bit.kicad_sch`](../hardware/code_converter_4bit/code_converter_4bit.kicad_sch): Production-ready KiCad 7.0/8.0 schematic.
+  - [`code_converter_4bit.net`](../hardware/code_converter_4bit/code_converter_4bit.net): Netlist.
+
+---
+
 ## What still needs a design-question session before implementation
 - Comparator module's function contract (3 open questions above)
 - MUX module's function contract (2 open questions above)
 - SOP/POS module's entire API shape (not started)
 - IC library's storage format (dict vs JSON vs SQLite — leaning dict, see
   earlier database discussion: 14 static rows don't need a real database)
+

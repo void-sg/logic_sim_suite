@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IC Workbench & EDA Schematic Lab | Digital Logic Simulation Suite</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="workbench.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="workbench-body">
+
+  <!-- Top App Navigation -->
+  <header class="wb-header">
+    <a class="wb-brand" href="index.html">
+      <span class="wb-brand-badge">DE</span>
+      <div>
+        <div class="wb-brand-title">Digital Logic Simulation Suite</div>
+        <div class="wb-brand-subtitle">CAMPUS EDA LAB &bull; KICAD WORKBENCH</div>
+      </div>
+    </a>
+
+    <nav class="wb-nav-links">
+      <a href="index.html#converter" class="wb-nav-link">Converter</a>
+      <a href="multiplexer.html" class="wb-nav-link">Multiplexer</a>
+      <a href="comparator.html" class="wb-nav-link">Comparator</a>
+      <a href="adder-subtractor.html" class="wb-nav-link">Adder</a>
+      <a href="schematic.html" class="wb-nav-link">Schematic</a>
+      <a href="workbench.html" class="wb-nav-link active">IC Workbench</a>
+    </nav>
+  </header>
+
+  <!-- KiCad-Style Workbench Toolbar -->
+  <div class="wb-toolbar">
+    <!-- Component Placement & Tools -->
+    <div class="wb-toolbar-group">
+      <button class="wb-btn wb-btn-primary" id="btn-add-symbol" title="Choose and Place Symbol (Shortcut: A)">
+        <span style="font-size: 15px; font-weight: 800;">+</span>
+        <span>Choose Symbol [A]</span>
+      </button>
+
+      <div class="wb-toolbar-divider"></div>
+
+      <button class="wb-btn tool-btn active" id="btn-tool-select" title="Select & Move Tool (Shortcut: S)">
+        <span>↖ Select [S]</span>
+      </button>
+
+      <button class="wb-btn tool-btn" id="btn-tool-wire" title="Draw Manhattan Wire (Shortcut: W)">
+        <span>⚡ Wire [W]</span>
+      </button>
+
+      <button class="wb-btn tool-btn wb-btn-danger" id="btn-tool-delete" title="Delete Selected Item (Shortcut: Del)">
+        <span>🗑 Delete [Del]</span>
+      </button>
+    </div>
+
+    <!-- Presets & Simulation Controls -->
+    <div class="wb-toolbar-group">
+      <select class="wb-select" id="preset-select" title="Load Standard Academic Lab Experiment">
+        <option value="">-- Load Lab Experiment Preset --</option>
+        <option value="7400_nand">Exp 1: 7400 Quad NAND Gate Verification</option>
+        <option value="7483_adder">Exp 2: 7483 4-Bit Binary Full Adder Test</option>
+        <option value="7485_comparator">Exp 3: 7485 4-Bit Magnitude Comparator Test</option>
+        <option value="74151_mux">Exp 4: 74151 8:1 Multiplexer Experiment</option>
+        <option value="diode_or">Exp 5: Diode OR Logic Gate Circuit</option>
+      </select>
+
+      <div class="wb-toolbar-divider"></div>
+
+      <button class="wb-btn wb-btn-success" id="btn-sim-toggle" title="Toggle Real-Time Logic Propagation">
+        <span>⏸ Pause Sim</span>
+      </button>
+
+      <div class="wb-sim-status">
+        <div class="wb-status-dot" id="sim-status-dot"></div>
+        <span id="sim-status-text">SIMULATION LIVE</span>
+      </div>
+    </div>
+
+    <!-- View & Canvas Controls -->
+    <div class="wb-toolbar-group">
+      <button class="wb-btn" id="btn-zoom-in" title="Zoom In (+)">🔍 +</button>
+      <button class="wb-btn" id="btn-zoom-out" title="Zoom Out (-)">🔍 -</button>
+      <button class="wb-btn" id="btn-zoom-reset" title="Reset Zoom">1:1</button>
+      <button class="wb-btn wb-btn-danger" id="btn-clear-canvas" title="Clear all components from canvas">Clear All</button>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <div class="wb-main-container">
+
+    <!-- Left Quick Palette Sidebar -->
+    <aside class="wb-palette-sidebar">
+      <div class="wb-palette-header">
+        <span>COMPONENT PALETTE</span>
+        <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #2563eb;">Click to Add</span>
+      </div>
+
+      <div class="wb-palette-scroll">
+        <!-- Logic Gates (DIP-14) -->
+        <div>
+          <div class="wb-palette-category-title">Logic Gate ICs (DIP-14)</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="7400">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7400</span>
+                <span class="wb-palette-item-desc">Quad 2-In NAND</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">NAND</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7408">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7408</span>
+                <span class="wb-palette-item-desc">Quad 2-In AND</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">AND</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7432">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7432</span>
+                <span class="wb-palette-item-desc">Quad 2-In OR</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">OR</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7486">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7486</span>
+                <span class="wb-palette-item-desc">Quad 2-In XOR</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">XOR</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7402">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7402</span>
+                <span class="wb-palette-item-desc">Quad 2-In NOR</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">NOR</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7404">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7404</span>
+                <span class="wb-palette-item-desc">Hex Inverter</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">NOT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MSI Combinational ICs (DIP-16) -->
+        <div>
+          <div class="wb-palette-category-title">Combinational MSI ICs (DIP-16)</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="74151">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">74151</span>
+                <span class="wb-palette-item-desc">8:1 Data MUX</span>
+              </div>
+              <span class="wb-palette-tag tag-ic">MUX</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7485">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7485</span>
+                <span class="wb-palette-item-desc">4-Bit Comparator</span>
+              </div>
+              <span class="wb-palette-tag tag-ic">COMP</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="7483">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">7483</span>
+                <span class="wb-palette-item-desc">4-Bit Binary Adder</span>
+              </div>
+              <span class="wb-palette-tag tag-ic">ADDER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diodes & Discrete -->
+        <div>
+          <div class="wb-palette-category-title">Diodes & Discrete</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="DIODE">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">1N4148</span>
+                <span class="wb-palette-item-desc">Silicon Diode</span>
+              </div>
+              <span class="wb-palette-tag tag-io">DIODE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Power & Logic Sources -->
+        <div>
+          <div class="wb-palette-category-title">Power & Inputs</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="SWITCH">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">SWITCH</span>
+                <span class="wb-palette-item-desc">Toggle Logic (0/1)</span>
+              </div>
+              <span class="wb-palette-tag tag-io">IN</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="CLOCK">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">CLOCK</span>
+                <span class="wb-palette-item-desc">1 Hz Pulse Source</span>
+              </div>
+              <span class="wb-palette-tag tag-io">CLK</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="VCC">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">+5V (VCC)</span>
+                <span class="wb-palette-item-desc">Power High (1)</span>
+              </div>
+              <span class="wb-palette-tag tag-io">PWR</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="GND">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">GND</span>
+                <span class="wb-palette-item-desc">Ground Low (0)</span>
+              </div>
+              <span class="wb-palette-tag tag-io">GND</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Probes -->
+        <div>
+          <div class="wb-palette-category-title">Indicators & Probes</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="LED">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">LED</span>
+                <span class="wb-palette-item-desc">Logic Light Indicator</span>
+              </div>
+              <span class="wb-palette-tag tag-io">OUT</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="PROBE">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">PROBE</span>
+                <span class="wb-palette-item-desc">Digital State [0/1]</span>
+              </div>
+              <span class="wb-palette-tag tag-io">OUT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- KiCad Schematic Canvas -->
+    <div class="wb-canvas-wrap tool-select" id="canvas-wrap">
+      <svg id="workbench-svg">
+        <!-- Zoom group, wires, components dynamically rendered here -->
+      </svg>
+
+      <!-- Bottom Hint Bar -->
+      <div class="wb-hint-bar">
+        <span class="wb-hint-badge">HELP</span>
+        <span id="tool-hint-text">SELECT MODE: Drag components to reposition. Click toggle switches to flip 0/1 logic.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =========================================================================
+       KiCad "Choose Symbol" Modal (Exact KiCad workflow from video)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="kicad-modal">
+    <div class="kicad-modal-window">
+      
+      <!-- Modal Header -->
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <h2 class="modal-title">Choose Symbol</h2>
+          <span class="modal-badge">Campus IC Library (12 items loaded)</span>
+        </div>
+        <button class="modal-close-btn" id="btn-modal-close" title="Close">&times;</button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="modal-search-row">
+        <span class="modal-search-icon">🔍 Q:</span>
+        <input type="text" class="modal-search-input" id="modal-search" placeholder="Filter symbols (e.g., 7400, 7483, 74151, diode, switch)..." autocomplete="off">
+      </div>
+
+      <!-- Split Body: Left Tree vs Right Previews -->
+      <div class="modal-split-body">
+        
+        <!-- Left: Categories and Items -->
+        <div class="modal-component-list" id="modal-tree-container">
+          <!-- Populated dynamically by workbench.js -->
+        </div>
+
+        <!-- Right: Dual Preview (Symbol on Top, Footprint on Bottom) -->
+        <div class="modal-preview-panel">
+          
+          <!-- Symbol Schematic Preview -->
+          <div class="preview-box">
+            <span class="preview-label-tag">SCHEMATIC SYMBOL</span>
+            <div class="preview-svg-container" id="preview-symbol-svg">
+              <!-- SVG preview rendered here -->
+            </div>
+          </div>
+
+          <!-- Footprint PCB Preview -->
+          <div class="preview-box">
+            <span class="preview-label-tag">DIP PACKAGE FOOTPRINT</span>
+            <div class="preview-svg-container" id="preview-footprint-svg">
+              <!-- PCB footprint rendered here -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer-bar">
+        <div class="modal-desc-text" id="modal-desc-box">
+          Select an IC or component to view its pinout details, truth table, and DIP packaging.
+        </div>
+        <div class="modal-actions">
+          <button class="wb-btn" id="btn-modal-cancel">Cancel</button>
+          <button class="wb-btn wb-btn-primary" id="btn-modal-place">Place Symbol [OK]</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="workbench.js"></script>
+</body>
+</html>

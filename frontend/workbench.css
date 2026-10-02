@@ -1141,3 +1141,20 @@
     display: none;
   }
 }
+
+/* IC Power Status Badges */
+.ic-power-badge {
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ic-power-badge rect {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.ic-power-badge text {
+  transition: fill 0.2s ease;
+  user-select: none;
+}
+

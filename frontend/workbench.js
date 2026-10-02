@@ -23,21 +23,23 @@
       refPrefix: "U",
       desc: "Four independent 2-input NAND gates. Universal logic IC used in all fundamental logic synthesis.",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A,1B->1Y), (2A,2B->2Y), (3A,3B->3Y), (4A,4B->4Y).",
+      vccPin: 14,
+      gndPin: 7,
       pins: [
-        { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
-        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
-        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "1A", type: "in", side: "left" },
+        { num: 2, name: "1B", type: "in", side: "left" },
+        { num: 3, name: "1Y", type: "out", side: "left" },
+        { num: 4, name: "2A", type: "in", side: "left" },
+        { num: 5, name: "2B", type: "in", side: "left" },
+        { num: 6, name: "2Y", type: "out", side: "left" },
+        { num: 7, name: "GND", type: "pwr", side: "left" },
+        { num: 14, name: "VCC", type: "pwr", side: "right" },
+        { num: 13, name: "4B", type: "in", side: "right" },
+        { num: 12, name: "4A", type: "in", side: "right" },
+        { num: 11, name: "4Y", type: "out", side: "right" },
+        { num: 10, name: "3B", type: "in", side: "right" },
+        { num: 9, name: "3A", type: "in", side: "right" },
+        { num: 8, name: "3Y", type: "out", side: "right" }
       ],
       evaluate: (inputs) => {
         const in1 = inputs["1"] !== undefined ? inputs["1"] : 1;
@@ -67,21 +69,23 @@
       refPrefix: "U",
       desc: "Four independent 2-input positive AND gates.",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A,1B->1Y), (2A,2B->2Y), (3A,3B->3Y), (4A,4B->4Y).",
+      vccPin: 14,
+      gndPin: 7,
       pins: [
-        { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
-        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
-        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "1A", type: "in", side: "left" },
+        { num: 2, name: "1B", type: "in", side: "left" },
+        { num: 3, name: "1Y", type: "out", side: "left" },
+        { num: 4, name: "2A", type: "in", side: "left" },
+        { num: 5, name: "2B", type: "in", side: "left" },
+        { num: 6, name: "2Y", type: "out", side: "left" },
+        { num: 7, name: "GND", type: "pwr", side: "left" },
+        { num: 14, name: "VCC", type: "pwr", side: "right" },
+        { num: 13, name: "4B", type: "in", side: "right" },
+        { num: 12, name: "4A", type: "in", side: "right" },
+        { num: 11, name: "4Y", type: "out", side: "right" },
+        { num: 10, name: "3B", type: "in", side: "right" },
+        { num: 9, name: "3A", type: "in", side: "right" },
+        { num: 8, name: "3Y", type: "out", side: "right" }
       ],
       evaluate: (inputs) => {
         return {
@@ -102,21 +106,23 @@
       refPrefix: "U",
       desc: "Four independent 2-input positive OR gates.",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A,1B->1Y), (2A,2B->2Y), (3A,3B->3Y), (4A,4B->4Y).",
+      vccPin: 14,
+      gndPin: 7,
       pins: [
-        { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
-        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
-        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "1A", type: "in", side: "left" },
+        { num: 2, name: "1B", type: "in", side: "left" },
+        { num: 3, name: "1Y", type: "out", side: "left" },
+        { num: 4, name: "2A", type: "in", side: "left" },
+        { num: 5, name: "2B", type: "in", side: "left" },
+        { num: 6, name: "2Y", type: "out", side: "left" },
+        { num: 7, name: "GND", type: "pwr", side: "left" },
+        { num: 14, name: "VCC", type: "pwr", side: "right" },
+        { num: 13, name: "4B", type: "in", side: "right" },
+        { num: 12, name: "4A", type: "in", side: "right" },
+        { num: 11, name: "4Y", type: "out", side: "right" },
+        { num: 10, name: "3B", type: "in", side: "right" },
+        { num: 9, name: "3A", type: "in", side: "right" },
+        { num: 8, name: "3Y", type: "out", side: "right" }
       ],
       evaluate: (inputs) => {
         return {
@@ -137,21 +143,23 @@
       refPrefix: "U",
       desc: "Four independent 2-input Exclusive-OR gates. Essential for adders, subtractors, and parity generators.",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A,1B->1Y), (2A,2B->2Y), (3A,3B->3Y), (4A,4B->4Y).",
+      vccPin: 14,
+      gndPin: 7,
       pins: [
-        { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
-        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
-        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "1A", type: "in", side: "left" },
+        { num: 2, name: "1B", type: "in", side: "left" },
+        { num: 3, name: "1Y", type: "out", side: "left" },
+        { num: 4, name: "2A", type: "in", side: "left" },
+        { num: 5, name: "2B", type: "in", side: "left" },
+        { num: 6, name: "2Y", type: "out", side: "left" },
+        { num: 7, name: "GND", type: "pwr", side: "left" },
+        { num: 14, name: "VCC", type: "pwr", side: "right" },
+        { num: 13, name: "4B", type: "in", side: "right" },
+        { num: 12, name: "4A", type: "in", side: "right" },
+        { num: 11, name: "4Y", type: "out", side: "right" },
+        { num: 10, name: "3B", type: "in", side: "right" },
+        { num: 9, name: "3A", type: "in", side: "right" },
+        { num: 8, name: "3Y", type: "out", side: "right" }
       ],
       evaluate: (inputs) => {
         return {
@@ -172,21 +180,23 @@
       refPrefix: "U",
       desc: "Four independent 2-input positive NOR gates. Note: Pin 1 is output 1Y (opposite pinout from 7400/7408).",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A:2, 1B:3 -> 1Y:1), (2A:5, 2B:6 -> 2Y:4), (3A:8, 3B:9 -> 3Y:10), (4A:11, 4B:12 -> 4Y:13).",
+      vccPin: 14,
+      gndPin: 7,
       pins: [
-        { num: 1, name: "1Y", type: "out", side: "left", pos: 1 },
-        { num: 2, name: "1A", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1B", type: "in", side: "left", pos: 3 },
-        { num: 4, name: "2Y", type: "out", side: "left", pos: 4 },
-        { num: 5, name: "2A", type: "in", side: "left", pos: 5 },
-        { num: 6, name: "2B", type: "in", side: "left", pos: 6 },
-        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3A", type: "in", side: "right", pos: 7 },
-        { num: 9, name: "3B", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3Y", type: "out", side: "right", pos: 5 },
-        { num: 11, name: "4A", type: "in", side: "right", pos: 4 },
-        { num: 12, name: "4B", type: "in", side: "right", pos: 3 },
-        { num: 13, name: "4Y", type: "out", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "1Y", type: "out", side: "left" },
+        { num: 2, name: "1A", type: "in", side: "left" },
+        { num: 3, name: "1B", type: "in", side: "left" },
+        { num: 4, name: "2Y", type: "out", side: "left" },
+        { num: 5, name: "2A", type: "in", side: "left" },
+        { num: 6, name: "2B", type: "in", side: "left" },
+        { num: 7, name: "GND", type: "pwr", side: "left" },
+        { num: 14, name: "VCC", type: "pwr", side: "right" },
+        { num: 13, name: "4Y", type: "out", side: "right" },
+        { num: 12, name: "4B", type: "in", side: "right" },
+        { num: 11, name: "4A", type: "in", side: "right" },
+        { num: 10, name: "3Y", type: "out", side: "right" },
+        { num: 9, name: "3B", type: "in", side: "right" },
+        { num: 8, name: "3A", type: "in", side: "right" }
       ],
       evaluate: (inputs) => {
         return {
@@ -207,21 +217,23 @@
       refPrefix: "U",
       desc: "Six independent inverters. Standard logic gate for complementary logic and oscillator generation.",
       datasheet: "VCC: Pin 14, GND: Pin 7. Inverters: (1A->1Y), (2A->2Y), (3A->3Y), (4A->4Y), (5A->5Y), (6A->6Y).",
+      vccPin: 14,
+      gndPin: 7,
       pins: [
-        { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "1Y", type: "out", side: "left", pos: 2 },
-        { num: 3, name: "2A", type: "in", side: "left", pos: 3 },
-        { num: 4, name: "2Y", type: "out", side: "left", pos: 4 },
-        { num: 5, name: "3A", type: "in", side: "left", pos: 5 },
-        { num: 6, name: "3Y", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "4Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "4A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "5Y", type: "out", side: "right", pos: 5 },
-        { num: 11, name: "5A", type: "in", side: "right", pos: 4 },
-        { num: 12, name: "6Y", type: "out", side: "right", pos: 3 },
-        { num: 13, name: "6A", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "1A", type: "in", side: "left" },
+        { num: 2, name: "1Y", type: "out", side: "left" },
+        { num: 3, name: "2A", type: "in", side: "left" },
+        { num: 4, name: "2Y", type: "out", side: "left" },
+        { num: 5, name: "3A", type: "in", side: "left" },
+        { num: 6, name: "3Y", type: "out", side: "left" },
+        { num: 7, name: "GND", type: "pwr", side: "left" },
+        { num: 14, name: "VCC", type: "pwr", side: "right" },
+        { num: 13, name: "6A", type: "in", side: "right" },
+        { num: 12, name: "6Y", type: "out", side: "right" },
+        { num: 11, name: "5A", type: "in", side: "right" },
+        { num: 10, name: "5Y", type: "out", side: "right" },
+        { num: 9, name: "4A", type: "in", side: "right" },
+        { num: 8, name: "4Y", type: "out", side: "right" }
       ],
       evaluate: (inputs) => {
         return {
@@ -266,23 +278,25 @@
       refPrefix: "U",
       desc: "8-to-1 Data Selector/Multiplexer with complementary outputs (Y and W = ~Y) and active-low Strobe (~G).",
       datasheet: "VCC: Pin 16, GND: Pin 8. Data D0-D7, Select A(11), B(10), C(9). Enable ~G(7). True Y(5), Inverted W(6).",
+      vccPin: 16,
+      gndPin: 8,
       pins: [
-        { num: 1, name: "D3", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "D2", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "D1", type: "in", side: "left", pos: 3 },
-        { num: 4, name: "D0", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "Y", type: "out", side: "left", pos: 5 },
-        { num: 6, name: "W", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "~G", type: "in", side: "left", pos: 7 },
-        { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
-        { num: 9, name: "C", type: "in", side: "right", pos: 8 },
-        { num: 10, name: "B", type: "in", side: "right", pos: 7 },
-        { num: 11, name: "A", type: "in", side: "right", pos: 6 },
-        { num: 12, name: "D7", type: "in", side: "right", pos: 5 },
-        { num: 13, name: "D6", type: "in", side: "right", pos: 4 },
-        { num: 14, name: "D5", type: "in", side: "right", pos: 3 },
-        { num: 15, name: "D4", type: "in", side: "right", pos: 2 },
-        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "D3", type: "in", side: "left" },
+        { num: 2, name: "D2", type: "in", side: "left" },
+        { num: 3, name: "D1", type: "in", side: "left" },
+        { num: 4, name: "D0", type: "in", side: "left" },
+        { num: 5, name: "Y", type: "out", side: "left" },
+        { num: 6, name: "W", type: "out", side: "left" },
+        { num: 7, name: "~G", type: "in", side: "left" },
+        { num: 8, name: "GND", type: "pwr", side: "left" },
+        { num: 16, name: "VCC", type: "pwr", side: "right" },
+        { num: 15, name: "D4", type: "in", side: "right" },
+        { num: 14, name: "D5", type: "in", side: "right" },
+        { num: 13, name: "D6", type: "in", side: "right" },
+        { num: 12, name: "D7", type: "in", side: "right" },
+        { num: 11, name: "A", type: "in", side: "right" },
+        { num: 10, name: "B", type: "in", side: "right" },
+        { num: 9, name: "C", type: "in", side: "right" }
       ],
       evaluate: (inputs) => {
         const strobe = inputs["7"] || 0; // ~G active low
@@ -321,23 +335,25 @@
       refPrefix: "U",
       desc: "4-bit magnitude comparator comparing two binary words A and B. Includes expansion cascading inputs.",
       datasheet: "VCC: Pin 16, GND: Pin 8. A inputs: A0(10), A1(12), A2(13), A3(15). B inputs: B0(9), B1(11), B2(14), B3(1). Outputs: A>B(5), A=B(6), A<B(7).",
+      vccPin: 16,
+      gndPin: 8,
       pins: [
-        { num: 1, name: "B3", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "I_LT", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "I_EQ", type: "in", side: "left", pos: 3 },
-        { num: 4, name: "I_GT", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "O_GT", type: "out", side: "left", pos: 5 },
-        { num: 6, name: "O_EQ", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "O_LT", type: "out", side: "left", pos: 7 },
-        { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
-        { num: 9, name: "B0", type: "in", side: "right", pos: 8 },
-        { num: 10, name: "A0", type: "in", side: "right", pos: 7 },
-        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
-        { num: 12, name: "A1", type: "in", side: "right", pos: 5 },
-        { num: 13, name: "A2", type: "in", side: "right", pos: 4 },
-        { num: 14, name: "B2", type: "in", side: "right", pos: 3 },
-        { num: 15, name: "A3", type: "in", side: "right", pos: 2 },
-        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 1, name: "B3", type: "in", side: "left" },
+        { num: 2, name: "I_LT", type: "in", side: "left" },
+        { num: 3, name: "I_EQ", type: "in", side: "left" },
+        { num: 4, name: "I_GT", type: "in", side: "left" },
+        { num: 5, name: "O_GT", type: "out", side: "left" },
+        { num: 6, name: "O_EQ", type: "out", side: "left" },
+        { num: 7, name: "O_LT", type: "out", side: "left" },
+        { num: 8, name: "GND", type: "pwr", side: "left" },
+        { num: 16, name: "VCC", type: "pwr", side: "right" },
+        { num: 15, name: "A3", type: "in", side: "right" },
+        { num: 14, name: "B2", type: "in", side: "right" },
+        { num: 13, name: "A2", type: "in", side: "right" },
+        { num: 12, name: "A1", type: "in", side: "right" },
+        { num: 11, name: "B1", type: "in", side: "right" },
+        { num: 10, name: "A0", type: "in", side: "right" },
+        { num: 9, name: "B0", type: "in", side: "right" }
       ],
       evaluate: (inputs) => {
         const aVal = ((inputs["15"] || 0) << 3) | ((inputs["13"] || 0) << 2) | ((inputs["12"] || 0) << 1) | (inputs["10"] || 0);
@@ -375,23 +391,25 @@
       refPrefix: "U",
       desc: "4-bit binary full adder with fast internal look-ahead carry. Standard lab IC for adders and subtractors.",
       datasheet: "VCC: Pin 5, GND: Pin 12. A: (A1:10, A2:8, A3:3, A4:1). B: (B1:11, B2:7, B3:4, B4:16). Cin: C0(13). Sum: (S1:9, S2:6, S3:2, S4:15). Cout: C4(14).",
+      vccPin: 5,
+      gndPin: 12,
       pins: [
-        { num: 1, name: "A4", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "S3", type: "out", side: "left", pos: 2 },
-        { num: 3, name: "A3", type: "in", side: "left", pos: 3 },
-        { num: 4, name: "B3", type: "in", side: "left", pos: 4 },
-        { num: 5, name: "VCC", type: "pwr", side: "left", pos: 5 },
-        { num: 6, name: "S2", type: "out", side: "left", pos: 6 },
-        { num: 7, name: "B2", type: "in", side: "left", pos: 7 },
-        { num: 8, name: "A2", type: "in", side: "left", pos: 8 },
-        { num: 9, name: "S1", type: "out", side: "right", pos: 8 },
-        { num: 10, name: "A1", type: "in", side: "right", pos: 7 },
-        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
-        { num: 12, name: "GND", type: "pwr", side: "right", pos: 5 },
-        { num: 13, name: "C0", type: "in", side: "right", pos: 4 },
-        { num: 14, name: "C4", type: "out", side: "right", pos: 3 },
-        { num: 15, name: "S4", type: "out", side: "right", pos: 2 },
-        { num: 16, name: "B4", type: "in", side: "right", pos: 1 }
+        { num: 1, name: "A4", type: "in", side: "left" },
+        { num: 2, name: "S3", type: "out", side: "left" },
+        { num: 3, name: "A3", type: "in", side: "left" },
+        { num: 4, name: "B3", type: "in", side: "left" },
+        { num: 5, name: "VCC", type: "pwr", side: "left" },
+        { num: 6, name: "S2", type: "out", side: "left" },
+        { num: 7, name: "B2", type: "in", side: "left" },
+        { num: 8, name: "A2", type: "in", side: "left" },
+        { num: 16, name: "B4", type: "in", side: "right" },
+        { num: 15, name: "S4", type: "out", side: "right" },
+        { num: 14, name: "C4", type: "out", side: "right" },
+        { num: 13, name: "C0", type: "in", side: "right" },
+        { num: 12, name: "GND", type: "pwr", side: "right" },
+        { num: 11, name: "B1", type: "in", side: "right" },
+        { num: 10, name: "A1", type: "in", side: "right" },
+        { num: 9, name: "S1", type: "out", side: "right" }
       ],
       evaluate: (inputs) => {
         const aVal = ((inputs["1"] || 0) << 3) | ((inputs["3"] || 0) << 2) | ((inputs["8"] || 0) << 1) | (inputs["10"] || 0);
@@ -1705,8 +1723,8 @@
       }
     });
 
-    // 2. Propagate through Wires iteratively (up to 4 passes for cascading logic like 4-bit adders/comparators)
-    for (let pass = 0; pass < 4; pass++) {
+    // 2. Propagate through Wires iteratively (up to 6 passes for cascading logic like 4-bit adders/comparators)
+    for (let pass = 0; pass < 6; pass++) {
       state.wires.forEach((w) => {
         const keyFrom = `${w.from.compId}:${w.from.pinNum}`;
         const keyTo = `${w.to.compId}:${w.to.pinNum}`;
@@ -1729,6 +1747,24 @@
       state.components.forEach((c) => {
         const spec = LIBRARY[c.type];
         if (spec.category === "gates" || spec.category === "msi" || spec.id === "DIODE") {
+          // Check VCC and GND power supply requirement
+          if (spec.vccPin && spec.gndPin) {
+            const vccVal = pinVoltages[`${c.id}:${spec.vccPin}`];
+            const gndVal = pinVoltages[`${c.id}:${spec.gndPin}`];
+            const isPowered = (vccVal === 1) && (gndVal === 0);
+            c.isPowered = isPowered;
+
+            if (!isPowered) {
+              // IC is unpowered! All output pins must produce 0 logic
+              spec.pins.forEach((p) => {
+                if (p.type === "out") {
+                  pinVoltages[`${c.id}:${p.num}`] = 0;
+                }
+              });
+              return;
+            }
+          }
+
           const inputValues = {};
           spec.pins.forEach((p) => {
             const val = pinVoltages[`${c.id}:${p.num}`];
@@ -1764,6 +1800,36 @@
     });
 
     state.components.forEach((c) => {
+      const spec = LIBRARY[c.type];
+      if (!spec) return;
+
+      // Update Power Badges on ICs
+      if (spec.vccPin && spec.gndPin) {
+        const pwrG = document.getElementById(`ic-pwr-badge-${c.id}`);
+        const pill = document.getElementById(`ic-pwr-pill-${c.id}`);
+        const dot = document.getElementById(`ic-pwr-dot-${c.id}`);
+        const txt = document.getElementById(`ic-pwr-text-${c.id}`);
+        if (pwrG && pill && dot && txt) {
+          if (c.isPowered) {
+            pwrG.classList.add("powered");
+            pwrG.classList.remove("unpowered");
+            pill.setAttribute("fill", "#ecfdf5");
+            pill.setAttribute("stroke", "#10b981");
+            dot.setAttribute("fill", "#10b981");
+            txt.setAttribute("fill", "#065f46");
+            txt.textContent = "⚡ PWR OK";
+          } else {
+            pwrG.classList.add("unpowered");
+            pwrG.classList.remove("powered");
+            pill.setAttribute("fill", "#fef2f2");
+            pill.setAttribute("stroke", "#ef4444");
+            dot.setAttribute("fill", "#ef4444");
+            txt.setAttribute("fill", "#b91c1c");
+            txt.textContent = "⚠️ NO PWR";
+          }
+        }
+      }
+
       if (c.type === "LED") {
         const inVal = pinVoltages[`${c.id}:1`] || 0;
         const ledGlow = document.getElementById(`led-glow-${c.id}`);
@@ -2031,6 +2097,57 @@
     });
     pkgText.textContent = spec.package;
     g.appendChild(pkgText);
+
+    // Power Status Badge (for ICs requiring VCC and GND)
+    if (spec.vccPin && spec.gndPin) {
+      const isPwr = !!c.isPowered;
+      const pwrG = createSVGElement("g", {
+        id: `ic-pwr-badge-${c.id}`,
+        class: `ic-power-badge ${isPwr ? "powered" : "unpowered"}`,
+        "pointer-events": "none"
+      });
+
+      const pillY = c.y + 20;
+      const pillW = 86;
+      const pillH = 18;
+
+      const pill = createSVGElement("rect", {
+        id: `ic-pwr-pill-${c.id}`,
+        x: c.x - pillW / 2,
+        y: pillY,
+        width: pillW,
+        height: pillH,
+        rx: 9,
+        fill: isPwr ? "#ecfdf5" : "#fef2f2",
+        stroke: isPwr ? "#10b981" : "#ef4444",
+        "stroke-width": 1.2
+      });
+
+      const dot = createSVGElement("circle", {
+        id: `ic-pwr-dot-${c.id}`,
+        cx: c.x - pillW / 2 + 10,
+        cy: pillY + pillH / 2,
+        r: 3.5,
+        fill: isPwr ? "#10b981" : "#ef4444"
+      });
+
+      const txt = createSVGElement("text", {
+        id: `ic-pwr-text-${c.id}`,
+        x: c.x + 4,
+        y: pillY + pillH / 2 + 3.5,
+        "text-anchor": "middle",
+        fill: isPwr ? "#065f46" : "#b91c1c",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 9.5
+      });
+      txt.textContent = isPwr ? "⚡ PWR OK" : "⚠️ NO PWR";
+
+      pwrG.appendChild(pill);
+      pwrG.appendChild(dot);
+      pwrG.appendChild(txt);
+      g.appendChild(pwrG);
+    }
 
     // Render Pins & Terminals (All pins use single source of truth getPinWorldPos)
     spec.pins.forEach((p) => {
@@ -2586,7 +2703,11 @@
         const vStr = volt !== undefined ? (volt === 1 ? "HIGH (1)" : "LOW (0)") : "FLOATING";
         const hint = document.getElementById("tool-hint-text");
         if (hint && comp) {
-          hint.textContent = `Pin ${pinNum} [${pin ? pin.name : ""}] of ${comp.ref} (${comp.type}) | Signal: ${vStr} | Connected: ${wCount} wire(s). Click to route wire, right-click for options.`;
+          if (spec && spec.vccPin && spec.gndPin && !comp.isPowered) {
+            hint.textContent = `Pin ${pinNum} [${pin ? pin.name : ""}] of ${comp.ref} (${comp.type}) | ⚠️ UNPOWERED: Connect Pin ${spec.vccPin} to +5V & Pin ${spec.gndPin} to GND | Signal: ${vStr}`;
+          } else {
+            hint.textContent = `Pin ${pinNum} [${pin ? pin.name : ""}] of ${comp.ref} (${comp.type}) | Signal: ${vStr} | Connected: ${wCount} wire(s). Click to route wire, right-click for options.`;
+          }
         }
       }
     });
@@ -2763,30 +2884,40 @@
 
     if (presetKey === "7400_nand") {
       // Preset 1: 7400 NAND Gate Truth Table Verification
-      const swA = addComponentAt("SWITCH", 200, 240);
-      const swB = addComponentAt("SWITCH", 200, 320);
-      const ic = addComponentAt("7400", 420, 280);
-      const led = addComponentAt("LED", 660, 240);
-      const prb = addComponentAt("PROBE", 660, 320);
+      const vcc = addComponentAt("VCC", 530, 130);
+      const gnd = addComponentAt("GND", 350, 440);
+      const swA = addComponentAt("SWITCH", 180, 210);
+      const swB = addComponentAt("SWITCH", 180, 240);
+      const ic = addComponentAt("7400", 440, 280);
+      const led = addComponentAt("LED", 700, 250);
+      const prb = addComponentAt("PROBE", 700, 330);
 
-      // Connect SW A -> Pin 1 (1A)
+      // Power Connections (Required for IC gate operation)
+      state.wires.push({ id: "w_vcc", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_gnd", from: { compId: ic.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Signal Connections: SW A -> Pin 1 (1A), SW B -> Pin 2 (1B), Pin 3 (1Y) -> LED & Probe
       state.wires.push({ id: "w1", from: { compId: swA.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 1 }, state: 0 });
-      // Connect SW B -> Pin 2 (1B)
       state.wires.push({ id: "w2", from: { compId: swB.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 2 }, state: 0 });
-      // Connect Pin 3 (1Y) -> LED
       state.wires.push({ id: "w3", from: { compId: ic.id, pinNum: 3 }, to: { compId: led.id, pinNum: 1 }, state: 1 });
-      // Connect Pin 3 (1Y) -> Probe
       state.wires.push({ id: "w4", from: { compId: ic.id, pinNum: 3 }, to: { compId: prb.id, pinNum: 1 }, state: 1 });
 
     } else if (presetKey === "7483_adder") {
       // Preset 2: 7483 4-Bit Binary Full Adder Test
-      const swA1 = addComponentAt("SWITCH", 200, 200);
-      const swB1 = addComponentAt("SWITCH", 200, 280);
-      const swCin = addComponentAt("SWITCH", 200, 360);
+      const vcc = addComponentAt("VCC", 370, 130);
+      const gnd = addComponentAt("GND", 550, 450);
+      const swA1 = addComponentAt("SWITCH", 180, 200);
+      const swB1 = addComponentAt("SWITCH", 180, 270);
+      const swCin = addComponentAt("SWITCH", 180, 340);
       const ic = addComponentAt("7483", 460, 280);
-      const ledS1 = addComponentAt("LED", 700, 240);
-      const ledC4 = addComponentAt("LED", 700, 340);
+      const ledS1 = addComponentAt("LED", 720, 240);
+      const ledC4 = addComponentAt("LED", 720, 330);
 
+      // Power Connections: Pin 5: VCC, Pin 12: GND
+      state.wires.push({ id: "w_vcc", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 1 });
+      state.wires.push({ id: "w_gnd", from: { compId: ic.id, pinNum: 12 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Signal Connections: A1 (Pin 10), B1 (Pin 11), Cin (Pin 13), Sum S1 (Pin 9), Cout C4 (Pin 14)
       state.wires.push({ id: "w1", from: { compId: swA1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 10 }, state: 0 });
       state.wires.push({ id: "w2", from: { compId: swB1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 11 }, state: 0 });
       state.wires.push({ id: "w3", from: { compId: swCin.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 13 }, state: 0 });
@@ -2795,13 +2926,21 @@
 
     } else if (presetKey === "7485_comparator") {
       // Preset 3: 7485 4-Bit Magnitude Comparator Test
-      const swA0 = addComponentAt("SWITCH", 200, 220);
-      const swB0 = addComponentAt("SWITCH", 200, 320);
+      const vcc = addComponentAt("VCC", 550, 130);
+      const gnd = addComponentAt("GND", 370, 450);
+      const swA0 = addComponentAt("SWITCH", 180, 230);
+      const swB0 = addComponentAt("SWITCH", 180, 330);
       const ic = addComponentAt("7485", 460, 280);
-      const ledGT = addComponentAt("LED", 700, 220);
-      const ledEQ = addComponentAt("LED", 700, 280);
-      const ledLT = addComponentAt("LED", 700, 340);
+      const ledGT = addComponentAt("LED", 720, 210);
+      const ledEQ = addComponentAt("LED", 720, 270);
+      const ledLT = addComponentAt("LED", 720, 330);
 
+      // Power & Cascade Connections: Pin 16: VCC, Pin 8: GND, Pin 3: I_EQ (Tie to VCC for standard comparison)
+      state.wires.push({ id: "w_vcc", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_gnd", from: { compId: ic.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_ieq", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 3 }, state: 1 });
+
+      // Signal Connections: A0 (Pin 10), B0 (Pin 9), Outputs: A>B (Pin 5), A=B (Pin 6), A<B (Pin 7)
       state.wires.push({ id: "w1", from: { compId: swA0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 10 }, state: 0 });
       state.wires.push({ id: "w2", from: { compId: swB0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 9 }, state: 0 });
       state.wires.push({ id: "w3", from: { compId: ic.id, pinNum: 5 }, to: { compId: ledGT.id, pinNum: 1 }, state: 0 });
@@ -2810,13 +2949,21 @@
 
     } else if (presetKey === "74151_mux") {
       // Preset 4: 74151 8:1 Multiplexer
-      const swD0 = addComponentAt("SWITCH", 200, 200);
-      const swD1 = addComponentAt("SWITCH", 200, 260);
-      const swS0 = addComponentAt("SWITCH", 200, 340);
+      const vcc = addComponentAt("VCC", 550, 130);
+      const gnd = addComponentAt("GND", 370, 450);
+      const swD0 = addComponentAt("SWITCH", 180, 200);
+      const swD1 = addComponentAt("SWITCH", 180, 260);
+      const swS0 = addComponentAt("SWITCH", 180, 340);
       const ic = addComponentAt("74151", 460, 280);
-      const ledY = addComponentAt("LED", 700, 240);
-      const ledW = addComponentAt("LED", 700, 320);
+      const ledY = addComponentAt("LED", 720, 240);
+      const ledW = addComponentAt("LED", 720, 320);
 
+      // Power & Enable: Pin 16: VCC, Pin 8: GND, Pin 7: ~G (Active-low Strobe tied to GND to enable)
+      state.wires.push({ id: "w_vcc", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_gnd", from: { compId: ic.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_strobe", from: { compId: ic.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Signal Connections: D0 (Pin 4), D1 (Pin 3), Select A (Pin 11), True Y (Pin 5), Inverted W (Pin 6)
       state.wires.push({ id: "w1", from: { compId: swD0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 4 }, state: 0 });
       state.wires.push({ id: "w2", from: { compId: swD1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 3 }, state: 0 });
       state.wires.push({ id: "w3", from: { compId: swS0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 11 }, state: 0 });

@@ -574,18 +574,41 @@
 
     updateSvgViewBox();
 
+    // Wire Action Pill Delete Button
+    document.getElementById("btn-wire-pill-delete")?.addEventListener("click", () => {
+      deleteSelectedItem();
+    });
+
     // Global SVG mouse events
     svgRoot.addEventListener("mousemove", onCanvasMouseMove);
     svgRoot.addEventListener("mousedown", onCanvasMouseDown);
     svgRoot.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      cancelActiveWire();
+      // If right clicking on empty canvas, cancel active wire and close context menu
+      if (!e.target.closest(".pin-terminal-hit")) {
+        e.preventDefault();
+        cancelActiveWire();
+        hideContextMenu();
+      }
     });
     window.addEventListener("mouseup", onCanvasMouseUp);
+
+    // Close context menu on external click
+    window.addEventListener("click", (e) => {
+      if (!e.target.closest("#wb-context-menu")) {
+        hideContextMenu();
+      }
+    });
 
     // Keyboard shortcuts
     window.addEventListener("keydown", (e) => {
       if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT") return;
+
+      // Undo: Ctrl+Z / Cmd+Z
+      if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        performUndo();
+        return;
+      }
 
       if (e.key === "a" || e.key === "A") {
         openModal();
@@ -613,6 +636,7 @@
       } else if (e.key === "Escape") {
         cancelActiveWire();
         closeModal();
+        hideContextMenu();
       }
     });
   }
@@ -1114,6 +1138,29 @@
     return comp;
   }
 
+  // Undo history stack
+  const undoStack = [];
+  function pushUndoState(action) {
+    undoStack.push(action);
+    if (undoStack.length > 50) undoStack.shift();
+  }
+
+  function performUndo() {
+    if (undoStack.length === 0) return;
+    const action = undoStack.pop();
+    if (action.action === "add_wire") {
+      state.wires = state.wires.filter((w) => w.id !== action.wire.id);
+      if (state.selectedItem?.id === action.wire.id) setSelectedItem(null);
+      render();
+    } else if (action.action === "remove_wire") {
+      state.wires.push(action.wire);
+      render();
+    } else if (action.action === "remove_wires") {
+      action.wires.forEach((w) => state.wires.push(w));
+      render();
+    }
+  }
+
   function setSelectedItem(item) {
     if (state.selectedItem) {
       if (state.selectedItem.type === "comp") {
@@ -1125,12 +1172,39 @@
 
     state.selectedItem = item;
 
+    const pill = document.getElementById("wire-action-pill");
+    document.querySelectorAll(".pin-endpoint-highlight").forEach((el) => el.classList.remove("pin-endpoint-highlight"));
+
     if (item) {
       if (item.type === "comp") {
         document.getElementById(`node-${item.id}`)?.classList.add("selected");
+        if (pill) pill.style.display = "none";
       } else if (item.type === "wire") {
         document.getElementById(`wire-${item.id}`)?.classList.add("selected");
+        const wire = state.wires.find((w) => w.id === item.id);
+        if (wire) {
+          highlightWireEndpoints(wire, true);
+          if (pill) {
+            const fromComp = state.components.find((c) => c.id === wire.from.compId);
+            const toComp = state.components.find((c) => c.id === wire.to.compId);
+            const fromSpec = fromComp ? LIBRARY[fromComp.type] : null;
+            const toSpec = toComp ? LIBRARY[toComp.type] : null;
+            const fromPin = fromSpec?.pins.find((p) => p.num === wire.from.pinNum);
+            const toPin = toSpec?.pins.find((p) => p.num === wire.to.pinNum);
+
+            const infoEl = document.getElementById("wire-pill-info");
+            const stateEl = document.getElementById("wire-pill-state");
+            if (infoEl) infoEl.textContent = `${fromComp ? fromComp.ref : ""}.${wire.from.pinNum} (${fromPin?.name || ""}) ➔ ${toComp ? toComp.ref : ""}.${wire.to.pinNum} (${toPin?.name || ""})`;
+            if (stateEl) {
+              stateEl.textContent = wire.state === 1 ? "[HIGH - 5V]" : "[LOW - 0V]";
+              stateEl.style.color = wire.state === 1 ? "#22c55e" : "#94a3b8";
+            }
+            pill.style.display = "flex";
+          }
+        }
       }
+    } else {
+      if (pill) pill.style.display = "none";
     }
   }
 
@@ -1139,17 +1213,26 @@
 
     if (state.selectedItem.type === "comp") {
       const compId = state.selectedItem.id;
+      const removedWires = state.wires.filter(
+        (w) => w.from.compId === compId || w.to.compId === compId
+      );
+      pushUndoState({ action: "remove_wires", wires: removedWires });
       state.wires = state.wires.filter(
         (w) => w.from.compId !== compId && w.to.compId !== compId
       );
       state.components = state.components.filter((c) => c.id !== compId);
     } else if (state.selectedItem.type === "wire") {
       const wireId = state.selectedItem.id;
+      const removedWire = state.wires.find((w) => w.id === wireId);
+      if (removedWire) {
+        pushUndoState({ action: "remove_wire", wire: removedWire });
+      }
       state.wires = state.wires.filter((w) => w.id !== wireId);
     }
 
-    state.selectedItem = null;
+    setSelectedItem(null);
     render();
+    updateHintForCurrentTool();
   }
 
   function clearCanvas() {
@@ -1159,6 +1242,139 @@
       state.selectedItem = null;
       cancelActiveWire();
       render();
+    }
+  }
+
+  function getConnectedWires(compId, pinNum) {
+    return state.wires.filter(
+      (w) =>
+        (w.from.compId === compId && w.from.pinNum === pinNum) ||
+        (w.to.compId === compId && w.to.pinNum === pinNum)
+    );
+  }
+
+  function disconnectWiresFromPin(compId, pinNum) {
+    const removed = state.wires.filter(
+      (w) =>
+        (w.from.compId === compId && w.from.pinNum === pinNum) ||
+        (w.to.compId === compId && w.to.pinNum === pinNum)
+    );
+    if (removed.length > 0) {
+      pushUndoState({ action: "remove_wires", wires: removed });
+      state.wires = state.wires.filter(
+        (w) =>
+          !(w.from.compId === compId && w.from.pinNum === pinNum) &&
+          !(w.to.compId === compId && w.to.pinNum === pinNum)
+      );
+      if (state.selectedItem?.type === "wire") setSelectedItem(null);
+      render();
+      const hint = document.getElementById("tool-hint-text");
+      if (hint) {
+        hint.textContent = `✓ Disconnected ${removed.length} wire(s) from Pin ${pinNum}.`;
+      }
+    }
+  }
+
+  function highlightWireEndpoints(wire, isHighlighted) {
+    document.querySelectorAll(".pin-endpoint-highlight").forEach((el) => el.classList.remove("pin-endpoint-highlight"));
+    if (!isHighlighted || !wire) return;
+    const p1El = document.querySelector(`.pin-terminal-group[data-comp-id="${wire.from.compId}"][data-pin-num="${wire.from.pinNum}"]`);
+    const p2El = document.querySelector(`.pin-terminal-group[data-comp-id="${wire.to.compId}"][data-pin-num="${wire.to.pinNum}"]`);
+    p1El?.classList.add("pin-endpoint-highlight");
+    p2El?.classList.add("pin-endpoint-highlight");
+  }
+
+  function highlightPinConnectedWires(compId, pinNum, isHighlighted) {
+    const wires = getConnectedWires(compId, pinNum);
+    wires.forEach((w) => {
+      const wireG = document.getElementById(`wire-${w.id}`);
+      if (wireG) {
+        if (isHighlighted) wireG.classList.add("pin-wire-highlight");
+        else wireG.classList.remove("pin-wire-highlight");
+      }
+    });
+  }
+
+  function showPinContextMenu(compId, pinNum, clientX, clientY) {
+    const comp = state.components.find((c) => c.id === compId);
+    if (!comp) return;
+    const spec = LIBRARY[comp.type];
+    const pin = spec?.pins.find((p) => p.num === pinNum);
+    const wires = getConnectedWires(compId, pinNum);
+    const volt = state.pinVoltages[`${compId}:${pinNum}`];
+    const valStr = volt !== undefined ? (volt === 1 ? "HIGH (1)" : "LOW (0)") : "FLOATING";
+
+    const menu = document.getElementById("wb-context-menu");
+    if (!menu) return;
+
+    const hdr = document.getElementById("ctx-header");
+    const st = document.getElementById("ctx-status");
+    if (hdr) hdr.textContent = `${comp.ref} Pin ${pinNum} (${pin ? pin.name : ""})`;
+    if (st) st.textContent = `Signal: ${valStr} • ${wires.length} wire(s)`;
+
+    const disconnBtn = document.getElementById("ctx-btn-disconnect");
+    if (disconnBtn) {
+      if (wires.length > 0) {
+        disconnBtn.style.display = "flex";
+        disconnBtn.textContent = `🗑 Disconnect Wires (${wires.length})`;
+        disconnBtn.onclick = () => {
+          disconnectWiresFromPin(compId, pinNum);
+          hideContextMenu();
+        };
+      } else {
+        disconnBtn.style.display = "none";
+      }
+    }
+
+    const startBtn = document.getElementById("ctx-btn-start-wire");
+    if (startBtn) {
+      startBtn.onclick = () => {
+        startWireFromPin(compId, pinNum);
+        hideContextMenu();
+      };
+    }
+
+    const wrap = document.getElementById("canvas-wrap");
+    if (wrap) {
+      const rect = wrap.getBoundingClientRect();
+      const x = Math.min(clientX - rect.left, rect.width - 220);
+      const y = Math.min(clientY - rect.top, rect.height - 180);
+      menu.style.left = `${Math.max(10, x)}px`;
+      menu.style.top = `${Math.max(10, y)}px`;
+      menu.style.display = "block";
+    }
+  }
+
+  function hideContextMenu() {
+    const menu = document.getElementById("wb-context-menu");
+    if (menu) menu.style.display = "none";
+  }
+
+  function triggerConnectionRipple(x, y) {
+    if (!tempWireLayer) return;
+    const ripple = createSVGElement("circle", {
+      cx: x,
+      cy: y,
+      r: 6,
+      class: "connection-ripple-anim"
+    });
+    tempWireLayer.appendChild(ripple);
+    setTimeout(() => {
+      ripple.remove();
+    }, 550);
+  }
+
+  function updateHintForCurrentTool() {
+    const hint = document.getElementById("tool-hint-text");
+    if (!hint) return;
+    if (state.activeWire) {
+      hint.textContent = `ROUTING WIRE: Move near target pin to connect. [Space] to flip bend. Click board to add corner. [Esc] to cancel.`;
+    } else if (state.tool === "wire") {
+      hint.textContent = "WIRE MODE: Click any pin terminal to start routing. Click destination pin to connect.";
+    } else if (state.tool === "delete") {
+      hint.textContent = "DELETE MODE: Click any wire or component to delete it. Click pin to disconnect its wires.";
+    } else {
+      hint.textContent = "SELECT MODE: Drag components to move. Click switch to toggle 0/1. Click pin to route wire.";
     }
   }
 
@@ -1251,6 +1467,7 @@
     const comp = state.components.find((c) => c.id === compId);
     if (!comp) return;
 
+    hideContextMenu();
     const startPos = getPinWorldPos(comp, pinNum);
     state.activeWire = {
       fromCompId: compId,
@@ -1260,16 +1477,21 @@
     };
 
     document.querySelectorAll(".pin-terminal-group").forEach((el) => {
-      el.classList.remove("active-start");
-      el.classList.add("connect-target");
+      el.classList.remove("active-start", "snap-hover");
+      const cId = el.getAttribute("data-comp-id");
+      const pNum = parseInt(el.getAttribute("data-pin-num"), 10);
+      if (cId === compId && pNum === pinNum) {
+        el.classList.add("active-start");
+      } else {
+        el.classList.add("connect-target");
+      }
     });
 
-    const activeEl = document.querySelector(`.pin-terminal-group[data-comp-id="${compId}"][data-pin-num="${pinNum}"]`);
-    activeEl?.classList.add("active-start");
-
+    const spec = LIBRARY[comp.type];
+    const pin = spec?.pins.find((p) => p.num === pinNum);
     const hint = document.getElementById("tool-hint-text");
     if (hint) {
-      hint.textContent = `ROUTING WIRE from ${comp.ref} Pin ${pinNum}. Click on empty space to drop corners. Press [Space] to flip bend. Click destination pin to finish.`;
+      hint.textContent = `ROUTING WIRE from ${comp.ref} Pin ${pinNum} (${pin?.name || ""}). Move to destination pin to connect. [Space] flips bend. Click board to add corner.`;
     }
   }
 
@@ -1284,8 +1506,24 @@
       return;
     }
 
+    const fromComp = state.components.find((c) => c.id === state.activeWire.fromCompId);
     const toComp = state.components.find((c) => c.id === compId);
-    if (!toComp) return;
+    if (!fromComp || !toComp) {
+      cancelActiveWire();
+      return;
+    }
+
+    // Check duplicate
+    const duplicate = state.wires.find(
+      (w) =>
+        (w.from.compId === state.activeWire.fromCompId && w.from.pinNum === state.activeWire.fromPinNum && w.to.compId === compId && w.to.pinNum === pinNum) ||
+        (w.to.compId === state.activeWire.fromCompId && w.to.pinNum === state.activeWire.fromPinNum && w.from.compId === compId && w.from.pinNum === pinNum)
+    );
+    if (duplicate) {
+      setSelectedItem({ type: "wire", id: duplicate.id });
+      cancelActiveWire();
+      return;
+    }
 
     const endPos = getPinWorldPos(toComp, pinNum);
     const lastPt = state.activeWire.waypoints[state.activeWire.waypoints.length - 1];
@@ -1312,10 +1550,25 @@
     };
 
     state.wires.push(wire);
-    setSelectedItem({ type: "wire", id: wire.id });
+    pushUndoState({ action: "add_wire", wire });
+
+    triggerConnectionRipple(endPos.x, endPos.y);
+
+    const fromSpec = LIBRARY[fromComp.type];
+    const toSpec = LIBRARY[toComp.type];
+    const fromPin = fromSpec?.pins.find((p) => p.num === state.activeWire.fromPinNum);
+    const toPin = toSpec?.pins.find((p) => p.num === pinNum);
+    const fromStr = `${fromComp.ref}.${state.activeWire.fromPinNum} (${fromPin?.name || ""})`;
+    const toStr = `${toComp.ref}.${pinNum} (${toPin?.name || ""})`;
 
     cancelActiveWire();
+    setSelectedItem({ type: "wire", id: wire.id });
     render();
+
+    const hint = document.getElementById("tool-hint-text");
+    if (hint) {
+      hint.textContent = `✓ Connected ${fromStr} ➔ ${toStr}. Click wire to inspect or press [Delete] to disconnect.`;
+    }
   }
 
   function cancelActiveWire() {
@@ -1326,14 +1579,7 @@
       el.classList.remove("connect-target", "active-start", "snap-hover");
     });
 
-    const hint = document.getElementById("tool-hint-text");
-    if (hint) {
-      if (state.tool === "wire") {
-        hint.textContent = "WIRE MODE: Click any red pin terminal to start. Click on empty space to add corners. Space to toggle bend direction. Click destination pin to finish.";
-      } else {
-        hint.textContent = "SELECT MODE: Drag components to reposition. Click toggle switches to flip 0/1 logic.";
-      }
-    }
+    updateHintForCurrentTool();
   }
 
   /**
@@ -1410,9 +1656,33 @@
         cx: bendPts[0].x,
         cy: bendPts[0].y,
         r: 3,
-        fill: "#2563eb",
-        opacity: "0.6"
+        fill: state.hoveredTargetPin ? "#00ff55" : "#2563eb",
+        opacity: "0.8"
       }));
+    }
+
+    // If magnetic snapping is active, render magnetic target reticle & badge
+    if (state.hoveredTargetPin) {
+      tempWireLayer.appendChild(createSVGElement("circle", {
+        cx: state.hoveredTargetPin.x,
+        cy: state.hoveredTargetPin.y,
+        r: 16,
+        class: "snap-target-ring"
+      }));
+
+      const snapComp = state.components.find((c) => c.id === state.hoveredTargetPin.compId);
+      const snapSpec = snapComp ? LIBRARY[snapComp.type] : null;
+      const snapPin = snapSpec ? snapSpec.pins.find((p) => p.num === state.hoveredTargetPin.pinNum) : null;
+      const pinName = snapPin ? snapPin.name : `Pin ${state.hoveredTargetPin.pinNum}`;
+
+      const badge = createSVGElement("text", {
+        x: state.hoveredTargetPin.x,
+        y: state.hoveredTargetPin.y - 18,
+        "text-anchor": "middle",
+        class: "snap-badge-text"
+      });
+      badge.textContent = `⚡ Connect: ${snapComp ? snapComp.ref : ""}.${pinName}`;
+      tempWireLayer.appendChild(badge);
     }
   }
 
@@ -1583,13 +1853,43 @@
       wireG.appendChild(wirePath);
 
       wireG.addEventListener("mousedown", (e) => {
+        // If actively drawing a wire, don't intercept click
+        if (state.activeWire) return;
         e.stopPropagation();
+        hideContextMenu();
         if (state.tool === "delete") {
+          const removedWire = state.wires.find((item) => item.id === w.id);
+          if (removedWire) pushUndoState({ action: "remove_wire", wire: removedWire });
           state.wires = state.wires.filter((item) => item.id !== w.id);
+          setSelectedItem(null);
           render();
         } else {
           setSelectedItem({ type: "wire", id: w.id });
         }
+      });
+
+      wireG.addEventListener("mouseenter", () => {
+        if (state.activeWire) return;
+        highlightWireEndpoints(w, true);
+        const fromComp = state.components.find((c) => c.id === w.from.compId);
+        const toComp = state.components.find((c) => c.id === w.to.compId);
+        const fromSpec = fromComp ? LIBRARY[fromComp.type] : null;
+        const toSpec = toComp ? LIBRARY[toComp.type] : null;
+        const fromPin = fromSpec?.pins.find((p) => p.num === w.from.pinNum);
+        const toPin = toSpec?.pins.find((p) => p.num === w.to.pinNum);
+        const hint = document.getElementById("tool-hint-text");
+        if (hint && fromComp && toComp) {
+          const voltStr = w.state === 1 ? "HIGH (1)" : "LOW (0)";
+          hint.textContent = `WIRE: ${fromComp.ref}.${w.from.pinNum} (${fromPin?.name || ""}) ➔ ${toComp.ref}.${w.to.pinNum} (${toPin?.name || ""}) | Logic: ${voltStr} | Click to select, [Del] to disconnect.`;
+        }
+      });
+
+      wireG.addEventListener("mouseleave", () => {
+        if (state.activeWire) return;
+        if (!state.selectedItem || state.selectedItem.id !== w.id) {
+          highlightWireEndpoints(w, false);
+        }
+        updateHintForCurrentTool();
       });
 
       wireLayer.appendChild(wireG);
@@ -1616,16 +1916,24 @@
       g.addEventListener("mousedown", (e) => {
         if (e.target.closest(".pin-terminal-hit")) return;
 
+        // If routing a wire, completely disallow dragging components!
+        if (state.activeWire) {
+          if (state.hoveredTargetPin) {
+            e.stopPropagation();
+            e.preventDefault();
+            completeWireToPin(state.hoveredTargetPin.compId, state.hoveredTargetPin.pinNum);
+          }
+          return;
+        }
+
         if (state.tool === "delete") {
           setSelectedItem({ type: "comp", id: c.id });
           deleteSelectedItem();
           return;
         }
 
-        // If in wire mode and currently routing, ignore dragging
-        if (state.tool === "wire" && state.activeWire) return;
-
         e.stopPropagation();
+        hideContextMenu();
         setSelectedItem({ type: "comp", id: c.id });
         state.draggingComp = c;
         const coords = clientToSvgCoords(e.clientX, e.clientY);
@@ -2185,39 +2493,116 @@
       "data-pin-num": pinNum
     });
 
+    const wires = getConnectedWires(compId, pinNum);
+    const isConnected = wires.length > 0;
+    const isJunction = wires.length >= 2;
+    const volt = state.pinVoltages[`${compId}:${pinNum}`];
+    const isHigh = volt === 1;
+
+    let visualClass = "pin-terminal-visual";
+    let r = 4.5;
+    let fill = "#fffdf2";
+    let stroke = "#a00000";
+    let strokeWidth = 1.8;
+
+    if (!isConnected) {
+      visualClass += " unconnected";
+      r = 4.0;
+      fill = "#fffdf2";
+      stroke = "#a00000";
+      strokeWidth = 1.8;
+    } else if (isJunction) {
+      visualClass += ` junction ${isHigh ? "state-high" : "state-low"}`;
+      r = 6.0;
+      fill = isHigh ? "#00ff66" : "#0a8c2f";
+      stroke = isHigh ? "#ffffff" : "#064e3b";
+      strokeWidth = 2.0;
+    } else {
+      visualClass += ` connected ${isHigh ? "state-high" : "state-low"}`;
+      r = 4.8;
+      fill = isHigh ? "#00ff66" : "#0a8c2f";
+      stroke = isHigh ? "#009933" : "#064e3b";
+      strokeWidth = 1.5;
+    }
+
     const visual = createSVGElement("circle", {
       cx: x,
       cy: y,
-      r: 4.5,
-      fill: "#fffdf2",
-      stroke: "#a00000",
-      "stroke-width": 1.8,
-      class: "pin-terminal-visual"
+      r: r,
+      fill: fill,
+      stroke: stroke,
+      "stroke-width": strokeWidth,
+      class: visualClass
     });
 
-    // Generous 30px touch hit-target
+    // Generous 36px touch hit-target
     const hitArea = createSVGElement("circle", {
       cx: x,
       cy: y,
-      r: 15,
+      r: 18,
       class: "pin-terminal-hit"
     });
 
     g.appendChild(visual);
     g.appendChild(hitArea);
 
-    const handlePinActivation = (e) => {
+    hitArea.addEventListener("mousedown", (e) => {
       e.stopPropagation();
       e.preventDefault();
+      hideContextMenu();
+
+      if (state.tool === "delete") {
+        disconnectWiresFromPin(compId, pinNum);
+        return;
+      }
 
       if (!state.activeWire) {
         startWireFromPin(compId, pinNum);
       } else {
         completeWireToPin(compId, pinNum);
       }
-    };
+    });
 
-    hitArea.addEventListener("mousedown", handlePinActivation);
+    hitArea.addEventListener("mouseup", (e) => {
+      if (state.activeWire && state.activeWire.fromCompId !== compId) {
+        e.stopPropagation();
+        e.preventDefault();
+        completeWireToPin(compId, pinNum);
+      }
+    });
+
+    hitArea.addEventListener("mouseenter", () => {
+      highlightPinConnectedWires(compId, pinNum, true);
+
+      if (state.activeWire && !(state.activeWire.fromCompId === compId && state.activeWire.fromPinNum === pinNum)) {
+        state.hoveredTargetPin = { compId, pinNum, x, y };
+        g.classList.add("snap-hover");
+        updateTempWirePreview();
+      } else if (!state.activeWire) {
+        const comp = state.components.find((c) => c.id === compId);
+        const spec = comp ? LIBRARY[comp.type] : null;
+        const pin = spec?.pins.find((p) => p.num === pinNum);
+        const wCount = wires.length;
+        const vStr = volt !== undefined ? (volt === 1 ? "HIGH (1)" : "LOW (0)") : "FLOATING";
+        const hint = document.getElementById("tool-hint-text");
+        if (hint && comp) {
+          hint.textContent = `Pin ${pinNum} [${pin ? pin.name : ""}] of ${comp.ref} (${comp.type}) | Signal: ${vStr} | Connected: ${wCount} wire(s). Click to route wire, right-click for options.`;
+        }
+      }
+    });
+
+    hitArea.addEventListener("mouseleave", () => {
+      highlightPinConnectedWires(compId, pinNum, false);
+      if (!state.activeWire) {
+        updateHintForCurrentTool();
+      }
+    });
+
+    hitArea.addEventListener("contextmenu", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      showPinContextMenu(compId, pinNum, e.clientX, e.clientY);
+    });
 
     return g;
   }
@@ -2243,14 +2628,17 @@
       return;
     }
 
-    // Active multi-point wire drawing with magnetic snapping
+    // Active multi-point wire drawing with generous magnetic snapping (28px)
     if (state.activeWire) {
       state.hoveredTargetPin = null;
       document.querySelectorAll(".pin-terminal-group").forEach((el) => {
         el.classList.remove("snap-hover");
       });
 
-      // Check if mouse is near any valid pin
+      const SNAP_RADIUS = 28;
+      let bestDist = SNAP_RADIUS;
+      let bestPin = null;
+
       for (const comp of state.components) {
         const spec = LIBRARY[comp.type];
         for (const p of spec.pins) {
@@ -2258,14 +2646,17 @@
 
           const pPos = getPinWorldPos(comp, p.num);
           const dist = Math.hypot(coords.x - pPos.x, coords.y - pPos.y);
-          if (dist < 18) {
-            state.hoveredTargetPin = { compId: comp.id, pinNum: p.num, x: pPos.x, y: pPos.y };
-            const targetEl = document.querySelector(`.pin-terminal-group[data-comp-id="${comp.id}"][data-pin-num="${p.num}"]`);
-            targetEl?.classList.add("snap-hover");
-            break;
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestPin = { compId: comp.id, pinNum: p.num, x: pPos.x, y: pPos.y };
           }
         }
-        if (state.hoveredTargetPin) break;
+      }
+
+      if (bestPin) {
+        state.hoveredTargetPin = bestPin;
+        const targetEl = document.querySelector(`.pin-terminal-group[data-comp-id="${bestPin.compId}"][data-pin-num="${bestPin.pinNum}"]`);
+        targetEl?.classList.add("snap-hover");
       }
 
       updateTempWirePreview();
@@ -2273,17 +2664,52 @@
   }
 
   function onCanvasMouseDown(e) {
-    // If active wire routing is in progress, clicking empty board adds a locked corner (waypoint)!
-    if (state.activeWire) {
-      if (e.target.closest(".pin-terminal-hit")) {
-        return; // Terminal click handles connection
-      }
-      e.stopPropagation();
+    // If context menu is open, clicking canvas hides it
+    if (!e.target.closest("#wb-context-menu")) {
+      hideContextMenu();
+    }
 
+    // If active wire routing is in progress
+    if (state.activeWire) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      // 1. Check if snapped, or clicked near ANY pin (within 28px)
+      let target = state.hoveredTargetPin;
+      if (!target) {
+        const coords = clientToSvgCoords(e.clientX, e.clientY);
+        const SNAP_RADIUS = 28;
+        let bestDist = SNAP_RADIUS;
+        for (const comp of state.components) {
+          const spec = LIBRARY[comp.type];
+          for (const p of spec.pins) {
+            if (comp.id === state.activeWire.fromCompId && p.num === state.activeWire.fromPinNum) continue;
+            const pPos = getPinWorldPos(comp, p.num);
+            const dist = Math.hypot(coords.x - pPos.x, coords.y - pPos.y);
+            if (dist < bestDist) {
+              bestDist = dist;
+              target = { compId: comp.id, pinNum: p.num, x: pPos.x, y: pPos.y };
+            }
+          }
+        }
+      }
+
+      if (target) {
+        completeWireToPin(target.compId, target.pinNum);
+        return;
+      }
+
+      // 2. Check if clicked near the start pin -> cancel
+      const startPos = state.activeWire.waypoints[0];
+      const coords = clientToSvgCoords(e.clientX, e.clientY);
+      if (Math.hypot(coords.x - startPos.x, coords.y - startPos.y) < 20) {
+        cancelActiveWire();
+        return;
+      }
+
+      // 3. Otherwise add intermediate right-angle corner and click point to waypoints
       const lastPt = state.activeWire.waypoints[state.activeWire.waypoints.length - 1];
       const targetPt = state.mousePos;
-
-      // Add intermediate right-angle corner and click point to waypoints
       const bendPts = getOrthogonalSegment(lastPt, targetPt, state.activeWire.bendMode);
       bendPts.forEach((pt) => {
         const prev = state.activeWire.waypoints[state.activeWire.waypoints.length - 1];
@@ -2311,6 +2737,17 @@
       if (comp.type === "SWITCH" && !state.hasDraggedFar) {
         comp.state.value = comp.state.value ? 0 : 1;
         runSimulation();
+      }
+      return;
+    }
+
+    // Drag-to-connect support for wires
+    if (state.activeWire && state.hoveredTargetPin && state.activeWire.waypoints.length === 1) {
+      const startPos = state.activeWire.waypoints[0];
+      const coords = clientToSvgCoords(e.clientX, e.clientY);
+      const distFromStart = Math.hypot(coords.x - startPos.x, coords.y - startPos.y);
+      if (distFromStart > 20) {
+        completeWireToPin(state.hoveredTargetPin.compId, state.hoveredTargetPin.pinNum);
       }
     }
   }

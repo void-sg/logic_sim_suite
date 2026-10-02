@@ -374,6 +374,9 @@
   background-position: 0 0;
   overflow: hidden;
   cursor: default;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
 }
 
 .wb-canvas-wrap.tool-wire {
@@ -392,6 +395,17 @@
   width: 100%;
   height: 100%;
   display: block;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+#workbench-svg text,
+#workbench-svg path,
+#workbench-svg rect,
+#workbench-svg circle,
+#workbench-svg g {
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 /* KiCad Title Block in Bottom Right */
@@ -405,10 +419,10 @@
   position: absolute;
   bottom: 14px;
   left: 14px;
-  background: rgba(15, 23, 42, 0.88);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(6px);
   color: #f8fafc;
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: 6px;
   font-family: "DM Mono", monospace;
   font-size: 11px;
@@ -416,15 +430,151 @@
   align-items: center;
   gap: 12px;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .wb-hint-badge {
   background: #e9bd4f;
   color: #14233b;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+/* Floating Wire Action Pill (when a wire is selected) */
+.wb-wire-action-pill {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 6px 14px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 25;
+  border: 1px solid #334155;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  animation: pill-slide-down 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pill-slide-down {
+  from { transform: translate(-50%, -12px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.wb-wire-action-pill .pill-badge {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.wb-wire-action-pill .pill-info {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.wb-wire-action-pill .pill-state {
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.wb-wire-action-pill .pill-btn-del {
+  background: #dc2626;
+  border: none;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: "DM Mono", monospace;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.wb-wire-action-pill .pill-btn-del:hover {
+  background: #b91c1c;
+  transform: scale(1.04);
+}
+
+/* Custom Context Menu */
+.wb-context-menu {
+  position: absolute;
+  z-index: 50;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  min-width: 210px;
+  padding: 6px 0;
+  font-family: "DM Mono", monospace;
+  animation: menu-pop 0.15s ease-out;
+}
+
+@keyframes menu-pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.wb-context-menu .ctx-header {
+  padding: 6px 14px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.wb-context-menu .ctx-status {
+  padding: 0 14px 6px;
+  font-size: 10px;
+  color: #64748b;
+}
+
+.wb-context-menu .ctx-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 4px 0;
+}
+
+.wb-context-menu .ctx-item {
+  width: 100%;
+  text-align: left;
+  padding: 7px 14px;
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-family: "DM Mono", monospace;
+  cursor: pointer;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s ease;
+}
+
+.wb-context-menu .ctx-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.wb-context-menu .ctx-danger {
+  color: #dc2626;
+}
+
+.wb-context-menu .ctx-danger:hover {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 /* Pin Hover & Wire Interactive Styles */
@@ -437,6 +587,41 @@
   pointer-events: none; /* Let hit circle capture all events */
 }
 
+/* Unconnected Pin: Open Ivory Red-Border Circle (KiCad style) */
+.pin-terminal-visual.unconnected {
+  fill: #fffdf2;
+  stroke: #a00000;
+  stroke-width: 1.8px;
+}
+
+/* Connected Pin (1 wire): Solid Terminal Node */
+.pin-terminal-visual.connected.state-low {
+  fill: #0a8c2f;
+  stroke: #064e3b;
+  stroke-width: 1.5px;
+}
+
+.pin-terminal-visual.connected.state-high {
+  fill: #00e650;
+  stroke: #009933;
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 0 3px rgba(0, 230, 80, 0.7));
+}
+
+/* Multiple Wires on Same Pin: Prominent KiCad Junction Dot */
+.pin-terminal-visual.junction.state-low {
+  fill: #0a8c2f;
+  stroke: #ffffff;
+  stroke-width: 2px;
+}
+
+.pin-terminal-visual.junction.state-high {
+  fill: #00e650;
+  stroke: #ffffff;
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 5px rgba(0, 255, 85, 0.8));
+}
+
 .pin-terminal-hit {
   fill: transparent;
   stroke: transparent;
@@ -445,7 +630,7 @@
 }
 
 /* In Wire Mode, highlight all terminals so user sees where to wire */
-.wb-canvas-wrap.tool-wire .pin-terminal-visual {
+.wb-canvas-wrap.tool-wire .pin-terminal-visual.unconnected {
   r: 5.5px !important;
   stroke: #2563eb !important;
   stroke-width: 2px !important;
@@ -453,14 +638,13 @@
 }
 
 .pin-terminal-group:hover .pin-terminal-visual {
-  r: 7px !important;
+  r: 7.5px !important;
   stroke: #ff0055 !important;
   stroke-width: 2.5px !important;
-  fill: #fee2e2 !important;
 }
 
 .pin-terminal-group.active-start .pin-terminal-visual {
-  r: 8px !important;
+  r: 8.5px !important;
   stroke: #f59e0b !important;
   stroke-width: 3.5px !important;
   fill: #fef3c7 !important;
@@ -476,16 +660,70 @@
 }
 
 .pin-terminal-group.snap-hover .pin-terminal-visual {
-  r: 9px !important;
+  r: 10px !important;
   stroke: #00ff55 !important;
   stroke-width: 4px !important;
   fill: #86efac !important;
-  filter: drop-shadow(0 0 6px rgba(0, 255, 85, 0.8));
+  filter: drop-shadow(0 0 8px rgba(0, 255, 85, 0.9));
+}
+
+/* Target endpoint pulse when hovering or selecting a wire */
+.pin-terminal-group.pin-endpoint-highlight .pin-terminal-visual {
+  r: 9.5px !important;
+  stroke: #06b6d4 !important;
+  stroke-width: 3.5px !important;
+  fill: #cffafe !important;
+  filter: drop-shadow(0 0 8px #06b6d4) !important;
+  animation: pulse-endpoint 0.8s infinite alternate;
+}
+
+@keyframes pulse-endpoint {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
 }
 
 @keyframes pulse-terminal {
   from { stroke-width: 2px; }
   to { stroke-width: 4px; }
+}
+
+/* Magnetic Snap Target Ring */
+.snap-target-ring {
+  fill: none;
+  stroke: #00ff55;
+  stroke-width: 2px;
+  stroke-dasharray: 5 3;
+  animation: rotate-snap 4s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 85, 0.9));
+  pointer-events: none;
+}
+
+@keyframes rotate-snap {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.snap-badge-text {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  fill: #15803d;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9));
+  pointer-events: none;
+}
+
+/* Connection Ripple Animation on Wire Complete */
+.connection-ripple-anim {
+  fill: none;
+  stroke: #00ff55;
+  stroke-width: 3.5px;
+  animation: ripple-anim 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple-anim {
+  0% { r: 6px; opacity: 1; stroke-width: 4px; }
+  100% { r: 32px; opacity: 0; stroke-width: 1px; }
 }
 
 .component-node {
@@ -533,8 +771,9 @@
 
 .active-wire-preview.snapped {
   stroke: #00ff55;
-  stroke-width: 3px;
-  filter: drop-shadow(0 0 5px rgba(0, 255, 85, 0.8));
+  stroke-width: 3.5px;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 85, 0.9));
 }
 
 .wire-group {
@@ -563,10 +802,16 @@
   filter: drop-shadow(0 0 4px #00e650);
 }
 
+.wire-group.pin-wire-highlight .schematic-wire {
+  stroke: #06b6d4 !important;
+  stroke-width: 4.5px !important;
+  filter: drop-shadow(0 0 6px #06b6d4) !important;
+}
+
 .wire-group.selected .schematic-wire {
   stroke: var(--kicad-wire-selected) !important;
-  stroke-width: 4px !important;
-  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.7));
+  stroke-width: 4.5px !important;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8));
 }
 
 /* Active High Glowing Wire */

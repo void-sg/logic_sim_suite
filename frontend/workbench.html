@@ -265,6 +265,23 @@
         <!-- Zoom group, wires, components dynamically rendered here -->
       </svg>
 
+      <!-- Floating Wire Action Pill (when a wire is selected) -->
+      <div class="wb-wire-action-pill" id="wire-action-pill" style="display: none;">
+        <span class="pill-badge">WIRE</span>
+        <span class="pill-info" id="wire-pill-info">U1.3 ➔ LED1.1</span>
+        <span class="pill-state" id="wire-pill-state">[HIGH]</span>
+        <button class="pill-btn-del" id="btn-wire-pill-delete" title="Delete this wire (Shortcut: Del or Backspace)">🗑 Disconnect</button>
+      </div>
+
+      <!-- Custom Pin / Terminal Context Menu -->
+      <div class="wb-context-menu" id="wb-context-menu" style="display: none;">
+        <div class="ctx-header" id="ctx-header">Pin 1 (1A)</div>
+        <div class="ctx-status" id="ctx-status">Signal: HIGH (1) • 1 wire(s)</div>
+        <div class="ctx-divider"></div>
+        <button class="ctx-item" id="ctx-btn-start-wire">⚡ Route Wire From Here</button>
+        <button class="ctx-item ctx-danger" id="ctx-btn-disconnect">🗑 Disconnect All Wires</button>
+      </div>
+
       <!-- Bottom Hint Bar -->
       <div class="wb-hint-bar">
         <span class="wb-hint-badge">HELP</span>

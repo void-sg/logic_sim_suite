@@ -428,22 +428,59 @@
 }
 
 /* Pin Hover & Wire Interactive Styles */
-.pin-terminal {
+.pin-terminal-group {
   cursor: crosshair;
-  transition: r 0.15s ease, stroke-width 0.15s ease;
 }
 
-.pin-terminal:hover {
-  r: 5px !important;
-  stroke: #ff0055 !important;
+.pin-terminal-visual {
+  transition: r 0.15s ease, stroke 0.15s ease, stroke-width 0.15s ease, fill 0.15s ease;
+  pointer-events: none; /* Let hit circle capture all events */
+}
+
+.pin-terminal-hit {
+  fill: transparent;
+  stroke: transparent;
+  cursor: crosshair;
+  pointer-events: all;
+}
+
+/* In Wire Mode, highlight all terminals so user sees where to wire */
+.wb-canvas-wrap.tool-wire .pin-terminal-visual {
+  r: 5.5px !important;
+  stroke: #2563eb !important;
   stroke-width: 2px !important;
+  fill: #eff6ff !important;
 }
 
-.pin-terminal.connect-target {
-  r: 6px !important;
-  stroke: #00ff66 !important;
+.pin-terminal-group:hover .pin-terminal-visual {
+  r: 7px !important;
+  stroke: #ff0055 !important;
+  stroke-width: 2.5px !important;
+  fill: #fee2e2 !important;
+}
+
+.pin-terminal-group.active-start .pin-terminal-visual {
+  r: 8px !important;
+  stroke: #f59e0b !important;
+  stroke-width: 3.5px !important;
+  fill: #fef3c7 !important;
+  animation: pulse-terminal 0.6s infinite alternate;
+}
+
+.pin-terminal-group.connect-target .pin-terminal-visual {
+  r: 7.5px !important;
+  stroke: #00e650 !important;
   stroke-width: 3px !important;
+  fill: #dcfce7 !important;
   animation: pulse-terminal 0.8s infinite alternate;
+}
+
+.pin-terminal-group.snap-hover .pin-terminal-visual {
+  r: 9px !important;
+  stroke: #00ff55 !important;
+  stroke-width: 4px !important;
+  fill: #86efac !important;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 85, 0.8));
 }
 
 @keyframes pulse-terminal {
@@ -466,42 +503,60 @@
   filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.4));
 }
 
-.schematic-wire {
+.wire-group {
   cursor: pointer;
+}
+
+.wire-hit-area {
+  stroke: transparent;
+  stroke-width: 16px;
   stroke-linecap: round;
   stroke-linejoin: round;
+  fill: none;
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+.schematic-wire {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none; /* Let wire-hit-area handle clicking */
   transition: stroke 0.15s ease, stroke-width 0.15s ease;
 }
 
-.schematic-wire:hover {
+.wire-group:hover .schematic-wire {
   stroke-width: 4px !important;
   filter: drop-shadow(0 0 4px #00e650);
 }
 
-.schematic-wire.selected {
+.wire-group.selected .schematic-wire {
   stroke: var(--kicad-wire-selected) !important;
-  stroke-width: 3.5px !important;
+  stroke-width: 4px !important;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.7));
 }
 
 /* Active High Glowing Wire */
 .schematic-wire.state-high {
   stroke: var(--kicad-wire-high) !important;
-  filter: drop-shadow(0 0 4px var(--kicad-wire-high-glow));
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 4px var(--kicad-wire-high-glow)) drop-shadow(0 0 8px rgba(0, 230, 80, 0.3));
 }
 
 .schematic-wire.state-low {
   stroke: var(--kicad-wire-low) !important;
+  stroke-width: 2.5px !important;
 }
 
 /* Junction Dots */
 .junction-dot {
   fill: var(--kicad-wire-low);
   transition: fill 0.15s ease;
+  pointer-events: none;
 }
 
 .junction-dot.state-high {
   fill: var(--kicad-wire-high);
-  filter: drop-shadow(0 0 3px var(--kicad-wire-high-glow));
+  filter: drop-shadow(0 0 4px var(--kicad-wire-high-glow));
 }
 
 /* Toggle Switch Node */

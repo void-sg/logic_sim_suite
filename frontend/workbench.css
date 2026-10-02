@@ -497,10 +497,44 @@
   cursor: grabbing;
 }
 
-.component-node.selected .comp-body {
-  stroke: #2563eb !important;
-  stroke-width: 2.5px !important;
-  filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.4));
+.comp-grab-area {
+  fill: transparent;
+  pointer-events: all;
+  cursor: grab;
+}
+
+.component-node:active .comp-grab-area {
+  cursor: grabbing;
+}
+
+.wire-waypoint-dot {
+  fill: #00ff55;
+  stroke: #064e3b;
+  stroke-width: 1.5px;
+  pointer-events: none;
+  animation: pulse-dot 1s infinite alternate;
+}
+
+.active-wire-fixed {
+  stroke: #00e650;
+  stroke-width: 2.5px;
+  fill: none;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(0, 230, 80, 0.4));
+}
+
+.active-wire-preview {
+  stroke: #2563eb;
+  stroke-width: 2.5px;
+  stroke-dasharray: 6 3;
+  fill: none;
+  pointer-events: none;
+}
+
+.active-wire-preview.snapped {
+  stroke: #00ff55;
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 5px rgba(0, 255, 85, 0.8));
 }
 
 .wire-group {

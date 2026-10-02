@@ -1,7 +1,7 @@
 /**
    Virtual IC Workbench & EDA Schematic Lab Engine
-   Replicating KiCad Eeschema UI with Symbol Chooser, Orthogonal Manhattan Wires,
-   and Real-Time Digital Logic Simulation for Lab Practicals
+   Replicating KiCad Eeschema UI with Symbol Chooser, Multi-Point Orthogonal Wiring,
+   Effortless Component Dragging, and Real-Time Digital Logic Simulation
 */
 
 (function () {
@@ -26,21 +26,20 @@
       pins: [
         { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
         { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "right", pos: 1 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 3 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 4 },
-        { num: 6, name: "2Y", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 3 },
-        { num: 9, name: "3A", type: "in", side: "left", pos: 5 },
-        { num: 10, name: "3B", type: "in", side: "left", pos: 6 },
+        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
+        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
         { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "left", pos: 7 },
-        { num: 13, name: "4B", type: "in", side: "left", pos: 8 },
-        { num: 14, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
-        // Active low NAND output: 0 only if both inputs are 1. Default unconnected input = 1 (TTL float HIGH).
         const in1 = inputs["1"] !== undefined ? inputs["1"] : 1;
         const in2 = inputs["2"] !== undefined ? inputs["2"] : 1;
         const in4 = inputs["4"] !== undefined ? inputs["4"] : 1;
@@ -71,18 +70,18 @@
       pins: [
         { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
         { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "right", pos: 1 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 3 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 4 },
-        { num: 6, name: "2Y", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 3 },
-        { num: 9, name: "3A", type: "in", side: "left", pos: 5 },
-        { num: 10, name: "3B", type: "in", side: "left", pos: 6 },
+        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
+        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
         { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "left", pos: 7 },
-        { num: 13, name: "4B", type: "in", side: "left", pos: 8 },
-        { num: 14, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         return {
@@ -106,18 +105,18 @@
       pins: [
         { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
         { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "right", pos: 1 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 3 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 4 },
-        { num: 6, name: "2Y", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 3 },
-        { num: 9, name: "3A", type: "in", side: "left", pos: 5 },
-        { num: 10, name: "3B", type: "in", side: "left", pos: 6 },
+        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
+        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
         { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "left", pos: 7 },
-        { num: 13, name: "4B", type: "in", side: "left", pos: 8 },
-        { num: 14, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         return {
@@ -136,23 +135,23 @@
       package: "DIP-14",
       pinsCount: 14,
       refPrefix: "U",
-      desc: "Four independent 2-input Exclusive-OR gates. Core component for adders, subtractors, and parity generators.",
+      desc: "Four independent 2-input Exclusive-OR gates. Essential for adders, subtractors, and parity generators.",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A,1B->1Y), (2A,2B->2Y), (3A,3B->3Y), (4A,4B->4Y).",
       pins: [
         { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
         { num: 2, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 3, name: "1Y", type: "out", side: "right", pos: 1 },
-        { num: 4, name: "2A", type: "in", side: "left", pos: 3 },
-        { num: 5, name: "2B", type: "in", side: "left", pos: 4 },
-        { num: 6, name: "2Y", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 3 },
-        { num: 9, name: "3A", type: "in", side: "left", pos: 5 },
-        { num: 10, name: "3B", type: "in", side: "left", pos: 6 },
+        { num: 3, name: "1Y", type: "out", side: "left", pos: 3 },
+        { num: 4, name: "2A", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
         { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "left", pos: 7 },
-        { num: 13, name: "4B", type: "in", side: "left", pos: 8 },
-        { num: 14, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         return {
@@ -174,20 +173,20 @@
       desc: "Four independent 2-input positive NOR gates. Note: Pin 1 is output 1Y (opposite pinout from 7400/7408).",
       datasheet: "VCC: Pin 14, GND: Pin 7. Gates: (1A:2, 1B:3 -> 1Y:1), (2A:5, 2B:6 -> 2Y:4), (3A:8, 3B:9 -> 3Y:10), (4A:11, 4B:12 -> 4Y:13).",
       pins: [
-        { num: 1, name: "1Y", type: "out", side: "right", pos: 1 },
-        { num: 2, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 3, name: "1B", type: "in", side: "left", pos: 2 },
-        { num: 4, name: "2Y", type: "out", side: "right", pos: 2 },
-        { num: 5, name: "2A", type: "in", side: "left", pos: 3 },
-        { num: 6, name: "2B", type: "in", side: "left", pos: 4 },
-        { num: 7, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 8, name: "3A", type: "in", side: "left", pos: 5 },
-        { num: 9, name: "3B", type: "in", side: "left", pos: 6 },
-        { num: 10, name: "3Y", type: "out", side: "right", pos: 3 },
-        { num: 11, name: "4A", type: "in", side: "left", pos: 7 },
-        { num: 12, name: "4B", type: "in", side: "left", pos: 8 },
-        { num: 13, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 14, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 1, name: "1Y", type: "out", side: "left", pos: 1 },
+        { num: 2, name: "1A", type: "in", side: "left", pos: 2 },
+        { num: 3, name: "1B", type: "in", side: "left", pos: 3 },
+        { num: 4, name: "2Y", type: "out", side: "left", pos: 4 },
+        { num: 5, name: "2A", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "2B", type: "in", side: "left", pos: 6 },
+        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
+        { num: 8, name: "3A", type: "in", side: "right", pos: 7 },
+        { num: 9, name: "3B", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "3Y", type: "out", side: "right", pos: 5 },
+        { num: 11, name: "4A", type: "in", side: "right", pos: 4 },
+        { num: 12, name: "4B", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "4Y", type: "out", side: "right", pos: 2 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         return {
@@ -210,19 +209,19 @@
       datasheet: "VCC: Pin 14, GND: Pin 7. Inverters: (1A->1Y), (2A->2Y), (3A->3Y), (4A->4Y), (5A->5Y), (6A->6Y).",
       pins: [
         { num: 1, name: "1A", type: "in", side: "left", pos: 1 },
-        { num: 2, name: "1Y", type: "out", side: "right", pos: 1 },
-        { num: 3, name: "2A", type: "in", side: "left", pos: 2 },
-        { num: 4, name: "2Y", type: "out", side: "right", pos: 2 },
-        { num: 5, name: "3A", type: "in", side: "left", pos: 3 },
-        { num: 6, name: "3Y", type: "out", side: "right", pos: 3 },
-        { num: 7, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 8, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 9, name: "4A", type: "in", side: "left", pos: 4 },
+        { num: 2, name: "1Y", type: "out", side: "left", pos: 2 },
+        { num: 3, name: "2A", type: "in", side: "left", pos: 3 },
+        { num: 4, name: "2Y", type: "out", side: "left", pos: 4 },
+        { num: 5, name: "3A", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "3Y", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
+        { num: 8, name: "4Y", type: "out", side: "right", pos: 7 },
+        { num: 9, name: "4A", type: "in", side: "right", pos: 6 },
         { num: 10, name: "5Y", type: "out", side: "right", pos: 5 },
-        { num: 11, name: "5A", type: "in", side: "left", pos: 5 },
-        { num: 12, name: "6Y", type: "out", side: "right", pos: 6 },
-        { num: 13, name: "6A", type: "in", side: "left", pos: 6 },
-        { num: 14, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 11, name: "5A", type: "in", side: "right", pos: 4 },
+        { num: 12, name: "6Y", type: "out", side: "right", pos: 3 },
+        { num: 13, name: "6A", type: "in", side: "right", pos: 2 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         return {
@@ -268,22 +267,22 @@
       desc: "8-to-1 Data Selector/Multiplexer with complementary outputs (Y and W = ~Y) and active-low Strobe (~G).",
       datasheet: "VCC: Pin 16, GND: Pin 8. Data D0-D7, Select A(11), B(10), C(9). Enable ~G(7). True Y(5), Inverted W(6).",
       pins: [
-        { num: 1, name: "D3", type: "in", side: "left", pos: 4 },
-        { num: 2, name: "D2", type: "in", side: "left", pos: 3 },
-        { num: 3, name: "D1", type: "in", side: "left", pos: 2 },
-        { num: 4, name: "D0", type: "in", side: "left", pos: 1 },
-        { num: 5, name: "Y", type: "out", side: "right", pos: 1 },
-        { num: 6, name: "W", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "~G", type: "in", side: "left", pos: 12 },
-        { num: 8, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 9, name: "C", type: "in", side: "left", pos: 11 },
-        { num: 10, name: "B", type: "in", side: "left", pos: 10 },
-        { num: 11, name: "A", type: "in", side: "left", pos: 9 },
-        { num: 12, name: "D7", type: "in", side: "left", pos: 8 },
-        { num: 13, name: "D6", type: "in", side: "left", pos: 7 },
-        { num: 14, name: "D5", type: "in", side: "left", pos: 6 },
-        { num: 15, name: "D4", type: "in", side: "left", pos: 5 },
-        { num: 16, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 1, name: "D3", type: "in", side: "left", pos: 1 },
+        { num: 2, name: "D2", type: "in", side: "left", pos: 2 },
+        { num: 3, name: "D1", type: "in", side: "left", pos: 3 },
+        { num: 4, name: "D0", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "Y", type: "out", side: "left", pos: 5 },
+        { num: 6, name: "W", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "~G", type: "in", side: "left", pos: 7 },
+        { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
+        { num: 9, name: "C", type: "in", side: "right", pos: 8 },
+        { num: 10, name: "B", type: "in", side: "right", pos: 7 },
+        { num: 11, name: "A", type: "in", side: "right", pos: 6 },
+        { num: 12, name: "D7", type: "in", side: "right", pos: 5 },
+        { num: 13, name: "D6", type: "in", side: "right", pos: 4 },
+        { num: 14, name: "D5", type: "in", side: "right", pos: 3 },
+        { num: 15, name: "D4", type: "in", side: "right", pos: 2 },
+        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         const strobe = inputs["7"] || 0; // ~G active low
@@ -323,22 +322,22 @@
       desc: "4-bit magnitude comparator comparing two binary words A and B. Includes expansion cascading inputs.",
       datasheet: "VCC: Pin 16, GND: Pin 8. A inputs: A0(10), A1(12), A2(13), A3(15). B inputs: B0(9), B1(11), B2(14), B3(1). Outputs: A>B(5), A=B(6), A<B(7).",
       pins: [
-        { num: 1, name: "B3", type: "in", side: "left", pos: 8 },
-        { num: 2, name: "I_LT", type: "in", side: "left", pos: 11 },
-        { num: 3, name: "I_EQ", type: "in", side: "left", pos: 10 },
-        { num: 4, name: "I_GT", type: "in", side: "left", pos: 9 },
-        { num: 5, name: "O_GT", type: "out", side: "right", pos: 1 },
-        { num: 6, name: "O_EQ", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "O_LT", type: "out", side: "right", pos: 3 },
-        { num: 8, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 9, name: "B0", type: "in", side: "left", pos: 5 },
-        { num: 10, name: "A0", type: "in", side: "left", pos: 1 },
-        { num: 11, name: "B1", type: "in", side: "left", pos: 6 },
-        { num: 12, name: "A1", type: "in", side: "left", pos: 2 },
-        { num: 13, name: "A2", type: "in", side: "left", pos: 3 },
-        { num: 14, name: "B2", type: "in", side: "left", pos: 7 },
-        { num: 15, name: "A3", type: "in", side: "left", pos: 4 },
-        { num: 16, name: "VCC", type: "pwr", side: "top", pos: 1 }
+        { num: 1, name: "B3", type: "in", side: "left", pos: 1 },
+        { num: 2, name: "I_LT", type: "in", side: "left", pos: 2 },
+        { num: 3, name: "I_EQ", type: "in", side: "left", pos: 3 },
+        { num: 4, name: "I_GT", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "O_GT", type: "out", side: "left", pos: 5 },
+        { num: 6, name: "O_EQ", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "O_LT", type: "out", side: "left", pos: 7 },
+        { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
+        { num: 9, name: "B0", type: "in", side: "right", pos: 8 },
+        { num: 10, name: "A0", type: "in", side: "right", pos: 7 },
+        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
+        { num: 12, name: "A1", type: "in", side: "right", pos: 5 },
+        { num: 13, name: "A2", type: "in", side: "right", pos: 4 },
+        { num: 14, name: "B2", type: "in", side: "right", pos: 3 },
+        { num: 15, name: "A3", type: "in", side: "right", pos: 2 },
+        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         const aVal = ((inputs["15"] || 0) << 3) | ((inputs["13"] || 0) << 2) | ((inputs["12"] || 0) << 1) | (inputs["10"] || 0);
@@ -377,22 +376,22 @@
       desc: "4-bit binary full adder with fast internal look-ahead carry. Standard lab IC for adders and subtractors.",
       datasheet: "VCC: Pin 5, GND: Pin 12. A: (A1:10, A2:8, A3:3, A4:1). B: (B1:11, B2:7, B3:4, B4:16). Cin: C0(13). Sum: (S1:9, S2:6, S3:2, S4:15). Cout: C4(14).",
       pins: [
-        { num: 1, name: "A4", type: "in", side: "left", pos: 4 },
-        { num: 2, name: "S3", type: "out", side: "right", pos: 3 },
+        { num: 1, name: "A4", type: "in", side: "left", pos: 1 },
+        { num: 2, name: "S3", type: "out", side: "left", pos: 2 },
         { num: 3, name: "A3", type: "in", side: "left", pos: 3 },
-        { num: 4, name: "B3", type: "in", side: "left", pos: 7 },
-        { num: 5, name: "VCC", type: "pwr", side: "top", pos: 1 },
-        { num: 6, name: "S2", type: "out", side: "right", pos: 2 },
-        { num: 7, name: "B2", type: "in", side: "left", pos: 6 },
-        { num: 8, name: "A2", type: "in", side: "left", pos: 2 },
-        { num: 9, name: "S1", type: "out", side: "right", pos: 1 },
-        { num: 10, name: "A1", type: "in", side: "left", pos: 1 },
-        { num: 11, name: "B1", type: "in", side: "left", pos: 5 },
-        { num: 12, name: "GND", type: "pwr", side: "bottom", pos: 1 },
-        { num: 13, name: "C0", type: "in", side: "left", pos: 9 },
-        { num: 14, name: "C4", type: "out", side: "right", pos: 5 },
-        { num: 15, name: "S4", type: "out", side: "right", pos: 4 },
-        { num: 16, name: "B4", type: "in", side: "left", pos: 8 }
+        { num: 4, name: "B3", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "VCC", type: "pwr", side: "left", pos: 5 },
+        { num: 6, name: "S2", type: "out", side: "left", pos: 6 },
+        { num: 7, name: "B2", type: "in", side: "left", pos: 7 },
+        { num: 8, name: "A2", type: "in", side: "left", pos: 8 },
+        { num: 9, name: "S1", type: "out", side: "right", pos: 8 },
+        { num: 10, name: "A1", type: "in", side: "right", pos: 7 },
+        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
+        { num: 12, name: "GND", type: "pwr", side: "right", pos: 5 },
+        { num: 13, name: "C0", type: "in", side: "right", pos: 4 },
+        { num: 14, name: "C4", type: "out", side: "right", pos: 3 },
+        { num: 15, name: "S4", type: "out", side: "right", pos: 2 },
+        { num: 16, name: "B4", type: "in", side: "right", pos: 1 }
       ],
       evaluate: (inputs) => {
         const aVal = ((inputs["1"] || 0) << 3) | ((inputs["3"] || 0) << 2) | ((inputs["8"] || 0) << 1) | (inputs["10"] || 0);
@@ -492,7 +491,7 @@
   // =========================================================================
   const state = {
     components: [],   // { id, type, ref, x, y, state }
-    wires: [],        // { id, from: { compId, pinNum }, to: { compId, pinNum }, state: 0 }
+    wires: [],        // { id, from: { compId, pinNum }, to: { compId, pinNum }, waypoints: [], state: 0 }
     selectedItem: null,// { type: 'comp'|'wire', id }
     tool: "select",   // "select" | "wire" | "delete"
     isSimRunning: true,
@@ -502,8 +501,8 @@
     // Last computed voltages for seamless DOM re-renders: { "compId:pinNum": 0|1 }
     pinVoltages: {},
 
-    // Wire drawing state
-    activeWireStart: null, // { compId, pinNum, x, y }
+    // Active multi-point wire drawing state (KiCad style)
+    activeWire: null, // { fromCompId, fromPinNum, waypoints: [{x, y}, ...], bendMode: "HV"|"VH" }
     hoveredTargetPin: null,// { compId, pinNum, x, y }
     mousePos: { x: 0, y: 0 },
 
@@ -516,12 +515,13 @@
     // Dragging components
     draggingComp: null,
     dragOffset: { x: 0, y: 0 },
+    dragStartPos: { x: 0, y: 0 },
+    hasDraggedFar: false,
 
     // Symbol Chooser Modal state
     selectedModalItem: "7400"
   };
 
-  // Counter for unique reference IDs
   const refCounters = {};
 
   function getNextRef(prefix) {
@@ -544,7 +544,7 @@
     // Load default introductory lab circuit (Exp 1: 7400 NAND Verification)
     loadLabPreset("7400_nand");
 
-    // Continuous simulation loop ensures clock, switches, and LEDs remain live
+    // Continuous simulation heartbeat
     setInterval(() => {
       if (state.isSimRunning) {
         runSimulation();
@@ -593,8 +593,23 @@
         setTool("wire");
       } else if (e.key === "s" || e.key === "S") {
         setTool("select");
-      } else if (e.key === "Delete" || e.key === "Backspace") {
+      } else if (e.key === "Delete") {
         deleteSelectedItem();
+      } else if (e.key === "Backspace") {
+        if (state.activeWire && state.activeWire.waypoints.length > 1) {
+          // Remove last waypoint
+          state.activeWire.waypoints.pop();
+          updateTempWirePreview();
+        } else {
+          deleteSelectedItem();
+        }
+      } else if (e.key === " " || e.code === "Space") {
+        if (state.activeWire) {
+          e.preventDefault();
+          // Toggle orthogonal bend mode (Horizontal-first vs Vertical-first)
+          state.activeWire.bendMode = state.activeWire.bendMode === "HV" ? "VH" : "HV";
+          updateTempWirePreview();
+        }
       } else if (e.key === "Escape") {
         cancelActiveWire();
         closeModal();
@@ -603,14 +618,12 @@
   }
 
   function initToolbar() {
-    // Tool buttons
     document.getElementById("btn-tool-select")?.addEventListener("click", () => setTool("select"));
     document.getElementById("btn-tool-wire")?.addEventListener("click", () => setTool("wire"));
     document.getElementById("btn-tool-delete")?.addEventListener("click", () => setTool("delete"));
     document.getElementById("btn-add-symbol")?.addEventListener("click", () => openModal());
     document.getElementById("btn-clear-canvas")?.addEventListener("click", () => clearCanvas());
 
-    // Simulation toggle
     document.getElementById("btn-sim-toggle")?.addEventListener("click", () => {
       state.isSimRunning = !state.isSimRunning;
       const btn = document.getElementById("btn-sim-toggle");
@@ -632,7 +645,6 @@
       runSimulation();
     });
 
-    // Preset selector
     const presetSelect = document.getElementById("preset-select");
     presetSelect?.addEventListener("change", (e) => {
       if (e.target.value) {
@@ -641,12 +653,10 @@
       }
     });
 
-    // Zoom buttons
     document.getElementById("btn-zoom-in")?.addEventListener("click", () => zoom(0.8));
     document.getElementById("btn-zoom-out")?.addEventListener("click", () => zoom(1.25));
     document.getElementById("btn-zoom-reset")?.addEventListener("click", () => resetZoom());
 
-    // Quick palette items
     document.querySelectorAll(".wb-palette-item").forEach((item) => {
       item.addEventListener("click", () => {
         const type = item.getAttribute("data-type");
@@ -669,7 +679,7 @@
     const hint = document.getElementById("tool-hint-text");
     if (hint) {
       if (toolName === "wire") {
-        hint.textContent = "WIRE MODE: Click any red pin terminal to start a wire. Hover over another pin to snap and connect.";
+        hint.textContent = "WIRE MODE: Click any red pin terminal to start. Click on empty space to add corners. Space to toggle bend direction. Click destination pin to finish.";
       } else if (toolName === "delete") {
         hint.textContent = "DELETE MODE: Click any component or wire to delete it.";
       } else {
@@ -912,26 +922,28 @@
 
     if (spec.category === "power") {
       if (spec.id === "VCC") {
-        svg.appendChild(createSVGElement("line", { x1: 0, y1: 0, x2: 0, y2: -30, stroke: "#a00000", "stroke-width": 2 }));
-        svg.appendChild(createSVGElement("line", { x1: -15, y1: -30, x2: 15, y2: -30, stroke: "#a00000", "stroke-width": 2.5 }));
-        const t = createSVGElement("text", { x: 0, y: -40, "text-anchor": "middle", fill: "#a00000", "font-size": 13, "font-family": "DM Mono", "font-weight": "bold" });
+        svg.appendChild(createSVGElement("line", { x1: 0, y1: 15, x2: 0, y2: -15, stroke: "#a00000", "stroke-width": 2 }));
+        svg.appendChild(createSVGElement("line", { x1: -15, y1: -15, x2: 15, y2: -15, stroke: "#a00000", "stroke-width": 3 }));
+        const t = createSVGElement("text", { x: 0, y: -25, "text-anchor": "middle", fill: "#a00000", "font-size": 13, "font-family": "DM Mono", "font-weight": "bold" });
         t.textContent = "+5V (VCC)";
         svg.appendChild(t);
+        svg.appendChild(createSVGElement("circle", { cx: 0, cy: 15, r: 4, fill: "#fffdf2", stroke: "#a00000", "stroke-width": 1.5 }));
       } else {
-        svg.appendChild(createSVGElement("line", { x1: 0, y1: 0, x2: 0, y2: 30, stroke: "#a00000", "stroke-width": 2 }));
-        svg.appendChild(createSVGElement("line", { x1: -20, y1: 30, x2: 20, y2: 30, stroke: "#a00000", "stroke-width": 2 }));
-        svg.appendChild(createSVGElement("line", { x1: -12, y1: 38, x2: 12, y2: 38, stroke: "#a00000", "stroke-width": 2 }));
-        svg.appendChild(createSVGElement("line", { x1: -4, y1: 46, x2: 4, y2: 46, stroke: "#a00000", "stroke-width": 2 }));
+        svg.appendChild(createSVGElement("line", { x1: 0, y1: -15, x2: 0, y2: 10, stroke: "#a00000", "stroke-width": 2 }));
+        svg.appendChild(createSVGElement("line", { x1: -18, y1: 10, x2: 18, y2: 10, stroke: "#a00000", "stroke-width": 2 }));
+        svg.appendChild(createSVGElement("line", { x1: -11, y1: 16, x2: 11, y2: 16, stroke: "#a00000", "stroke-width": 2 }));
+        svg.appendChild(createSVGElement("line", { x1: -4, y1: 22, x2: 4, y2: 22, stroke: "#a00000", "stroke-width": 2 }));
+        svg.appendChild(createSVGElement("circle", { cx: 0, cy: -15, r: 4, fill: "#fffdf2", stroke: "#a00000", "stroke-width": 1.5 }));
       }
       previewContainer.appendChild(svg);
       return;
     }
 
     if (spec.id === "DIODE") {
-      svg.appendChild(createSVGElement("line", { x1: -50, y1: 0, x2: -15, y2: 0, stroke: "#1e293b", "stroke-width": 2 }));
-      svg.appendChild(createSVGElement("polygon", { points: "-15,-20 -15,20 15,0", fill: "#e9bd4f", stroke: "#1e293b", "stroke-width": 2 }));
-      svg.appendChild(createSVGElement("line", { x1: 15, y1: -20, x2: 15, y2: 20, stroke: "#1e293b", "stroke-width": 2.5 }));
-      svg.appendChild(createSVGElement("line", { x1: 15, y1: 0, x2: 50, y2: 0, stroke: "#1e293b", "stroke-width": 2 }));
+      svg.appendChild(createSVGElement("line", { x1: -40, y1: 0, x2: -14, y2: 0, stroke: "#1e293b", "stroke-width": 2 }));
+      svg.appendChild(createSVGElement("polygon", { points: "-14,-14 -14,14 14,0", fill: "#e9bd4f", stroke: "#1e293b", "stroke-width": 2 }));
+      svg.appendChild(createSVGElement("line", { x1: 14, y1: -14, x2: 14, y2: 14, stroke: "#1e293b", "stroke-width": 2.5 }));
+      svg.appendChild(createSVGElement("line", { x1: 14, y1: 0, x2: 40, y2: 0, stroke: "#1e293b", "stroke-width": 2 }));
       previewContainer.appendChild(svg);
       return;
     }
@@ -1103,7 +1115,6 @@
   }
 
   function setSelectedItem(item) {
-    // Remove previous selection classes without destroying DOM
     if (state.selectedItem) {
       if (state.selectedItem.type === "comp") {
         document.getElementById(`node-${state.selectedItem.id}`)?.classList.remove("selected");
@@ -1114,7 +1125,6 @@
 
     state.selectedItem = item;
 
-    // Apply new selection class
     if (item) {
       if (item.type === "comp") {
         document.getElementById(`node-${item.id}`)?.classList.add("selected");
@@ -1153,36 +1163,70 @@
   }
 
   // =========================================================================
-  // 7. ROBUST PIN TERMINALS & ORTHOGONAL WIRING
+  // 7. SINGLE SOURCE OF TRUTH PIN POSITIONS & ORTHOGONAL WIRING
   // =========================================================================
+
+  /**
+   * The single source of truth for pin coordinates.
+   * All wires, terminal circles, and hit targets use this exact coordinate.
+   */
   function getPinWorldPos(comp, pinNum) {
     const spec = LIBRARY[comp.type];
     const pin = spec.pins.find((p) => p.num === pinNum);
     if (!pin) return { x: comp.x, y: comp.y };
 
-    const dims = getComponentDims(comp.type);
-    let px = comp.x;
-    let py = comp.y;
-
-    if (pin.side === "left") {
-      px = comp.x - dims.w / 2 - 25;
-      const leftPins = spec.pins.filter((p) => p.side === "left");
-      const idx = leftPins.findIndex((p) => p.num === pinNum);
-      py = comp.y - dims.h / 2 + 16 + idx * ((dims.h - 32) / Math.max(1, leftPins.length - 1));
-    } else if (pin.side === "right") {
-      px = comp.x + dims.w / 2 + 25;
-      const rightPins = spec.pins.filter((p) => p.side === "right");
-      const idx = rightPins.findIndex((p) => p.num === pinNum);
-      py = comp.y - dims.h / 2 + 16 + idx * ((dims.h - 32) / Math.max(1, rightPins.length - 1));
-    } else if (pin.side === "top") {
-      px = comp.x;
-      py = comp.y - dims.h / 2 - 25;
-    } else if (pin.side === "bottom") {
-      px = comp.x;
-      py = comp.y + dims.h / 2 + 25;
+    if (comp.type === "VCC") {
+      // Terminal at the bottom of the VCC stem
+      return { x: comp.x, y: comp.y + 12 };
     }
 
-    return { x: px, y: py };
+    if (comp.type === "GND") {
+      // Terminal at the top of the GND stem
+      return { x: comp.x, y: comp.y - 14 };
+    }
+
+    if (comp.type === "SWITCH") {
+      // Terminal on the right of the switch box
+      return { x: comp.x + 50, y: comp.y };
+    }
+
+    if (comp.type === "LED") {
+      // Terminal on the left of the LED circle
+      return { x: comp.x - 42, y: comp.y };
+    }
+
+    if (comp.type === "PROBE") {
+      // Terminal on the left of the probe box
+      return { x: comp.x - 46, y: comp.y };
+    }
+
+    if (comp.type === "CLOCK") {
+      // Terminal on the right of the clock box
+      return { x: comp.x + 48, y: comp.y };
+    }
+
+    if (comp.type === "DIODE") {
+      // Pin 1 (Anode) on left, Pin 2 (Cathode) on right
+      return { x: pinNum === 1 ? comp.x - 40 : comp.x + 40, y: comp.y };
+    }
+
+    // Standard Dual-In-Line IC Packages (DIP-14, DIP-16)
+    const dims = getComponentDims(comp.type);
+    const boxX = comp.x - dims.w / 2;
+    const boxY = comp.y - dims.h / 2;
+
+    const leftPins = spec.pins.filter((p) => p.side === "left");
+    const rightPins = spec.pins.filter((p) => p.side === "right");
+
+    if (pin.side === "left") {
+      const idx = leftPins.findIndex((p) => p.num === pinNum);
+      const py = boxY + 16 + idx * ((dims.h - 32) / Math.max(1, leftPins.length - 1));
+      return { x: boxX - 25, y: py };
+    } else {
+      const idx = rightPins.findIndex((p) => p.num === pinNum);
+      const py = boxY + 16 + idx * ((dims.h - 32) / Math.max(1, rightPins.length - 1));
+      return { x: boxX + dims.w + 25, y: py };
+    }
   }
 
   function getComponentDims(type) {
@@ -1196,18 +1240,25 @@
     );
     return {
       w: 130,
-      h: Math.max(120, maxSidePins * 22 + 20)
+      h: Math.max(130, maxSidePins * 22 + 20)
     };
   }
 
+  /**
+   * Start multi-point orthogonal wire routing (as shown in wire.mp4)
+   */
   function startWireFromPin(compId, pinNum) {
     const comp = state.components.find((c) => c.id === compId);
     if (!comp) return;
 
-    const pos = getPinWorldPos(comp, pinNum);
-    state.activeWireStart = { compId, pinNum, x: pos.x, y: pos.y };
+    const startPos = getPinWorldPos(comp, pinNum);
+    state.activeWire = {
+      fromCompId: compId,
+      fromPinNum: pinNum,
+      waypoints: [{ x: startPos.x, y: startPos.y }],
+      bendMode: "HV" // default bend posture: Horizontal-first
+    };
 
-    // Clear previous start highlights
     document.querySelectorAll(".pin-terminal-group").forEach((el) => {
       el.classList.remove("active-start");
       el.classList.add("connect-target");
@@ -1218,49 +1269,57 @@
 
     const hint = document.getElementById("tool-hint-text");
     if (hint) {
-      hint.textContent = `ROUTING WIRE from ${comp.ref} Pin ${pinNum}... Click another pin to connect. Right-click or Esc to cancel.`;
+      hint.textContent = `ROUTING WIRE from ${comp.ref} Pin ${pinNum}. Click on empty space to drop corners. Press [Space] to flip bend. Click destination pin to finish.`;
     }
   }
 
+  /**
+   * Complete the wire to destination pin
+   */
   function completeWireToPin(compId, pinNum) {
-    if (!state.activeWireStart) return;
+    if (!state.activeWire) return;
 
-    // Cannot connect pin to itself on the same component
-    if (state.activeWireStart.compId === compId && state.activeWireStart.pinNum === pinNum) {
+    if (state.activeWire.fromCompId === compId && state.activeWire.fromPinNum === pinNum) {
       cancelActiveWire();
       return;
     }
 
-    // Check if wire already exists
-    const exists = state.wires.some(
-      (w) =>
-        (w.from.compId === state.activeWireStart.compId &&
-          w.from.pinNum === state.activeWireStart.pinNum &&
-          w.to.compId === compId &&
-          w.to.pinNum === pinNum) ||
-        (w.to.compId === state.activeWireStart.compId &&
-          w.to.pinNum === state.activeWireStart.pinNum &&
-          w.from.compId === compId &&
-          w.from.pinNum === pinNum)
-    );
+    const toComp = state.components.find((c) => c.id === compId);
+    if (!toComp) return;
 
-    if (!exists) {
-      const wire = {
-        id: "wire_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-        from: { compId: state.activeWireStart.compId, pinNum: state.activeWireStart.pinNum },
-        to: { compId, pinNum },
-        state: 0
-      };
-      state.wires.push(wire);
-      setSelectedItem({ type: "wire", id: wire.id });
-    }
+    const endPos = getPinWorldPos(toComp, pinNum);
+    const lastPt = state.activeWire.waypoints[state.activeWire.waypoints.length - 1];
+
+    // Build the final orthogonal bend to the destination pin
+    const finalBend = getOrthogonalSegment(lastPt, endPos, state.activeWire.bendMode);
+    
+    // Combine all waypoints
+    const allPoints = [...state.activeWire.waypoints];
+    finalBend.forEach((pt) => {
+      // Avoid duplicate consecutive points
+      const prev = allPoints[allPoints.length - 1];
+      if (!prev || prev.x !== pt.x || prev.y !== pt.y) {
+        allPoints.push({ x: pt.x, y: pt.y });
+      }
+    });
+
+    const wire = {
+      id: "wire_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+      from: { compId: state.activeWire.fromCompId, pinNum: state.activeWire.fromPinNum },
+      to: { compId, pinNum },
+      waypoints: allPoints,
+      state: 0
+    };
+
+    state.wires.push(wire);
+    setSelectedItem({ type: "wire", id: wire.id });
 
     cancelActiveWire();
     render();
   }
 
   function cancelActiveWire() {
-    state.activeWireStart = null;
+    state.activeWire = null;
     state.hoveredTargetPin = null;
     if (tempWireLayer) tempWireLayer.innerHTML = "";
     document.querySelectorAll(".pin-terminal-group").forEach((el) => {
@@ -1270,16 +1329,91 @@
     const hint = document.getElementById("tool-hint-text");
     if (hint) {
       if (state.tool === "wire") {
-        hint.textContent = "WIRE MODE: Click any red pin terminal to start a wire. Hover over another pin to snap and connect.";
+        hint.textContent = "WIRE MODE: Click any red pin terminal to start. Click on empty space to add corners. Space to toggle bend direction. Click destination pin to finish.";
       } else {
         hint.textContent = "SELECT MODE: Drag components to reposition. Click toggle switches to flip 0/1 logic.";
       }
     }
   }
 
+  /**
+   * Computes orthogonal points between P1 and P2 based on mode ("HV" or "VH")
+   */
+  function getOrthogonalSegment(p1, p2, mode) {
+    if (p1.x === p2.x || p1.y === p2.y) {
+      return [{ x: p2.x, y: p2.y }];
+    }
+    if (mode === "HV") {
+      return [
+        { x: p2.x, y: p1.y },
+        { x: p2.x, y: p2.y }
+      ];
+    } else {
+      return [
+        { x: p1.x, y: p2.y },
+        { x: p2.x, y: p2.y }
+      ];
+    }
+  }
+
   function calculateManhattanPath(x1, y1, x2, y2) {
     const midX = Math.round((x1 + x2) / 2 / 10) * 10;
     return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+  }
+
+  function updateTempWirePreview() {
+    if (!state.activeWire || !tempWireLayer) return;
+
+    tempWireLayer.innerHTML = "";
+    const waypoints = state.activeWire.waypoints;
+    const lastPt = waypoints[waypoints.length - 1];
+    const targetPt = state.hoveredTargetPin || state.mousePos;
+
+    // Draw fixed waypoints path
+    if (waypoints.length > 1) {
+      let fixedD = `M ${waypoints[0].x} ${waypoints[0].y}`;
+      for (let i = 1; i < waypoints.length; i++) {
+        fixedD += ` L ${waypoints[i].x} ${waypoints[i].y}`;
+      }
+      tempWireLayer.appendChild(createSVGElement("path", {
+        d: fixedD,
+        class: "active-wire-fixed"
+      }));
+
+      // Render dots at each corner
+      for (let i = 1; i < waypoints.length; i++) {
+        tempWireLayer.appendChild(createSVGElement("circle", {
+          cx: waypoints[i].x,
+          cy: waypoints[i].y,
+          r: 3.5,
+          class: "wire-waypoint-dot"
+        }));
+      }
+    }
+
+    // Draw active segment to cursor / snap target
+    const bendPts = getOrthogonalSegment(lastPt, targetPt, state.activeWire.bendMode);
+    let previewD = `M ${lastPt.x} ${lastPt.y}`;
+    bendPts.forEach((pt) => {
+      previewD += ` L ${pt.x} ${pt.y}`;
+    });
+
+    const previewPath = createSVGElement("path", {
+      d: previewD,
+      class: `active-wire-preview ${state.hoveredTargetPin ? "snapped" : ""}`
+    });
+    tempWireLayer.appendChild(previewPath);
+
+    // If corner exists in bend, draw subtle preview corner dot
+    if (bendPts.length > 1) {
+      tempWireLayer.appendChild(createSVGElement("circle", {
+        cx: bendPts[0].x,
+        cy: bendPts[0].y,
+        r: 3,
+        fill: "#2563eb",
+        opacity: "0.6"
+      }));
+    }
   }
 
   // =========================================================================
@@ -1303,7 +1437,6 @@
 
     // 2. Propagate through Wires iteratively (up to 4 passes for cascading logic like 4-bit adders/comparators)
     for (let pass = 0; pass < 4; pass++) {
-      // Propagate voltages across wires
       state.wires.forEach((w) => {
         const keyFrom = `${w.from.compId}:${w.from.pinNum}`;
         const keyTo = `${w.to.compId}:${w.to.pinNum}`;
@@ -1347,7 +1480,6 @@
   }
 
   function updateVisualSimulation(pinVoltages) {
-    // Update Wires
     state.wires.forEach((w) => {
       const wirePath = document.getElementById(`wire-path-${w.id}`);
       if (wirePath) {
@@ -1361,7 +1493,6 @@
       }
     });
 
-    // Update Probes, LEDs, Switches
     state.components.forEach((c) => {
       if (c.type === "LED") {
         const inVal = pinVoltages[`${c.id}:1`] || 0;
@@ -1402,7 +1533,7 @@
   function render() {
     renderWires();
     renderComponents();
-    runSimulation(); // Always maintain fresh simulation state
+    runSimulation();
   }
 
   function renderWires() {
@@ -1416,20 +1547,29 @@
 
       const p1 = getPinWorldPos(fromComp, w.from.pinNum);
       const p2 = getPinWorldPos(toComp, w.to.pinNum);
-      const d = calculateManhattanPath(p1.x, p1.y, p2.x, p2.y);
+
+      let d = "";
+      if (w.waypoints && w.waypoints.length > 1) {
+        // Multi-point custom wire
+        d = `M ${p1.x} ${p1.y}`;
+        for (let i = 1; i < w.waypoints.length - 1; i++) {
+          d += ` L ${w.waypoints[i].x} ${w.waypoints[i].y}`;
+        }
+        d += ` L ${p2.x} ${p2.y}`;
+      } else {
+        d = calculateManhattanPath(p1.x, p1.y, p2.x, p2.y);
+      }
 
       const wireG = createSVGElement("g", {
         id: `wire-${w.id}`,
         class: `wire-group ${state.selectedItem && state.selectedItem.id === w.id ? "selected" : ""}`
       });
 
-      // Invisible wide hit path ensures clicking/deleting a wire is effortless
       const hitPath = createSVGElement("path", {
         d: d,
         class: "wire-hit-area"
       });
 
-      // Visible schematic wire
       const wirePath = createSVGElement("path", {
         id: `wire-path-${w.id}`,
         d: d,
@@ -1442,7 +1582,6 @@
       wireG.appendChild(hitPath);
       wireG.appendChild(wirePath);
 
-      // Click to select or delete
       wireG.addEventListener("mousedown", (e) => {
         e.stopPropagation();
         if (state.tool === "delete") {
@@ -1455,7 +1594,6 @@
 
       wireLayer.appendChild(wireG);
 
-      // Junction dots
       const dot1 = createSVGElement("circle", { cx: p1.x, cy: p1.y, r: 3.5, class: `junction-dot ${w.state === 1 ? "state-high" : ""}` });
       const dot2 = createSVGElement("circle", { cx: p2.x, cy: p2.y, r: 3.5, class: `junction-dot ${w.state === 1 ? "state-high" : ""}` });
       junctionLayer.appendChild(dot1);
@@ -1474,14 +1612,9 @@
 
       renderSingleComponent(g, c);
 
-      // Component dragging & selection
+      // Intelligent drag handler
       g.addEventListener("mousedown", (e) => {
-        // If clicking terminal or switch, let them handle it
-        if (e.target.closest(".pin-terminal-group") || e.target.closest(".switch-control")) {
-          return;
-        }
-
-        e.stopPropagation();
+        if (e.target.closest(".pin-terminal-hit")) return;
 
         if (state.tool === "delete") {
           setSelectedItem({ type: "comp", id: c.id });
@@ -1489,10 +1622,16 @@
           return;
         }
 
+        // If in wire mode and currently routing, ignore dragging
+        if (state.tool === "wire" && state.activeWire) return;
+
+        e.stopPropagation();
         setSelectedItem({ type: "comp", id: c.id });
         state.draggingComp = c;
         const coords = clientToSvgCoords(e.clientX, e.clientY);
         state.dragOffset = { x: coords.x - c.x, y: coords.y - c.y };
+        state.dragStartPos = { x: e.clientX, y: e.clientY };
+        state.hasDraggedFar = false;
       });
 
       compLayer.appendChild(g);
@@ -1518,11 +1657,21 @@
       return;
     }
 
-    // Default: Professional KiCad IC Package Box
+    // Default: Professional KiCad IC Package Box (DIP)
     const boxX = c.x - dims.w / 2;
     const boxY = c.y - dims.h / 2;
 
-    const rect = createSVGElement("rect", {
+    // Generous grab area
+    g.appendChild(createSVGElement("rect", {
+      x: boxX - 10,
+      y: boxY - 10,
+      width: dims.w + 20,
+      height: dims.h + 20,
+      class: "comp-grab-area"
+    }));
+
+    // Body
+    g.appendChild(createSVGElement("rect", {
       x: boxX,
       y: boxY,
       width: dims.w,
@@ -1530,10 +1679,11 @@
       fill: "#fffdf2",
       stroke: "#1e293b",
       "stroke-width": 2,
-      class: "comp-body"
-    });
-    g.appendChild(rect);
+      class: "comp-body",
+      "pointer-events": "none"
+    }));
 
+    // Reference
     const refText = createSVGElement("text", {
       x: c.x,
       y: boxY - 8,
@@ -1541,11 +1691,13 @@
       fill: "#cc0000",
       "font-family": "DM Mono",
       "font-weight": "bold",
-      "font-size": 13
+      "font-size": 13,
+      "pointer-events": "none"
     });
     refText.textContent = c.ref;
     g.appendChild(refText);
 
+    // IC Model Name
     const nameText = createSVGElement("text", {
       x: c.x,
       y: c.y - 12,
@@ -1553,50 +1705,69 @@
       fill: "#1e293b",
       "font-family": "DM Mono",
       "font-weight": "bold",
-      "font-size": 15
+      "font-size": 15,
+      "pointer-events": "none"
     });
     nameText.textContent = spec.id;
     g.appendChild(nameText);
 
+    // Package subtitle
     const pkgText = createSVGElement("text", {
       x: c.x,
       y: c.y + 8,
       "text-anchor": "middle",
       fill: "#64748b",
       "font-family": "DM Mono",
-      "font-size": 10
+      "font-size": 10,
+      "pointer-events": "none"
     });
     pkgText.textContent = spec.package;
     g.appendChild(pkgText);
 
-    // Left and Right Pins
-    const leftPins = spec.pins.filter((p) => p.side === "left");
-    const rightPins = spec.pins.filter((p) => p.side === "right");
+    // Render Pins & Terminals (All pins use single source of truth getPinWorldPos)
+    spec.pins.forEach((p) => {
+      const pinPos = getPinWorldPos(c, p.num);
+      const isLeft = p.side === "left";
+      const lineX2 = isLeft ? boxX : boxX + dims.w;
 
-    leftPins.forEach((p, idx) => {
-      const py = boxY + 16 + idx * ((dims.h - 32) / Math.max(1, leftPins.length - 1));
-      const line = createSVGElement("line", { x1: boxX - 25, y1: py, x2: boxX, y2: py, stroke: "#a00000", "stroke-width": 1.5 });
-      const pinNum = createSVGElement("text", { x: boxX - 12, y: py - 4, fill: "#718096", "font-family": "DM Mono", "font-size": 9, "text-anchor": "middle", "pointer-events": "none" });
+      // Pin stub line
+      const line = createSVGElement("line", {
+        x1: pinPos.x,
+        y1: pinPos.y,
+        x2: lineX2,
+        y2: pinPos.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      });
+
+      // Pin number
+      const pinNum = createSVGElement("text", {
+        x: isLeft ? boxX - 12 : boxX + dims.w + 12,
+        y: pinPos.y - 4,
+        fill: "#718096",
+        "font-family": "DM Mono",
+        "font-size": 9,
+        "text-anchor": "middle",
+        "pointer-events": "none"
+      });
       pinNum.textContent = p.num;
-      const pinLbl = createSVGElement("text", { x: boxX + 6, y: py + 4, fill: "#1e293b", "font-family": "DM Mono", "font-weight": "600", "font-size": 10, "pointer-events": "none" });
+
+      // Pin name
+      const pinLbl = createSVGElement("text", {
+        x: isLeft ? boxX + 6 : boxX + dims.w - 6,
+        y: pinPos.y + 4,
+        fill: "#1e293b",
+        "font-family": "DM Mono",
+        "font-weight": "600",
+        "font-size": 10,
+        "text-anchor": isLeft ? "start" : "end",
+        "pointer-events": "none"
+      });
       pinLbl.textContent = p.name;
 
-      const term = createPinTerminalGroup(c.id, p.num, boxX - 25, py);
-      g.appendChild(line);
-      g.appendChild(pinNum);
-      g.appendChild(pinLbl);
-      g.appendChild(term);
-    });
+      const term = createPinTerminalGroup(c.id, p.num, pinPos.x, pinPos.y);
 
-    rightPins.forEach((p, idx) => {
-      const py = boxY + 16 + idx * ((dims.h - 32) / Math.max(1, rightPins.length - 1));
-      const line = createSVGElement("line", { x1: boxX + dims.w, y1: py, x2: boxX + dims.w + 25, y2: py, stroke: "#a00000", "stroke-width": 1.5 });
-      const pinNum = createSVGElement("text", { x: boxX + dims.w + 12, y: py - 4, fill: "#718096", "font-family": "DM Mono", "font-size": 9, "text-anchor": "middle", "pointer-events": "none" });
-      pinNum.textContent = p.num;
-      const pinLbl = createSVGElement("text", { x: boxX + dims.w - 6, y: py + 4, fill: "#1e293b", "font-family": "DM Mono", "font-weight": "600", "font-size": 10, "text-anchor": "end", "pointer-events": "none" });
-      pinLbl.textContent = p.name;
-
-      const term = createPinTerminalGroup(c.id, p.num, boxX + dims.w + 25, py);
       g.appendChild(line);
       g.appendChild(pinNum);
       g.appendChild(pinLbl);
@@ -1606,21 +1777,98 @@
 
   function renderPowerSymbol(g, c, spec) {
     if (spec.id === "VCC") {
-      g.appendChild(createSVGElement("line", { x1: c.x, y1: c.y, x2: c.x, y2: c.y - 25, stroke: "#a00000", "stroke-width": 2 }));
-      g.appendChild(createSVGElement("line", { x1: c.x - 14, y1: c.y - 25, x2: c.x + 14, y2: c.y - 25, stroke: "#a00000", "stroke-width": 3 }));
-      const t = createSVGElement("text", { x: c.x, y: c.y - 32, "text-anchor": "middle", fill: "#a00000", "font-family": "DM Mono", "font-weight": "bold", "font-size": 12, "pointer-events": "none" });
+      const pPos = getPinWorldPos(c, 1); // Exact terminal at c.x, c.y + 12
+
+      // Generous 70x70 transparent grab area
+      g.appendChild(createSVGElement("rect", {
+        x: c.x - 35,
+        y: c.y - 35,
+        width: 70,
+        height: 70,
+        class: "comp-grab-area"
+      }));
+
+      // VCC Stem from terminal up to arrow/bar
+      g.appendChild(createSVGElement("line", {
+        x1: pPos.x,
+        y1: pPos.y,
+        x2: c.x,
+        y2: c.y - 16,
+        stroke: "#a00000",
+        "stroke-width": 2,
+        "pointer-events": "none"
+      }));
+
+      // VCC Top Arrow / Bar
+      g.appendChild(createSVGElement("line", {
+        x1: c.x - 14,
+        y1: c.y - 16,
+        x2: c.x + 14,
+        y2: c.y - 16,
+        stroke: "#a00000",
+        "stroke-width": 3,
+        "pointer-events": "none"
+      }));
+
+      const t = createSVGElement("text", {
+        x: c.x,
+        y: c.y - 24,
+        "text-anchor": "middle",
+        fill: "#a00000",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 12,
+        "pointer-events": "none"
+      });
       t.textContent = "+5V";
       g.appendChild(t);
-      g.appendChild(createPinTerminalGroup(c.id, 1, c.x, c.y));
+
+      // Terminal circle placed exactly at pPos
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+
     } else {
-      g.appendChild(createSVGElement("line", { x1: c.x, y1: c.y, x2: c.x, y2: c.y + 20, stroke: "#a00000", "stroke-width": 2 }));
-      g.appendChild(createSVGElement("line", { x1: c.x - 18, y1: c.y + 20, x2: c.x + 18, y2: c.y + 20, stroke: "#a00000", "stroke-width": 2 }));
-      g.appendChild(createSVGElement("line", { x1: c.x - 11, y1: c.y + 26, x2: c.x + 11, y2: c.y + 26, stroke: "#a00000", "stroke-width": 2 }));
-      g.appendChild(createSVGElement("line", { x1: c.x - 4, y1: c.y + 32, x2: c.x + 4, y2: c.y + 32, stroke: "#a00000", "stroke-width": 2 }));
-      const t = createSVGElement("text", { x: c.x, y: c.y + 44, "text-anchor": "middle", fill: "#64748b", "font-family": "DM Mono", "font-size": 10, "pointer-events": "none" });
+      // GND symbol
+      const pPos = getPinWorldPos(c, 1); // Exact terminal at c.x, c.y - 14
+
+      // Generous 70x70 transparent grab area
+      g.appendChild(createSVGElement("rect", {
+        x: c.x - 35,
+        y: c.y - 25,
+        width: 70,
+        height: 70,
+        class: "comp-grab-area"
+      }));
+
+      // GND Stem from terminal down to horizontal plates
+      g.appendChild(createSVGElement("line", {
+        x1: pPos.x,
+        y1: pPos.y,
+        x2: c.x,
+        y2: c.y + 6,
+        stroke: "#a00000",
+        "stroke-width": 2,
+        "pointer-events": "none"
+      }));
+
+      // 3 Ground horizontal bars
+      g.appendChild(createSVGElement("line", { x1: c.x - 18, y1: c.y + 6, x2: c.x + 18, y2: c.y + 6, stroke: "#a00000", "stroke-width": 2.5, "pointer-events": "none" }));
+      g.appendChild(createSVGElement("line", { x1: c.x - 11, y1: c.y + 12, x2: c.x + 11, y2: c.y + 12, stroke: "#a00000", "stroke-width": 2, "pointer-events": "none" }));
+      g.appendChild(createSVGElement("line", { x1: c.x - 4, y1: c.y + 18, x2: c.x + 4, y2: c.y + 18, stroke: "#a00000", "stroke-width": 2, "pointer-events": "none" }));
+
+      const t = createSVGElement("text", {
+        x: c.x,
+        y: c.y + 32,
+        "text-anchor": "middle",
+        fill: "#64748b",
+        "font-family": "DM Mono",
+        "font-size": 10,
+        "pointer-events": "none"
+      });
       t.textContent = "GND";
       g.appendChild(t);
-      g.appendChild(createPinTerminalGroup(c.id, 1, c.x, c.y));
+
+      // Terminal circle placed exactly at pPos
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
     }
   }
 
@@ -1628,6 +1876,17 @@
     if (c.type === "SWITCH") {
       const boxW = 60;
       const boxH = 34;
+      const pPos = getPinWorldPos(c, 1);
+
+      // Generous grab area (80x60)
+      g.appendChild(createSVGElement("rect", {
+        x: c.x - boxW / 2 - 10,
+        y: c.y - boxH / 2 - 10,
+        width: boxW + 40,
+        height: boxH + 20,
+        class: "comp-grab-area"
+      }));
+
       const swG = createSVGElement("g", { class: "switch-control" });
 
       swG.appendChild(createSVGElement("rect", {
@@ -1638,7 +1897,8 @@
         rx: 4,
         fill: "#1e293b",
         stroke: "#334155",
-        "stroke-width": 1.5
+        "stroke-width": 1.5,
+        "pointer-events": "none"
       }));
 
       swG.appendChild(createSVGElement("rect", {
@@ -1648,7 +1908,8 @@
         width: 20,
         height: 24,
         rx: 3,
-        fill: c.state.value ? "#22c55e" : "#ef4444"
+        fill: c.state.value ? "#22c55e" : "#ef4444",
+        "pointer-events": "none"
       }));
 
       const swText = createSVGElement("text", {
@@ -1665,26 +1926,48 @@
       swText.textContent = c.state.value ? "1" : "0";
       swG.appendChild(swText);
 
-      swG.addEventListener("mousedown", (e) => {
-        e.stopPropagation();
-        c.state.value = c.state.value ? 0 : 1;
-        runSimulation();
-      });
-
       g.appendChild(swG);
 
-      const termX = c.x + boxW / 2 + 25;
-      g.appendChild(createSVGElement("line", { x1: c.x + boxW / 2, y1: c.y, x2: termX, y2: c.y, stroke: "#a00000", "stroke-width": 1.5 }));
-      g.appendChild(createPinTerminalGroup(c.id, 1, termX, c.y));
+      // Terminal stem line
+      g.appendChild(createSVGElement("line", {
+        x1: c.x + boxW / 2,
+        y1: c.y,
+        x2: pPos.x,
+        y2: pPos.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
 
-      const refT = createSVGElement("text", { x: c.x, y: c.y - boxH / 2 - 6, "text-anchor": "middle", fill: "#cc0000", "font-family": "DM Mono", "font-weight": "bold", "font-size": 11, "pointer-events": "none" });
+      // Terminal group
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+
+      const refT = createSVGElement("text", {
+        x: c.x,
+        y: c.y - boxH / 2 - 6,
+        "text-anchor": "middle",
+        fill: "#cc0000",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 11,
+        "pointer-events": "none"
+      });
       refT.textContent = c.ref;
       g.appendChild(refT);
 
     } else if (c.type === "LED") {
       const ledR = 18;
-      const termX = c.x - ledR - 25;
+      const pPos = getPinWorldPos(c, 1);
       const initialVal = state.pinVoltages[`${c.id}:1`] || 0;
+
+      // Generous grab area
+      g.appendChild(createSVGElement("rect", {
+        x: c.x - ledR - 25,
+        y: c.y - ledR - 10,
+        width: ledR * 2 + 50,
+        height: ledR * 2 + 20,
+        class: "comp-grab-area"
+      }));
 
       const glow = createSVGElement("circle", {
         id: `led-glow-${c.id}`,
@@ -1694,7 +1977,8 @@
         fill: "#00ff66",
         opacity: initialVal === 1 ? "0.95" : "0.0",
         class: "led-glow",
-        filter: "blur(6px)"
+        filter: "blur(6px)",
+        "pointer-events": "none"
       });
       g.appendChild(glow);
 
@@ -1705,22 +1989,49 @@
         r: ledR,
         fill: initialVal === 1 ? "#00ff66" : "#1e3a24",
         stroke: "#0f172a",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "pointer-events": "none"
       });
       g.appendChild(bulb);
 
-      g.appendChild(createSVGElement("line", { x1: termX, y1: c.y, x2: c.x - ledR, y2: c.y, stroke: "#a00000", "stroke-width": 1.5 }));
-      g.appendChild(createPinTerminalGroup(c.id, 1, termX, c.y));
+      g.appendChild(createSVGElement("line", {
+        x1: pPos.x,
+        y1: pPos.y,
+        x2: c.x - ledR,
+        y2: c.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
 
-      const refT = createSVGElement("text", { x: c.x, y: c.y - ledR - 6, "text-anchor": "middle", fill: "#cc0000", "font-family": "DM Mono", "font-weight": "bold", "font-size": 11, "pointer-events": "none" });
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+
+      const refT = createSVGElement("text", {
+        x: c.x,
+        y: c.y - ledR - 6,
+        "text-anchor": "middle",
+        fill: "#cc0000",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 11,
+        "pointer-events": "none"
+      });
       refT.textContent = c.ref;
       g.appendChild(refT);
 
     } else if (c.type === "PROBE") {
       const boxW = 46;
       const boxH = 34;
-      const termX = c.x - boxW / 2 - 25;
+      const pPos = getPinWorldPos(c, 1);
       const initialVal = state.pinVoltages[`${c.id}:1`] !== undefined ? state.pinVoltages[`${c.id}:1`] : "-";
+
+      g.appendChild(createSVGElement("rect", {
+        x: c.x - boxW / 2 - 25,
+        y: c.y - boxH / 2 - 10,
+        width: boxW + 40,
+        height: boxH + 20,
+        class: "comp-grab-area"
+      }));
 
       g.appendChild(createSVGElement("rect", {
         x: c.x - boxW / 2,
@@ -1730,7 +2041,8 @@
         rx: 4,
         fill: "#0f172a",
         stroke: "#38bdf8",
-        "stroke-width": 1.5
+        "stroke-width": 1.5,
+        "pointer-events": "none"
       }));
 
       const valText = createSVGElement("text", {
@@ -1747,17 +2059,43 @@
       valText.textContent = initialVal;
       g.appendChild(valText);
 
-      g.appendChild(createSVGElement("line", { x1: termX, y1: c.y, x2: c.x - boxW / 2, y2: c.y, stroke: "#a00000", "stroke-width": 1.5 }));
-      g.appendChild(createPinTerminalGroup(c.id, 1, termX, c.y));
+      g.appendChild(createSVGElement("line", {
+        x1: pPos.x,
+        y1: pPos.y,
+        x2: c.x - boxW / 2,
+        y2: c.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
 
-      const refT = createSVGElement("text", { x: c.x, y: c.y - boxH / 2 - 6, "text-anchor": "middle", fill: "#cc0000", "font-family": "DM Mono", "font-weight": "bold", "font-size": 11, "pointer-events": "none" });
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+
+      const refT = createSVGElement("text", {
+        x: c.x,
+        y: c.y - boxH / 2 - 6,
+        "text-anchor": "middle",
+        fill: "#cc0000",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 11,
+        "pointer-events": "none"
+      });
       refT.textContent = c.ref;
       g.appendChild(refT);
 
     } else if (c.type === "CLOCK") {
       const boxW = 54;
       const boxH = 34;
-      const termX = c.x + boxW / 2 + 25;
+      const pPos = getPinWorldPos(c, 1);
+
+      g.appendChild(createSVGElement("rect", {
+        x: c.x - boxW / 2 - 10,
+        y: c.y - boxH / 2 - 10,
+        width: boxW + 40,
+        height: boxH + 20,
+        class: "comp-grab-area"
+      }));
 
       g.appendChild(createSVGElement("rect", {
         x: c.x - boxW / 2,
@@ -1767,7 +2105,8 @@
         rx: 4,
         fill: "#312e81",
         stroke: "#6366f1",
-        "stroke-width": 1.5
+        "stroke-width": 1.5,
+        "pointer-events": "none"
       }));
 
       g.appendChild(createSVGElement("path", {
@@ -1778,10 +2117,28 @@
         "pointer-events": "none"
       }));
 
-      g.appendChild(createSVGElement("line", { x1: c.x + boxW / 2, y1: c.y, x2: termX, y2: c.y, stroke: "#a00000", "stroke-width": 1.5 }));
-      g.appendChild(createPinTerminalGroup(c.id, 1, termX, c.y));
+      g.appendChild(createSVGElement("line", {
+        x1: c.x + boxW / 2,
+        y1: c.y,
+        x2: pPos.x,
+        y2: pPos.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
 
-      const refT = createSVGElement("text", { x: c.x, y: c.y - boxH / 2 - 6, "text-anchor": "middle", fill: "#cc0000", "font-family": "DM Mono", "font-weight": "bold", "font-size": 11, "pointer-events": "none" });
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+
+      const refT = createSVGElement("text", {
+        x: c.x,
+        y: c.y - boxH / 2 - 6,
+        "text-anchor": "middle",
+        fill: "#cc0000",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 11,
+        "pointer-events": "none"
+      });
       refT.textContent = c.ref;
       g.appendChild(refT);
     }
@@ -1791,24 +2148,36 @@
     const p1 = getPinWorldPos(c, 1);
     const p2 = getPinWorldPos(c, 2);
 
-    g.appendChild(createSVGElement("line", { x1: p1.x, y1: c.y, x2: c.x - 14, y2: c.y, stroke: "#a00000", "stroke-width": 1.5 }));
-    g.appendChild(createSVGElement("polygon", { points: `${c.x - 14},${c.y - 14} ${c.x - 14},${c.y + 14} ${c.x + 14},${c.y}`, fill: "#e9bd4f", stroke: "#1e293b", "stroke-width": 1.8 }));
-    g.appendChild(createSVGElement("line", { x1: c.x + 14, y1: c.y - 14, x2: c.x + 14, y2: c.y + 14, stroke: "#1e293b", "stroke-width": 2.5 }));
-    g.appendChild(createSVGElement("line", { x1: c.x + 14, y1: c.y, x2: p2.x, y2: c.y, stroke: "#a00000", "stroke-width": 1.5 }));
+    g.appendChild(createSVGElement("rect", {
+      x: c.x - 45,
+      y: c.y - 25,
+      width: 90,
+      height: 50,
+      class: "comp-grab-area"
+    }));
+
+    g.appendChild(createSVGElement("line", { x1: p1.x, y1: c.y, x2: c.x - 14, y2: c.y, stroke: "#a00000", "stroke-width": 1.5, "pointer-events": "none" }));
+    g.appendChild(createSVGElement("polygon", { points: `${c.x - 14},${c.y - 14} ${c.x - 14},${c.y + 14} ${c.x + 14},${c.y}`, fill: "#e9bd4f", stroke: "#1e293b", "stroke-width": 1.8, "pointer-events": "none" }));
+    g.appendChild(createSVGElement("line", { x1: c.x + 14, y1: c.y - 14, x2: c.x + 14, y2: c.y + 14, stroke: "#1e293b", "stroke-width": 2.5, "pointer-events": "none" }));
+    g.appendChild(createSVGElement("line", { x1: c.x + 14, y1: c.y, x2: p2.x, y2: c.y, stroke: "#a00000", "stroke-width": 1.5, "pointer-events": "none" }));
 
     g.appendChild(createPinTerminalGroup(c.id, 1, p1.x, c.y));
     g.appendChild(createPinTerminalGroup(c.id, 2, p2.x, c.y));
 
-    const refT = createSVGElement("text", { x: c.x, y: c.y - 18, "text-anchor": "middle", fill: "#cc0000", "font-family": "DM Mono", "font-weight": "bold", "font-size": 11, "pointer-events": "none" });
+    const refT = createSVGElement("text", {
+      x: c.x,
+      y: c.y - 18,
+      "text-anchor": "middle",
+      fill: "#cc0000",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 11,
+      "pointer-events": "none"
+    });
     refT.textContent = c.ref + " 1N4148";
     g.appendChild(refT);
   }
 
-  /**
-   * Dual-layer pin terminal:
-   * 1. Visual ring
-   * 2. Wide, highly responsive hit target (r=15px) for effortless, 100% reliable mouse clicks
-   */
   function createPinTerminalGroup(compId, pinNum, x, y) {
     const g = createSVGElement("g", {
       class: "pin-terminal-group",
@@ -1816,7 +2185,6 @@
       "data-pin-num": pinNum
     });
 
-    // Visual circular terminal ring
     const visual = createSVGElement("circle", {
       cx: x,
       cy: y,
@@ -1827,7 +2195,7 @@
       class: "pin-terminal-visual"
     });
 
-    // Wide transparent hit target (radius 15px) for guaranteed click capture
+    // Generous 30px touch hit-target
     const hitArea = createSVGElement("circle", {
       cx: x,
       cy: y,
@@ -1842,7 +2210,7 @@
       e.stopPropagation();
       e.preventDefault();
 
-      if (!state.activeWireStart) {
+      if (!state.activeWire) {
         startWireFromPin(compId, pinNum);
       } else {
         completeWireToPin(compId, pinNum);
@@ -1850,7 +2218,6 @@
     };
 
     hitArea.addEventListener("mousedown", handlePinActivation);
-    hitArea.addEventListener("click", handlePinActivation);
 
     return g;
   }
@@ -1862,8 +2229,12 @@
     const coords = clientToSvgCoords(e.clientX, e.clientY);
     state.mousePos = coords;
 
-    // Component dragging
+    // Detect if mouse moved significantly during drag
     if (state.draggingComp) {
+      const dist = Math.hypot(e.clientX - state.dragStartPos.x, e.clientY - state.dragStartPos.y);
+      if (dist > 4) {
+        state.hasDraggedFar = true;
+      }
       const gx = Math.round((coords.x - state.dragOffset.x) / 10) * 10;
       const gy = Math.round((coords.y - state.dragOffset.y) / 10) * 10;
       state.draggingComp.x = gx;
@@ -1872,31 +2243,23 @@
       return;
     }
 
-    // Active wire drawing with magnetic snapping
-    if (state.activeWireStart) {
-      tempWireLayer.innerHTML = "";
-
-      let targetX = coords.x;
-      let targetY = coords.y;
-
-      // Magnetic snap check: Is mouse near any valid pin terminal?
+    // Active multi-point wire drawing with magnetic snapping
+    if (state.activeWire) {
       state.hoveredTargetPin = null;
       document.querySelectorAll(".pin-terminal-group").forEach((el) => {
         el.classList.remove("snap-hover");
       });
 
+      // Check if mouse is near any valid pin
       for (const comp of state.components) {
         const spec = LIBRARY[comp.type];
         for (const p of spec.pins) {
-          if (comp.id === state.activeWireStart.compId && p.num === state.activeWireStart.pinNum) continue;
+          if (comp.id === state.activeWire.fromCompId && p.num === state.activeWire.fromPinNum) continue;
 
           const pPos = getPinWorldPos(comp, p.num);
           const dist = Math.hypot(coords.x - pPos.x, coords.y - pPos.y);
           if (dist < 18) {
-            targetX = pPos.x;
-            targetY = pPos.y;
-            state.hoveredTargetPin = { compId: comp.id, pinNum: p.num };
-
+            state.hoveredTargetPin = { compId: comp.id, pinNum: p.num, x: pPos.x, y: pPos.y };
             const targetEl = document.querySelector(`.pin-terminal-group[data-comp-id="${comp.id}"][data-pin-num="${p.num}"]`);
             targetEl?.classList.add("snap-hover");
             break;
@@ -1905,41 +2268,50 @@
         if (state.hoveredTargetPin) break;
       }
 
-      const pathD = calculateManhattanPath(
-        state.activeWireStart.x,
-        state.activeWireStart.y,
-        targetX,
-        targetY
-      );
-
-      const tempWire = createSVGElement("path", {
-        d: pathD,
-        fill: "none",
-        stroke: state.hoveredTargetPin ? "#00ff55" : "#2563eb",
-        "stroke-width": 3,
-        "stroke-dasharray": "6 3",
-        opacity: "0.9"
-      });
-      tempWireLayer.appendChild(tempWire);
+      updateTempWirePreview();
     }
   }
 
   function onCanvasMouseDown(e) {
-    if (e.target === svgRoot || e.target.id === "grid-layer") {
-      if (state.activeWireStart) {
-        // If clicking empty canvas during wire drawing, cancel the wire
-        cancelActiveWire();
-      } else {
-        // Non-destructive deselect (preserves simulation visuals)
-        setSelectedItem(null);
+    // If active wire routing is in progress, clicking empty board adds a locked corner (waypoint)!
+    if (state.activeWire) {
+      if (e.target.closest(".pin-terminal-hit")) {
+        return; // Terminal click handles connection
       }
+      e.stopPropagation();
+
+      const lastPt = state.activeWire.waypoints[state.activeWire.waypoints.length - 1];
+      const targetPt = state.mousePos;
+
+      // Add intermediate right-angle corner and click point to waypoints
+      const bendPts = getOrthogonalSegment(lastPt, targetPt, state.activeWire.bendMode);
+      bendPts.forEach((pt) => {
+        const prev = state.activeWire.waypoints[state.activeWire.waypoints.length - 1];
+        if (!prev || prev.x !== pt.x || prev.y !== pt.y) {
+          state.activeWire.waypoints.push({ x: pt.x, y: pt.y });
+        }
+      });
+
+      updateTempWirePreview();
+      return;
+    }
+
+    // If clicking on background
+    if (e.target === svgRoot || e.target.id === "grid-layer") {
+      setSelectedItem(null);
     }
   }
 
-  function onCanvasMouseUp() {
+  function onCanvasMouseUp(e) {
     if (state.draggingComp) {
+      const comp = state.draggingComp;
       state.draggingComp = null;
-      runSimulation();
+
+      // If user simply clicked a SWITCH without dragging it, flip value!
+      if (comp.type === "SWITCH" && !state.hasDraggedFar) {
+        comp.state.value = comp.state.value ? 0 : 1;
+        runSimulation();
+      }
     }
   }
 
@@ -1954,11 +2326,11 @@
 
     if (presetKey === "7400_nand") {
       // Preset 1: 7400 NAND Gate Truth Table Verification
-      const swA = addComponentAt("SWITCH", 220, 260);
-      const swB = addComponentAt("SWITCH", 220, 340);
-      const ic = addComponentAt("7400", 440, 300);
-      const led = addComponentAt("LED", 660, 260);
-      const prb = addComponentAt("PROBE", 660, 340);
+      const swA = addComponentAt("SWITCH", 200, 240);
+      const swB = addComponentAt("SWITCH", 200, 320);
+      const ic = addComponentAt("7400", 420, 280);
+      const led = addComponentAt("LED", 660, 240);
+      const prb = addComponentAt("PROBE", 660, 320);
 
       // Connect SW A -> Pin 1 (1A)
       state.wires.push({ id: "w1", from: { compId: swA.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 1 }, state: 0 });
@@ -1971,10 +2343,10 @@
 
     } else if (presetKey === "7483_adder") {
       // Preset 2: 7483 4-Bit Binary Full Adder Test
-      const swA1 = addComponentAt("SWITCH", 200, 220);
-      const swB1 = addComponentAt("SWITCH", 200, 300);
-      const swCin = addComponentAt("SWITCH", 200, 380);
-      const ic = addComponentAt("7483", 460, 300);
+      const swA1 = addComponentAt("SWITCH", 200, 200);
+      const swB1 = addComponentAt("SWITCH", 200, 280);
+      const swCin = addComponentAt("SWITCH", 200, 360);
+      const ic = addComponentAt("7483", 460, 280);
       const ledS1 = addComponentAt("LED", 700, 240);
       const ledC4 = addComponentAt("LED", 700, 340);
 

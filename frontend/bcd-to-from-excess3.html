@@ -3,179 +3,180 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4-bit BCD to/from Excess-3 Code Converter</title>
+  <title>BCD ↔ Excess-3 Code Converter | Digital Electronics Notes</title>
   <link rel="stylesheet" href="style.css">
-  
+
   <style>
-    .simulator-card {
-      background: #ffffff;
-      border: 1px solid var(--line, #e2e8f0);
-      border-radius: 8px;
-      padding: 24px;
-      margin: 24px 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-
-    .mode-toggle-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--line, #e2e8f0);
-      padding-bottom: 16px;
-    }
-
-    .mode-btn {
-      padding: 8px 16px;
-      font-family: "DM Mono", monospace;
-      font-size: 13px;
-      font-weight: 600;
-      border: 1px solid var(--line, #cbd5e1);
-      border-radius: 6px;
-      background: #f8fafc;
-      color: #64748b;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .mode-btn:hover {
-      background: #f1f5f9;
-      color: var(--navy, #14233b);
-    }
-
-    .mode-btn.active {
-      background: #2c6ee8;
-      border-color: #2c6ee8;
-      color: #ffffff;
-    }
-
-    .domain-badge {
+    .meta-tag {
       display: inline-block;
-      padding: 4px 10px;
+      background: #e2e8f0;
+      color: #1e293b;
       font-family: "DM Mono", monospace;
       font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
       border-radius: 4px;
-      background: #eef2f8;
-      color: #2c6ee8;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
-    .bit-toggles {
+    .badge-group {
       display: flex;
-      gap: 16px;
-      margin: 20px 0;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
     }
 
-    .bit-btn {
-      flex: 1;
-      height: 54px;
+    .badge {
+      background: #eef2f8;
+      color: #2563eb;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 4px;
       font-family: "DM Mono", monospace;
-      font-size: 20px;
-      font-weight: 700;
-      border: 2px solid var(--line, #cbd5e1);
-      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+    }
+
+    .data-table th, 
+    .data-table td {
+      padding: 9px 12px;
+      text-align: center;
+      border: 1px solid #cbd5e1;
+    }
+
+    .data-table th {
+      background: #0f172a;
+      color: white;
+      font-weight: 500;
+    }
+
+    .data-table tr:nth-child(even) {
       background: #f8fafc;
-      color: #14233b;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    /* GFG-style diagrams and tables */
+    .diagram-section {
+      margin-top: 18px;
+      margin-bottom: 28px;
+    }
+
+    .diagram-label {
+      margin: 18px 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .gfg-figure {
+      margin: 12px 0 28px;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .gfg-figure img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    .truth-table-image {
+      max-width: 310px !important;
+    }
+
+    .kmap-image {
+      max-width: 535px !important;
+    }
+
+    .single-kmap-image {
+      max-width: 300px !important;
+    }
+
+
+    .logic-diagram-wrap {
+      margin: 18px 0 8px;
+      padding: 18px;
+      border: 1px solid #d7dee8;
+      background: #fff;
+      border-radius: 4px;
+      overflow-x: auto;
+      box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    }
+    .logic-diagram {
+      display:block;
+      width: 100%;
+      min-width: 760px;
+      height: auto;
+    }
+    .logic-diagram .wire { stroke:#2563eb; stroke-width:2.2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .logic-diagram .gate { stroke:#111827; stroke-width:2; fill:#fff; }
+    .logic-diagram .gate-fill { stroke:#111827; stroke-width:2; fill:#eaf2ff; }
+    .logic-diagram .inv { stroke:#111827; stroke-width:2; fill:#fff; }
+    .logic-diagram .dot { fill:#2563eb; }
+    .logic-diagram .label { fill:#111827; font-family:Arial,sans-serif; font-size:16px; font-weight:600; }
+    .logic-diagram .small { fill:#334155; font-family:Arial,sans-serif; font-size:13px; }
+    .logic-diagram .out { fill:#1d4ed8; font-family:Arial,sans-serif; font-size:17px; font-weight:700; }
+    .diagram-caption { font-size:13px; color:#475569; margin:7px 0 0; }
+
+    .circuit-image {
+      max-width: 560px !important;
+    }
+
+    .kmap-stack {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      gap: 4px;
     }
 
-    .bit-btn span:last-child {
-      font-size: 10px;
-      color: #64748b;
-      font-weight: 400;
-      margin-top: 2px;
-    }
-
-    .bit-btn.active {
-      background: #2c6ee8;
-      border-color: #2c6ee8;
-      color: #ffffff;
-    }
-
-    .bit-btn.active span:last-child {
-      color: #e2e8f0;
-    }
-
-    .convert-btn {
-      width: 100%;
-      padding: 14px;
-      background: #14233b;
-      color: #ffffff;
-      border: none;
-      border-radius: 6px;
+    .equation-block {
+      margin: 14px 0 28px;
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-left: 3px solid #2e7d32;
       font-family: "DM Mono", monospace;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
+      font-size: 15px;
+      line-height: 1.9;
     }
 
-    .convert-btn:hover {
-      background: #2c6ee8;
-    }
-
-    .convert-btn:disabled {
-      background: #94a3b8;
-      cursor: not-allowed;
-    }
-
-    .result-box {
-      margin-top: 20px;
-      padding: 16px;
-      background: #f1f5f9;
-      border-radius: 6px;
-      border-left: 4px solid #2c6ee8;
+    .equation-label {
+      margin-top: 14px;
       font-family: "DM Mono", monospace;
-      transition: all 0.2s ease;
-    }
-
-    .result-box.error {
-      border-left-color: #ef4444;
-      background: #fef2f2;
-    }
-
-    .result-header {
-      font-size: 11px;
-      color: #64748b;
-      text-transform: uppercase;
-    }
-
-    .result-value {
-      font-size: 24px;
+      font-size: 15px;
       font-weight: 700;
-      color: #14233b;
-      letter-spacing: 2px;
-      margin-top: 4px;
+      color: #2e7d32;
     }
 
-    .result-box.error .result-value {
-      color: #dc2626;
-      font-size: 14px;
-      letter-spacing: normal;
+    .subtopic-list {
+      padding-left: 20px;
+      margin-top: 10px;
     }
 
-    .result-meta {
-      font-size: 12px;
-      color: #475569;
-      margin-top: 6px;
+    .subtopic-list li {
+      margin-bottom: 8px;
     }
 
-    .reset-link {
-      background: none;
-      border: none;
-      color: #64748b;
-      font-size: 12px;
-      font-family: "DM Mono", monospace;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .reset-link:hover {
-      color: #14233b;
+    @media (max-width: 768px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -190,6 +191,7 @@
           <small>LOGIC SIMULATION</small>
         </span>
       </a>
+
       <nav class="main-nav">
         <a href="index.html#converter">← Back to Converter</a>
       </nav>
@@ -197,193 +199,198 @@
   </header>
 
   <main class="intro">
-    <p class="label">SIMULATOR & CONVERSION</p>
-    <h1 id="pageTitle">4-bit BCD to Excess-3 Code</h1>
+    <span class="meta-tag">ARTICLE CONTENT · UPDATED 2026</span>
+    <p class="label">CODE CONVERSION</p>
+    <h1>BCD ↔ Excess-3 Code Conversion</h1>
     
-    <!-- INTERACTIVE CONVERTER SECTION -->
-    <section class="simulator-card">
-      <div class="mode-toggle-group">
-        <button class="mode-btn active" id="btnModeBcdToXs3" onclick="setMode('bcd-to-xs3')">BCD → Excess-3 Code</button>
-        <button class="mode-btn" id="btnModeXs3ToBcd" onclick="setMode('xs3-to-bcd')">Excess-3 → BCD Code</button>
-      </div>
+    <p class="intro-text">
+      This page explains how BCD and Excess-3 codes can be converted in both directions. It brings together the conversion table, Karnaugh-map simplification, resulting Boolean expressions, and the corresponding logic implementation in one place.
+    </p>
 
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <h3 id="simSubtitle" style="margin: 0 0 8px;">Interactive Simulator (BCD to Excess-3)</h3>
-        <button class="reset-link" onclick="resetBits()">Reset to 0000</button>
-      </div>
+    <!-- SECTION 1: DEFINITIONS -->
+    <section class="topic-section">
+      <h3>1. BCD and Excess-3: Basic Idea</h3>
       
-      <p id="simHelpText" style="margin: 0 0 12px; font-size: 13px; color: #64748b;">
-        Click the BCD bits below to toggle between 0 and 1, then click Convert.
-      </p>
+      <div class="grid-2col">
+        <div>
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: #0f172a;">BCD (8421) Representation</h4>
+          <p class="intro-text" style="margin: 0; font-size: 13px;">
+            In BCD, every decimal digit is represented separately using four bits. The valid combinations are 0000 through 1001, while 1010 through 1111 do not represent decimal digits and can therefore be used as <strong>don't-care conditions (X)</strong> during simplification.
+          </p>
+        </div>
 
-      <div class="domain-badge" id="domainNote">
-        Valid 8421 BCD Range: 0000 to 1001 (Decimal 0–9). States 1010–1111 are invalid.
-      </div>
-      
-      <!-- 4-Bit Input Toggles -->
-      <div class="bit-toggles">
-        <button class="bit-btn" id="b3" onclick="toggleBit('b3')">
-          <span id="b3-val">0</span>
-          <span id="b3-lbl">B3 (MSB)</span>
-        </button>
-        <button class="bit-btn" id="b2" onclick="toggleBit('b2')">
-          <span id="b2-val">0</span>
-          <span id="b2-lbl">B2</span>
-        </button>
-        <button class="bit-btn" id="b1" onclick="toggleBit('b1')">
-          <span id="b1-val">0</span>
-          <span id="b1-lbl">B1</span>
-        </button>
-        <button class="bit-btn" id="b0" onclick="toggleBit('b0')">
-          <span id="b0-val">0</span>
-          <span id="b0-lbl">B0 (LSB)</span>
-        </button>
+        <div>
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: #0f172a;">Excess-3 Representation</h4>
+          <p class="intro-text" style="margin: 0; font-size: 13px;">
+            Excess-3 is an unweighted code formed by adding 0011 to the BCD representation of each decimal digit. An important property of this code is that it is self-complementing, which is useful in complement-based decimal arithmetic.
+          </p>
+        </div>
       </div>
 
-      <!-- Convert Action Button -->
-      <button class="convert-btn" id="convertBtn" onclick="performConversion()">Convert to Excess-3 Code</button>
-
-      <!-- Output Display Box -->
-      <div class="result-box" id="resultBox">
-        <div class="result-header" id="resultHeader">Converted Output (Excess-3 Bits)</div>
-        <div class="result-value" id="outputBits">----</div>
-        <div class="result-meta" id="resultMeta"></div>
+      <h4 style="margin-top: 20px; font-size: 13px; color: #64748b;">Important Points:</h4>
+      <div class="badge-group">
+        <span class="badge">Unweighted Code</span>
+        <span class="badge">Self-Complementing</span>
+        <span class="badge">Don't-Care States (10–15 in BCD)</span>
       </div>
     </section>
-  </main>
 
-  <script src="converter-engine.js"></script>
-  <script>
-    let currentMode = "bcd-to-xs3"; // 'bcd-to-xs3' or 'xs3-to-bcd'
+    <!-- SECTION 2: BCD TO EXCESS-3 CONVERSION -->
+    <section class="topic-section">
+      <h3>2. BCD(8421) → Excess-3</h3>
 
-    // Check query params on page load (e.g. ?mode=xs3-to-bcd)
-    window.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const modeParam = params.get('mode');
-      if (modeParam === 'xs3-to-bcd') {
-        setMode('xs3-to-bcd');
-      }
-    });
+      <p class="intro-text" style="margin-top: 0;">
+        To obtain the Excess-3 form, add binary 0011 to the BCD value of the decimal digit. Only the ten valid BCD combinations are required for decimal digits 0–9; the other four input combinations are available as don't-care states for the K-map.
+      </p>
 
-    function setMode(mode) {
-      currentMode = mode;
-      
-      const btnBcd = document.getElementById('btnModeBcdToXs3');
-      const btnXs3 = document.getElementById('btnModeXs3ToBcd');
-      const pageTitle = document.getElementById('pageTitle');
-      const simSubtitle = document.getElementById('simSubtitle');
-      const simHelpText = document.getElementById('simHelpText');
-      const convertBtn = document.getElementById('convertBtn');
-      const resultHeader = document.getElementById('resultHeader');
-      const domainNote = document.getElementById('domainNote');
-      
-      if (mode === 'bcd-to-xs3') {
-        btnBcd.classList.add('active');
-        btnXs3.classList.remove('active');
-        pageTitle.textContent = "4-bit BCD to Excess-3 Code";
-        simSubtitle.textContent = "Interactive Simulator (BCD to Excess-3)";
-        simHelpText.textContent = "Click the BCD bits below to toggle between 0 and 1, then click Convert.";
-        domainNote.textContent = "Valid 8421 BCD Range: 0000 to 1001 (Decimal 0–9). States 1010–1111 are invalid.";
-        convertBtn.textContent = "Convert to Excess-3 Code";
-        resultHeader.textContent = "Converted Output (Excess-3 Bits)";
-        
-        document.getElementById('b3-lbl').textContent = "B3 (MSB)";
-        document.getElementById('b2-lbl').textContent = "B2";
-        document.getElementById('b1-lbl').textContent = "B1";
-        document.getElementById('b0-lbl').textContent = "B0 (LSB)";
-      } else {
-        btnXs3.classList.add('active');
-        btnBcd.classList.remove('active');
-        pageTitle.textContent = "4-bit Excess-3 to BCD Code";
-        simSubtitle.textContent = "Interactive Simulator (Excess-3 to BCD)";
-        simHelpText.textContent = "Click the Excess-3 bits below to toggle between 0 and 1, then click Convert.";
-        domainNote.textContent = "Valid Excess-3 Range: 0011 to 1100 (representing decimal 0–9: Value = Digit + 3).";
-        convertBtn.textContent = "Convert to BCD Code";
-        resultHeader.textContent = "Converted Output (BCD Bits)";
-        
-        document.getElementById('b3-lbl').textContent = "X3 (MSB)";
-        document.getElementById('b2-lbl').textContent = "X2";
-        document.getElementById('b1-lbl').textContent = "X1";
-        document.getElementById('b0-lbl').textContent = "X0 (LSB)";
-      }
+      <p class="intro-text">
+        For the conversion circuit, A, B, C and D are taken as the BCD inputs, with A as the MSB and D as the LSB. The four Excess-3 outputs are w, x, y and z, with w as the MSB.
+      </p>
 
-      resetResultBox();
-    }
+      <div class="diagram-section">
+        <div class="diagram-label">Truth Table</div>
+        <figure class="gfg-figure">
+          <img class="truth-table-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/20220105123237/Screenshot3.png"
+               alt="BCD to Excess-3 truth table">
+        </figure>
 
-    function toggleBit(id) {
-      const btn = document.getElementById(id);
-      const valSpan = document.getElementById(id + '-val');
-      
-      btn.classList.toggle('active');
-      const isActive = btn.classList.contains('active');
-      valSpan.textContent = isActive ? "1" : "0";
-      resetResultBox();
-    }
+        <div class="diagram-label">K-Map</div>
+        <figure class="gfg-figure">
+          <img class="kmap-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/35777.png"
+               alt="BCD to Excess-3 Karnaugh maps">
+        </figure>
 
-    function resetBits() {
-      ['b3', 'b2', 'b1', 'b0'].forEach(id => {
-        const btn = document.getElementById(id);
-        const valSpan = document.getElementById(id + '-val');
-        btn.classList.remove('active');
-        valSpan.textContent = "0";
-      });
-      resetResultBox();
-    }
+        <div class="diagram-label">Simplified Boolean expressions for the Excess-3 outputs:</div>
+        <div class="equation-block">
+          <div><strong>w = A + BC + BD</strong></div>
+          <div><strong>x = B′C + B′D + BC′D′</strong></div>
+        </div>
 
-    function resetResultBox() {
-      const resultBox = document.getElementById('resultBox');
-      const outputBits = document.getElementById('outputBits');
-      const resultMeta = document.getElementById('resultMeta');
-      
-      resultBox.classList.remove('error');
-      outputBits.textContent = "----";
-      resultMeta.textContent = "";
-    }
+        <div class="diagram-label">Logic circuit:</div>
+        <div class="logic-diagram-wrap"><img src="https://media.geeksforgeeks.org/wp-content/uploads/bcd-circuit.jpg" alt="GeeksforGeeks BCD to Excess-3 logic circuit" style="display:block;width:100%;max-width:620px;height:auto;margin:auto;border-radius:4px;"></div><div class="diagram-caption">Logic circuit diagram from GeeksforGeeks.</div>
+      </div>
+    </section>
 
-    async function performConversion() {
-      const b3 = document.getElementById('b3-val').textContent;
-      const b2 = document.getElementById('b2-val').textContent;
-      const b1 = document.getElementById('b1-val').textContent;
-      const b0 = document.getElementById('b0-val').textContent;
-      const inputBits = b3 + b2 + b1 + b0;
+    <!-- SECTION 3: EXCESS-3 TO BCD CONVERSION -->
+    <section class="topic-section">
+      <h3>3. Excess-3 → BCD(8421)</h3>
 
-      const fromCode = (currentMode === 'bcd-to-xs3') ? "BCD" : "Excess-3";
-      const toCode = (currentMode === 'bcd-to-xs3') ? "Excess-3" : "BCD";
+      <p class="intro-text" style="margin-top: 0;">
+        For the reverse conversion, the valid Excess-3 combinations are mapped back to their BCD values. The unused input combinations can again be marked as don't-care states while simplifying the output functions.
+      </p>
 
-      const convertBtn = document.getElementById('convertBtn');
-      const resultBox = document.getElementById('resultBox');
-      const outputBits = document.getElementById('outputBits');
-      const resultMeta = document.getElementById('resultMeta');
+      <p class="intro-text">
+        Here w, x, y and z are the Excess-3 inputs, while A, B, C and D form the BCD output. In both codes, the leftmost bit is treated as the most significant bit.
+      </p>
 
-      convertBtn.disabled = true;
-      convertBtn.textContent = "Converting...";
-      resultBox.classList.remove('error');
-      outputBits.textContent = "....";
-      resultMeta.textContent = "Computing...";
+      <div class="diagram-section">
+        <div class="diagram-label">Truth Table</div>
+        <figure class="gfg-figure">
+          <img class="truth-table-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/20220105123300/Screenshot4.png"
+               alt="Excess-3 to BCD truth table">
+        </figure>
 
-      try {
-        const response = await universalConvert(fromCode, toCode, inputBits);
+        <div class="diagram-label">K-Map for D</div>
+        <figure class="gfg-figure">
+          <img class="single-kmap-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/bcd-dkmap.jpg"
+               alt="K-map for D in Excess-3 to BCD conversion">
+        </figure>
 
-        if (!response.ok) {
-          resultBox.classList.add('error');
-          outputBits.textContent = "Invalid Domain";
-          resultMeta.textContent = response.data.detail || "Conversion failed.";
-          return;
-        }
+        <div class="diagram-label">K-Map for C</div>
+        <figure class="gfg-figure">
+          <img class="single-kmap-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/bcd-ckmap.jpg"
+               alt="K-map for C in Excess-3 to BCD conversion">
+        </figure>
 
-        const data = response.data;
-        outputBits.textContent = data.output_bits;
-        resultMeta.textContent = `Input: ${data.input_bits} (${fromCode}) | Decimal Value: ${data.decimal_value} | Output: ${data.output_bits} (${toCode}) · [${response.source}]`;
-      } catch (err) {
-        resultBox.classList.add('error');
-        outputBits.textContent = "Error";
-        resultMeta.textContent = err.message;
-      } finally {
-        convertBtn.disabled = false;
-        convertBtn.textContent = (currentMode === 'bcd-to-xs3') ? "Convert to Excess-3 Code" : "Convert to BCD Code";
-      }
-    }
-  </script>
+        <div class="diagram-label">K-Map for B</div>
+        <figure class="gfg-figure">
+          <img class="single-kmap-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/bcd-bkmap.jpg"
+               alt="K-map for B in Excess-3 to BCD conversion">
+        </figure>
+
+        <div class="diagram-label">K-Map for A</div>
+        <figure class="gfg-figure">
+          <img class="single-kmap-image"
+               src="https://media.geeksforgeeks.org/wp-content/uploads/bcd-kmapa-1-300x272.jpg"
+               alt="K-map for A in Excess-3 to BCD conversion">
+        </figure>
+
+        <div class="diagram-label">Reduced Boolean expressions for the BCD outputs:</div>
+        <div class="equation-block">
+          <div><strong>A = wx + wyz</strong></div>
+          <div><strong>B = x′y′ + x′z′ + xyz</strong></div>
+          <div><strong>C = y′z + yz′</strong></div>
+          <div><strong>D = z′</strong></div>
+        </div>
+
+        <div class="diagram-label">Logic circuit:</div>
+        <p class="intro-text" style="font-size: 13px;">
+          In the circuit below, E<sub>3</sub>–E<sub>0</sub> denote the four Excess-3 input bits w–z. The BCD outputs B<sub>3</sub>–B<sub>0</sub> correspond to A–D respectively.
+        </p>
+        <div class="logic-diagram-wrap"><img src="https://media.geeksforgeeks.org/wp-content/uploads/BCD-excess-3-circuit.jpg" alt="GeeksforGeeks Excess-3 to BCD logic circuit" style="display:block;width:100%;max-width:620px;height:auto;margin:auto;border-radius:4px;"></div><div class="diagram-caption">Logic circuit diagram from GeeksforGeeks.</div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: COMPARISON -->
+    <section class="topic-section">
+      <h3>4. BCD vs Excess-3 at a Glance</h3>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>BCD</th>
+            <th>Excess-3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Coding Method</td>
+            <td>Stores each decimal digit using its 4-bit BCD form.</td>
+            <td>Uses the BCD value shifted by a fixed value of 3.</td>
+          </tr>
+          <tr>
+            <td>Value Range</td>
+            <td>Valid for the decimal digits 0–9.</td>
+            <td>Uses four bits after adding 3 to the decimal digit value.</td>
+          </tr>
+          <tr>
+            <td>Arithmetic Operations</td>
+            <td>Arithmetic generally needs suitable correction logic.</td>
+            <td>Its self-complementing nature can be useful in decimal arithmetic.</td>
+          </tr>
+          <tr>
+            <td>Error Detection</td>
+            <td>Unused combinations can help identify invalid BCD values.</td>
+            <td>Also contains unused code combinations that can indicate invalid inputs.</td>
+          </tr>
+          <tr>
+            <td>Complement Operation</td>
+            <td>Complementing is not directly represented by a simple bitwise operation.</td>
+            <td>Its self-complementing property is useful for obtaining decimal complements.</td>
+          </tr>
+          <tr>
+            <td>Binary Representation</td>
+            <td>Each decimal digit occupies four bits.</td>
+            <td>Each code word is four bits after the +3 transformation.</td>
+          </tr>
+          <tr>
+            <td>Conversion Complexity</td>
+            <td>No offset is added to the digit value.</td>
+            <td>Conversion can be viewed as adding 3 or removing 3.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  <footer>
+    <p>Digital Electronics Laboratory · Study Reference Page</p>
+  </footer>
 
 </body>
 </html>

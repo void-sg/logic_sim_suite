@@ -326,6 +326,73 @@
       }
     },
 
+    "74153": {
+      id: "74153",
+      name: "74153 (Dual 4:1 Multiplexer)",
+      category: "msi",
+      package: "DIP-16",
+      pinsCount: 16,
+      refPrefix: "U",
+      desc: "Dual 4-line to 1-line data selectors/multiplexers. Contains two independent 4:1 MUX sections sharing common select lines (S0, S1) with separate active-low strobes (1~G, 2~G).",
+      datasheet: "VCC: Pin 16, GND: Pin 8. Select: S1(2), S0(14). MUX 1: 1~G(1), 1D0(6), 1D1(5), 1D2(4), 1D3(3) -> 1Y(7). MUX 2: 2~G(15), 2D0(10), 2D1(11), 2D2(12), 2D3(13) -> 2Y(9).",
+      vccPin: 16,
+      gndPin: 8,
+      pins: [
+        { num: 1, name: "1~G", type: "in", side: "left" },
+        { num: 2, name: "S1", type: "in", side: "left" },
+        { num: 3, name: "1D3", type: "in", side: "left" },
+        { num: 4, name: "1D2", type: "in", side: "left" },
+        { num: 5, name: "1D1", type: "in", side: "left" },
+        { num: 6, name: "1D0", type: "in", side: "left" },
+        { num: 7, name: "1Y", type: "out", side: "left" },
+        { num: 8, name: "GND", type: "pwr", side: "left" },
+        { num: 16, name: "VCC", type: "pwr", side: "right" },
+        { num: 15, name: "2~G", type: "in", side: "right" },
+        { num: 14, name: "S0", type: "in", side: "right" },
+        { num: 13, name: "2D3", type: "in", side: "right" },
+        { num: 12, name: "2D2", type: "in", side: "right" },
+        { num: 11, name: "2D1", type: "in", side: "right" },
+        { num: 10, name: "2D0", type: "in", side: "right" },
+        { num: 9, name: "2Y", type: "out", side: "right" }
+      ],
+      evaluate: (inputs) => {
+        const s1 = inputs["2"] || 0;
+        const s0 = inputs["14"] || 0;
+        const sel = (s1 << 1) | s0;
+
+        // Section 1: 1~G active low
+        const strobe1 = inputs["1"] || 0;
+        let y1 = 0;
+        if (strobe1 === 0) {
+          const data1 = [
+            inputs["6"] || 0, // 1D0
+            inputs["5"] || 0, // 1D1
+            inputs["4"] || 0, // 1D2
+            inputs["3"] || 0  // 1D3
+          ];
+          y1 = data1[sel] || 0;
+        }
+
+        // Section 2: 2~G active low
+        const strobe2 = inputs["15"] || 0;
+        let y2 = 0;
+        if (strobe2 === 0) {
+          const data2 = [
+            inputs["10"] || 0, // 2D0
+            inputs["11"] || 0, // 2D1
+            inputs["12"] || 0, // 2D2
+            inputs["13"] || 0  // 2D3
+          ];
+          y2 = data2[sel] || 0;
+        }
+
+        return {
+          "7": y1,
+          "9": y2
+        };
+      }
+    },
+
     "7485": {
       id: "7485",
       name: "7485 (4-Bit Magnitude Comparator)",
@@ -2969,6 +3036,37 @@
       state.wires.push({ id: "w3", from: { compId: swS0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 11 }, state: 0 });
       state.wires.push({ id: "w4", from: { compId: ic.id, pinNum: 5 }, to: { compId: ledY.id, pinNum: 1 }, state: 0 });
       state.wires.push({ id: "w5", from: { compId: ic.id, pinNum: 6 }, to: { compId: ledW.id, pinNum: 1 }, state: 1 });
+
+    } else if (presetKey === "74153_mux") {
+      // Preset 5: 74153 Dual 4:1 Multiplexer Experiment
+      const vcc = addComponentAt("VCC", 550, 130);
+      const gnd = addComponentAt("GND", 370, 450);
+      const swD0 = addComponentAt("SWITCH", 180, 180);
+      swD0.state.value = 1; // Default HIGH so channel 00 output is immediately active
+      const swD1 = addComponentAt("SWITCH", 180, 230);
+      const swD2 = addComponentAt("SWITCH", 180, 280);
+      swD2.state.value = 1;
+      const swD3 = addComponentAt("SWITCH", 180, 330);
+      const swS0 = addComponentAt("SWITCH", 180, 390);
+      const swS1 = addComponentAt("SWITCH", 180, 450);
+      const ic = addComponentAt("74153", 460, 280);
+      const led1Y = addComponentAt("LED", 720, 260);
+      const prb1Y = addComponentAt("PROBE", 720, 330);
+
+      // Power & Enable: Pin 16: VCC, Pin 8: GND, Pin 1: 1~G (Active-low Strobe tied to GND to enable MUX 1)
+      state.wires.push({ id: "w_vcc", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_gnd", from: { compId: ic.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_strobe1", from: { compId: ic.id, pinNum: 1 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Signal Connections for MUX 1: 1D0 (Pin 6), 1D1 (Pin 5), 1D2 (Pin 4), 1D3 (Pin 3), S0 (Pin 14), S1 (Pin 2), Output 1Y (Pin 7)
+      state.wires.push({ id: "w1", from: { compId: swD0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 6 }, state: 1 });
+      state.wires.push({ id: "w2", from: { compId: swD1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 0 });
+      state.wires.push({ id: "w3", from: { compId: swD2.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 4 }, state: 1 });
+      state.wires.push({ id: "w4", from: { compId: swD3.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w5", from: { compId: swS0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 0 });
+      state.wires.push({ id: "w6", from: { compId: swS1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w7", from: { compId: ic.id, pinNum: 7 }, to: { compId: led1Y.id, pinNum: 1 }, state: 1 });
+      state.wires.push({ id: "w8", from: { compId: ic.id, pinNum: 7 }, to: { compId: prb1Y.id, pinNum: 1 }, state: 1 });
 
     } else if (presetKey === "diode_or") {
       // Preset 5: Diode OR Gate

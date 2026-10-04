@@ -1,12 +1,2 @@
-scikit-learn
-pandas
-ipykernel
-numpy
-matplotlib
-seaborn
-flask
-streamlit
-scikit-learn
-statsforecast
-utilsforecast
-pytest
+fastapi
+uvicorn[standard]

@@ -1772,49 +1772,99 @@
   }
 
   // =========================================================================
-  // 8. LIVE LOGIC SIMULATION SOLVER (Deterministic Event Graph)
+  // 8. LIVE LOGIC SIMULATION SOLVER (Principle-Based Equipotential Netlist Solver)
   // =========================================================================
   function runSimulation() {
     if (!state.isSimRunning) return;
 
-    const pinVoltages = {};
+    // 1. Build Equipotential Nets (Connected Pin Graph via Wires)
+    const pinToNet = new Map();
+    const netMembers = []; // array of Set<string (pinKey)>
 
-    // 1. Evaluate Drivers (Power, GND, Switches, Clock)
-    state.components.forEach((c) => {
-      const spec = LIBRARY[c.type];
-      if (spec.category === "power" || spec.category === "io") {
-        const out = spec.evaluate({}, c);
-        for (const [pinNum, val] of Object.entries(out)) {
-          pinVoltages[`${c.id}:${pinNum}`] = val;
-        }
+    function getOrCreateNet(pinKey) {
+      if (pinToNet.has(pinKey)) return pinToNet.get(pinKey);
+      const netId = netMembers.length;
+      netMembers.push(new Set([pinKey]));
+      pinToNet.set(pinKey, netId);
+      return netId;
+    }
+
+    function unionNets(pinKey1, pinKey2) {
+      let net1 = getOrCreateNet(pinKey1);
+      let net2 = getOrCreateNet(pinKey2);
+      if (net1 === net2) return net1;
+      if (netMembers[net1].size < netMembers[net2].size) {
+        const tmp = net1; net1 = net2; net2 = tmp;
       }
+      for (const pk of netMembers[net2]) {
+        netMembers[net1].add(pk);
+        pinToNet.set(pk, net1);
+      }
+      netMembers[net2] = null;
+      return net1;
+    }
+
+    // Connect all pins joined by wires into equipotential nets
+    state.wires.forEach((w) => {
+      const kFrom = `${w.from.compId}:${w.from.pinNum}`;
+      const kTo = `${w.to.compId}:${w.to.pinNum}`;
+      unionNets(kFrom, kTo);
     });
 
-    // 2. Propagate through Wires iteratively (up to 6 passes for cascading logic like 4-bit adders/comparators)
-    for (let pass = 0; pass < 6; pass++) {
-      state.wires.forEach((w) => {
-        const keyFrom = `${w.from.compId}:${w.from.pinNum}`;
-        const keyTo = `${w.to.compId}:${w.to.pinNum}`;
+    // Voltages for all pins: { "compId:pinNum": 0 | 1 }
+    const pinVoltages = {};
+    const icOutputVoltages = {};
 
-        const vFrom = pinVoltages[keyFrom];
-        const vTo = pinVoltages[keyTo];
+    // 2. Iterative Relaxation (up to 8 passes for cascaded deep MSI/gate chains)
+    for (let pass = 0; pass < 8; pass++) {
+      let changed = false;
 
-        if (vFrom !== undefined && vTo === undefined) {
-          pinVoltages[keyTo] = vFrom;
-          w.state = vFrom;
-        } else if (vTo !== undefined && vFrom === undefined) {
-          pinVoltages[keyFrom] = vTo;
-          w.state = vTo;
-        } else if (vFrom !== undefined) {
-          w.state = vFrom;
+      // A. Determine driver voltage for each equipotential net
+      netMembers.forEach((members) => {
+        if (!members) return;
+        let netVal = undefined;
+
+        for (const pk of members) {
+          const [compId, pinStr] = pk.split(":");
+          const pinNum = parseInt(pinStr, 10);
+          const comp = state.components.find((c) => c.id === compId);
+          if (!comp) continue;
+
+          // Primary drivers: VCC, GND, SWITCH, CLOCK
+          if (comp.type === "VCC") {
+            netVal = 1;
+            break;
+          } else if (comp.type === "GND") {
+            netVal = 0;
+            break;
+          } else if (comp.type === "SWITCH") {
+            netVal = comp.state?.value ? 1 : 0;
+            break;
+          } else if (comp.type === "CLOCK") {
+            netVal = comp.state?.value ? 1 : 0;
+            break;
+          } else if (icOutputVoltages[pk] !== undefined) {
+            // IC output pin driving this net
+            netVal = icOutputVoltages[pk];
+          }
+        }
+
+        // Apply netVal to all pins on this net
+        if (netVal !== undefined) {
+          for (const pk of members) {
+            if (pinVoltages[pk] !== netVal) {
+              pinVoltages[pk] = netVal;
+              changed = true;
+            }
+          }
         }
       });
 
-      // Evaluate Complex ICs (7400, 7408, 7432, 7486, 7402, 7404, 74151, 7485, 7483, DIODE)
+      // B. Evaluate ICs and Discrete components
       state.components.forEach((c) => {
         const spec = LIBRARY[c.type];
         if (spec.category === "gates" || spec.category === "msi" || spec.id === "DIODE") {
-          // Check VCC and GND power supply requirement
+          // Check power rails (VCC and GND)
           if (spec.vccPin && spec.gndPin) {
             const vccVal = pinVoltages[`${c.id}:${spec.vccPin}`];
             const gndVal = pinVoltages[`${c.id}:${spec.gndPin}`];
@@ -1822,16 +1872,20 @@
             c.isPowered = isPowered;
 
             if (!isPowered) {
-              // IC is unpowered! All output pins must produce 0 logic
               spec.pins.forEach((p) => {
                 if (p.type === "out") {
-                  pinVoltages[`${c.id}:${p.num}`] = 0;
+                  const pk = `${c.id}:${p.num}`;
+                  if (icOutputVoltages[pk] !== 0) {
+                    icOutputVoltages[pk] = 0;
+                    changed = true;
+                  }
                 }
               });
               return;
             }
           }
 
+          // Gather input values from current pinVoltages
           const inputValues = {};
           spec.pins.forEach((p) => {
             const val = pinVoltages[`${c.id}:${p.num}`];
@@ -1840,13 +1894,30 @@
             }
           });
 
+          // Evaluate IC function
           const outputs = spec.evaluate(inputValues, c);
           for (const [pinNum, val] of Object.entries(outputs)) {
-            pinVoltages[`${c.id}:${pinNum}`] = val;
+            const pk = `${c.id}:${pinNum}`;
+            if (icOutputVoltages[pk] !== val) {
+              icOutputVoltages[pk] = val;
+              changed = true;
+            }
           }
         }
       });
+
+      // Stop once network has converged
+      if (!changed && pass >= 2) break;
     }
+
+    // 3. Final Wire States (Equipotential wire logic levels)
+    state.wires.forEach((w) => {
+      const kFrom = `${w.from.compId}:${w.from.pinNum}`;
+      const kTo = `${w.to.compId}:${w.to.pinNum}`;
+      const vFrom = pinVoltages[kFrom];
+      const vTo = pinVoltages[kTo];
+      w.state = vFrom !== undefined ? vFrom : (vTo !== undefined ? vTo : 0);
+    });
 
     state.pinVoltages = pinVoltages;
     updateVisualSimulation(pinVoltages);
@@ -3067,6 +3138,175 @@
       state.wires.push({ id: "w6", from: { compId: swS1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 2 }, state: 0 });
       state.wires.push({ id: "w7", from: { compId: ic.id, pinNum: 7 }, to: { compId: led1Y.id, pinNum: 1 }, state: 1 });
       state.wires.push({ id: "w8", from: { compId: ic.id, pinNum: 7 }, to: { compId: prb1Y.id, pinNum: 1 }, state: 1 });
+
+    } else if (presetKey === "74153_case1_3var") {
+      // Preset 6: Case 1 from Report - F(C,B,A) = Σm(0,1,3,4,7) using 74LS153 as 8:1 MUX
+      const vcc = addComponentAt("VCC", 520, 110);
+      const gnd = addComponentAt("GND", 520, 620);
+
+      // 3 Switches: C (MSB / Strobe), B (Middle / S1), A (LSB / S0)
+      const swC = addComponentAt("SWITCH", 140, 220);
+      swC.ref = "SW_C";
+      const swB = addComponentAt("SWITCH", 140, 310);
+      swB.ref = "SW_B";
+      const swA = addComponentAt("SWITCH", 140, 400);
+      swA.ref = "SW_A";
+
+      // Chips: 74153 Dual 4:1 MUX, 7404 Hex Inverter, 7432 OR Gate
+      const icMux = addComponentAt("74153", 400, 320);
+      const icNot = addComponentAt("7404", 660, 240);
+      const icOr  = addComponentAt("7432", 660, 470);
+
+      // Output Indicators
+      const led = addComponentAt("LED", 860, 450);
+      const prb = addComponentAt("PROBE", 860, 520);
+
+      // Power & Ground
+      state.wires.push({ id: "w_pwr1", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_pwr2", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_pwr3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icOr.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_gnd1", from: { compId: icMux.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd2", from: { compId: icNot.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd3", from: { compId: icOr.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Select & Strobe Connections:
+      // Variable C controls Strobes: C -> 1~G (Pin 1), C -> 7404 Pin 1 (1A), 7404 Pin 2 (1Y) -> 2~G (Pin 15)
+      state.wires.push({ id: "w_sc1", from: { compId: swC.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sc2", from: { compId: swC.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sc_inv", from: { compId: icNot.id, pinNum: 2 }, to: { compId: icMux.id, pinNum: 15 }, state: 1 });
+
+      // Variable B -> S1 (Pin 2)
+      state.wires.push({ id: "w_sb", from: { compId: swB.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 2 }, state: 0 });
+      // Variable A -> S0 (Pin 14)
+      state.wires.push({ id: "w_sa", from: { compId: swA.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 14 }, state: 0 });
+
+      // Data Inputs - from PDF Page 6 Table:
+      // 1I0 (Pin 6) = 1 (VCC) - m0 = 1
+      state.wires.push({ id: "w_1i0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 6 }, state: 1 });
+      // 1I1 (Pin 5) = 1 (VCC) - m1 = 1
+      state.wires.push({ id: "w_1i1", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 5 }, state: 1 });
+      // 1I2 (Pin 4) = 0 (GND) - m2 = 0
+      state.wires.push({ id: "w_1i2", from: { compId: gnd.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 4 }, state: 0 });
+      // 1I3 (Pin 3) = 1 (VCC) - m3 = 1
+      state.wires.push({ id: "w_1i3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 3 }, state: 1 });
+
+      // 2I0 (Pin 10) = 1 (VCC) - m4 = 1
+      state.wires.push({ id: "w_2i0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 10 }, state: 1 });
+      // 2I1 (Pin 11) = 0 (GND) - m5 = 0
+      state.wires.push({ id: "w_2i1", from: { compId: gnd.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 11 }, state: 0 });
+      // 2I2 (Pin 12) = 0 (GND) - m6 = 0
+      state.wires.push({ id: "w_2i2", from: { compId: gnd.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 12 }, state: 0 });
+      // 2I3 (Pin 13) = 1 (VCC) - m7 = 1
+      state.wires.push({ id: "w_2i3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 13 }, state: 1 });
+
+      // Outputs & OR Gate (7432)
+      state.wires.push({ id: "w_out1", from: { compId: icMux.id, pinNum: 7 }, to: { compId: icOr.id, pinNum: 1 }, state: 1 });
+      state.wires.push({ id: "w_out2", from: { compId: icMux.id, pinNum: 9 }, to: { compId: icOr.id, pinNum: 2 }, state: 0 });
+      state.wires.push({
+        id: "w_out_led",
+        from: { compId: icOr.id, pinNum: 3 },
+        to: { compId: led.id, pinNum: 1 },
+        waypoints: [{ x: 550, y: 440 }, { x: 550, y: 570 }, { x: 800, y: 570 }, { x: 800, y: 450 }],
+        state: 1
+      });
+      state.wires.push({
+        id: "w_out_prb",
+        from: { compId: icOr.id, pinNum: 3 },
+        to: { compId: prb.id, pinNum: 1 },
+        waypoints: [{ x: 550, y: 440 }, { x: 550, y: 570 }, { x: 800, y: 570 }, { x: 800, y: 520 }],
+        state: 1
+      });
+
+    } else if (presetKey === "74153_8to1_function") {
+      // Preset 7: Implement f(ABCD) = Σm(0,1,2,4,7,8,9,11,12,14) using IC 74153 + 7404 + 7432
+      const vcc = addComponentAt("VCC", 520, 110);
+      const gnd = addComponentAt("GND", 520, 620);
+
+      // Switches on the left: A (MSB), B, C, D (LSB)
+      const swA = addComponentAt("SWITCH", 140, 190);
+      swA.ref = "SW_A";
+      const swB = addComponentAt("SWITCH", 140, 260);
+      swB.ref = "SW_B";
+      const swC = addComponentAt("SWITCH", 140, 330);
+      swC.ref = "SW_C";
+      const swD = addComponentAt("SWITCH", 140, 400);
+      swD.ref = "SW_D";
+
+      // Chips
+      const icMux = addComponentAt("74153", 400, 320); // Dual 4:1 MUX
+      const icNot = addComponentAt("7404", 660, 240);  // Hex Inverter
+      const icOr  = addComponentAt("7432", 660, 470);  // Quad OR Gate
+
+      // Output Indicators
+      const led = addComponentAt("LED", 860, 450);
+      const prb = addComponentAt("PROBE", 860, 520);
+
+      // 1. Power & Ground Connections
+      // VCC (+5V) to Pin 16 of 74153, Pin 14 of 7404, Pin 14 of 7432
+      state.wires.push({ id: "w_pwr1", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_pwr2", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_pwr3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icOr.id, pinNum: 14 }, state: 1 });
+
+      // GND (0V) to Pin 8 of 74153, Pin 7 of 7404, Pin 7 of 7432
+      state.wires.push({ id: "w_gnd1", from: { compId: icMux.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd2", from: { compId: icNot.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd3", from: { compId: icOr.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // 2. Select & Strobe Connections
+      // Variable A controls Strobes: A -> 1~G (Pin 1), A -> 7404 Pin 1 (1A), 7404 Pin 2 (1Y) -> 2~G (Pin 15)
+      state.wires.push({ id: "w_sa1", from: { compId: swA.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sa2", from: { compId: swA.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sa_inv", from: { compId: icNot.id, pinNum: 2 }, to: { compId: icMux.id, pinNum: 15 }, state: 1 });
+
+      // Variable B -> S1 (Pin 2)
+      state.wires.push({ id: "w_sb", from: { compId: swB.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 2 }, state: 0 });
+
+      // Variable C -> S0 (Pin 14)
+      state.wires.push({ id: "w_sc", from: { compId: swC.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 14 }, state: 0 });
+
+      // Variable D Inversion: swD -> 7404 Pin 3 (2A), Pin 4 (2Y) produces D_bar
+      state.wires.push({ id: "w_sd_in", from: { compId: swD.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 3 }, state: 0 });
+
+      // 3. Data Inputs - MUX 1 (A = 0):
+      // 1D0 (Pin 6) = 1 (+5V)
+      state.wires.push({ id: "w_1d0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 6 }, state: 1 });
+      // 1D1 (Pin 5) = D_bar (7404 Pin 4)
+      state.wires.push({ id: "w_1d1", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 5 }, state: 1 });
+      // 1D2 (Pin 4) = D_bar (7404 Pin 4)
+      state.wires.push({ id: "w_1d2", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 4 }, state: 1 });
+      // 1D3 (Pin 3) = D (swD)
+      state.wires.push({ id: "w_1d3", from: { compId: swD.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 3 }, state: 0 });
+
+      // 4. Data Inputs - MUX 2 (A = 1):
+      // 2D0 (Pin 10) = 1 (+5V)
+      state.wires.push({ id: "w_2d0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 10 }, state: 1 });
+      // 2D1 (Pin 11) = D (swD)
+      state.wires.push({ id: "w_2d1", from: { compId: swD.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 11 }, state: 0 });
+      // 2D2 (Pin 12) = D_bar (7404 Pin 4)
+      state.wires.push({ id: "w_2d2", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 12 }, state: 1 });
+      // 2D3 (Pin 13) = D_bar (7404 Pin 4)
+      state.wires.push({ id: "w_2d3", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 13 }, state: 1 });
+
+      // 5. Outputs & OR Gate (7432)
+      // 1Y (Pin 7) -> 7432 Pin 1 (1A)
+      state.wires.push({ id: "w_out1", from: { compId: icMux.id, pinNum: 7 }, to: { compId: icOr.id, pinNum: 1 }, state: 1 });
+      // 2Y (Pin 9) -> 7432 Pin 2 (1B)
+      state.wires.push({ id: "w_out2", from: { compId: icMux.id, pinNum: 9 }, to: { compId: icOr.id, pinNum: 2 }, state: 0 });
+      // 7432 Pin 3 (1Y) -> LED & PROBE (neatly routed around the chip bottom)
+      state.wires.push({
+        id: "w_out_led",
+        from: { compId: icOr.id, pinNum: 3 },
+        to: { compId: led.id, pinNum: 1 },
+        waypoints: [{ x: 550, y: 440 }, { x: 550, y: 570 }, { x: 800, y: 570 }, { x: 800, y: 450 }],
+        state: 1
+      });
+      state.wires.push({
+        id: "w_out_prb",
+        from: { compId: icOr.id, pinNum: 3 },
+        to: { compId: prb.id, pinNum: 1 },
+        waypoints: [{ x: 550, y: 440 }, { x: 550, y: 570 }, { x: 800, y: 570 }, { x: 800, y: 520 }],
+        state: 1
+      });
 
     } else if (presetKey === "diode_or") {
       // Preset 5: Diode OR Gate

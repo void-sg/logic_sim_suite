@@ -54,6 +54,13 @@
       <button class="wb-btn tool-btn wb-btn-danger" id="btn-tool-delete" title="Delete Selected Item (Shortcut: Del)">
         <span>🗑 Delete [Del]</span>
       </button>
+
+      <div class="wb-toolbar-divider"></div>
+
+      <button class="wb-btn" id="btn-toggle-palette" title="Slide / Toggle Component Palette (Shortcut: P)">
+        <span id="btn-palette-icon">◀</span>
+        <span>Palette [P]</span>
+      </button>
     </div>
 
     <!-- Presets & Simulation Controls -->
@@ -94,11 +101,14 @@
   <!-- Main Workspace -->
   <div class="wb-main-container">
 
-    <!-- Left Quick Palette Sidebar -->
-    <aside class="wb-palette-sidebar">
+    <!-- Left Quick Palette Sidebar with Slide Controls -->
+    <aside class="wb-palette-sidebar" id="palette-sidebar">
       <div class="wb-palette-header">
-        <span>COMPONENT PALETTE</span>
-        <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #2563eb;">Click to Add</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>COMPONENT PALETTE</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #2563eb;">Click to Add</span>
+        </div>
+        <button class="wb-palette-collapse-btn" id="btn-collapse-palette" title="Slide / Hide Component Palette (Shortcut: P)">◀</button>
       </div>
 
       <div class="wb-palette-scroll">
@@ -208,14 +218,30 @@
           </div>
         </div>
 
-        <!-- Power & Logic Sources -->
+        <!-- Power & Distribution Rails -->
         <div>
-          <div class="wb-palette-category-title">Power & Inputs</div>
+          <div class="wb-palette-category-title">Power & Distribution Rails</div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="POWER_RAIL">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">VCC / GND RAIL</span>
+                <span class="wb-palette-item-desc">Dual Power Bus (8-Pin)</span>
+              </div>
+              <span class="wb-palette-tag tag-io" style="background: #fef2f2; color: #b91c1c; border-color: #fecaca;">RAIL</span>
+            </div>
+
+            <div class="wb-palette-item" data-type="SW_RAIL_8">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">8-BIT SWITCH RAIL</span>
+                <span class="wb-palette-item-desc">8x Input Toggle Bank</span>
+              </div>
+              <span class="wb-palette-tag tag-io">8-IN</span>
+            </div>
+
             <div class="wb-palette-item" data-type="SWITCH">
               <div class="wb-palette-item-info">
                 <span class="wb-palette-item-name">SWITCH</span>
-                <span class="wb-palette-item-desc">Toggle Logic (0/1)</span>
+                <span class="wb-palette-item-desc">Single Logic Toggle</span>
               </div>
               <span class="wb-palette-tag tag-io">IN</span>
             </div>
@@ -231,7 +257,7 @@
             <div class="wb-palette-item" data-type="VCC">
               <div class="wb-palette-item-info">
                 <span class="wb-palette-item-name">+5V (VCC)</span>
-                <span class="wb-palette-item-desc">Power High (1)</span>
+                <span class="wb-palette-item-desc">Power Terminal (1)</span>
               </div>
               <span class="wb-palette-tag tag-io">PWR</span>
             </div>
@@ -239,21 +265,29 @@
             <div class="wb-palette-item" data-type="GND">
               <div class="wb-palette-item-info">
                 <span class="wb-palette-item-name">GND</span>
-                <span class="wb-palette-item-desc">Ground Low (0)</span>
+                <span class="wb-palette-item-desc">Ground Terminal (0)</span>
               </div>
               <span class="wb-palette-tag tag-io">GND</span>
             </div>
           </div>
         </div>
 
-        <!-- Output Probes -->
+        <!-- Output Indicators & LED Rail -->
         <div>
-          <div class="wb-palette-category-title">Indicators & Probes</div>
+          <div class="wb-palette-category-title">Indicators & LED Rails</div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="wb-palette-item" data-type="LED_RAIL_8">
+              <div class="wb-palette-item-info">
+                <span class="wb-palette-item-name">8-BIT LED RAIL</span>
+                <span class="wb-palette-item-desc">8x Output Monitor Bank</span>
+              </div>
+              <span class="wb-palette-tag tag-gate">8-LED</span>
+            </div>
+
             <div class="wb-palette-item" data-type="LED">
               <div class="wb-palette-item-info">
                 <span class="wb-palette-item-name">LED</span>
-                <span class="wb-palette-item-desc">Logic Light Indicator</span>
+                <span class="wb-palette-item-desc">Single Light Indicator</span>
               </div>
               <span class="wb-palette-tag tag-io">OUT</span>
             </div>
@@ -269,6 +303,11 @@
         </div>
       </div>
     </aside>
+
+    <!-- Edge Slider Tab Handle to open/close palette -->
+    <button class="wb-palette-slider-tab" id="palette-slider-tab" title="Slide / Toggle Component Palette (Shortcut: P)">
+      <span id="palette-tab-icon">◀</span>
+    </button>
 
     <!-- KiCad Schematic Canvas -->
     <div class="wb-canvas-wrap tool-select" id="canvas-wrap">

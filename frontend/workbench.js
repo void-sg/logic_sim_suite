@@ -519,6 +519,59 @@
       evaluate: () => ({ "1": 0 })
     },
 
+    "POWER_RAIL": {
+      id: "POWER_RAIL",
+      name: "VCC & GND Power Bus Rail",
+      category: "power",
+      package: "Power Rail (8-Pin)",
+      pinsCount: 8,
+      refPrefix: "PWR_RAIL",
+      desc: "Dual VCC (+5V) and GND (0V) power distribution rail. 4 top red terminals supply +5V, 4 bottom blue terminals supply Ground.",
+      pins: [
+        { num: 1, name: "+5V", type: "out", side: "top", pos: 1 },
+        { num: 2, name: "+5V", type: "out", side: "top", pos: 2 },
+        { num: 3, name: "+5V", type: "out", side: "top", pos: 3 },
+        { num: 4, name: "+5V", type: "out", side: "top", pos: 4 },
+        { num: 5, name: "GND", type: "out", side: "bottom", pos: 1 },
+        { num: 6, name: "GND", type: "out", side: "bottom", pos: 2 },
+        { num: 7, name: "GND", type: "out", side: "bottom", pos: 3 },
+        { num: 8, name: "GND", type: "out", side: "bottom", pos: 4 }
+      ],
+      evaluate: () => ({
+        "1": 1, "2": 1, "3": 1, "4": 1,
+        "5": 0, "6": 0, "7": 0, "8": 0
+      })
+    },
+
+    "SW_RAIL_8": {
+      id: "SW_RAIL_8",
+      name: "8-Bit Logic Input Switch Rail",
+      category: "io",
+      package: "Trainer Rail (8x IN)",
+      pinsCount: 8,
+      refPrefix: "SW_BANK",
+      desc: "8-channel trainer-kit toggle switch bank. Provides 8 independent interactive binary logic outputs (SW0 to SW7).",
+      pins: [
+        { num: 1, name: "SW0", type: "out", side: "bottom", pos: 1 },
+        { num: 2, name: "SW1", type: "out", side: "bottom", pos: 2 },
+        { num: 3, name: "SW2", type: "out", side: "bottom", pos: 3 },
+        { num: 4, name: "SW3", type: "out", side: "bottom", pos: 4 },
+        { num: 5, name: "SW4", type: "out", side: "bottom", pos: 5 },
+        { num: 6, name: "SW5", type: "out", side: "bottom", pos: 6 },
+        { num: 7, name: "SW6", type: "out", side: "bottom", pos: 7 },
+        { num: 8, name: "SW7", type: "out", side: "bottom", pos: 8 }
+      ],
+      customState: { values: [0, 0, 0, 0, 0, 0, 0, 0] },
+      evaluate: (inputs, comp) => {
+        const vals = comp.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+        const res = {};
+        for (let i = 0; i < 8; i++) {
+          res[(i + 1).toString()] = vals[i] ? 1 : 0;
+        }
+        return res;
+      }
+    },
+
     "SWITCH": {
       id: "SWITCH",
       name: "Toggle Switch (Logic In)",
@@ -567,6 +620,27 @@
       refPrefix: "PR",
       desc: "Digital logic analyzer probe. Displays real-time binary state [0] or [1].",
       pins: [{ num: 1, name: "IN", type: "in", side: "left", pos: 1 }],
+      evaluate: () => ({})
+    },
+
+    "LED_RAIL_8": {
+      id: "LED_RAIL_8",
+      name: "8-Bit Logic Output LED Rail",
+      category: "io",
+      package: "Trainer Rail (8x LED)",
+      pinsCount: 8,
+      refPrefix: "LED_BANK",
+      desc: "8-channel trainer-kit LED display bank. 8 indicator LEDs (L0 to L7) with real-time glow and digital status readouts.",
+      pins: [
+        { num: 1, name: "L0", type: "in", side: "top", pos: 1 },
+        { num: 2, name: "L1", type: "in", side: "top", pos: 2 },
+        { num: 3, name: "L2", type: "in", side: "top", pos: 3 },
+        { num: 4, name: "L3", type: "in", side: "top", pos: 4 },
+        { num: 5, name: "L4", type: "in", side: "top", pos: 5 },
+        { num: 6, name: "L5", type: "in", side: "top", pos: 6 },
+        { num: 7, name: "L6", type: "in", side: "top", pos: 7 },
+        { num: 8, name: "L7", type: "in", side: "top", pos: 8 }
+      ],
       evaluate: () => ({})
     }
   };
@@ -718,6 +792,8 @@
           state.activeWire.bendMode = state.activeWire.bendMode === "HV" ? "VH" : "HV";
           updateTempWirePreview();
         }
+      } else if (e.key === "p" || e.key === "P") {
+        togglePalette();
       } else if (e.key === "Escape") {
         cancelActiveWire();
         closeModal();
@@ -726,12 +802,43 @@
     });
   }
 
+  function togglePalette(forceState) {
+    const sidebar = document.getElementById("palette-sidebar");
+    const sliderTab = document.getElementById("palette-slider-tab");
+    const iconBtn = document.getElementById("btn-palette-icon");
+    const iconTab = document.getElementById("palette-tab-icon");
+    const collapseBtn = document.getElementById("btn-collapse-palette");
+
+    if (!sidebar) return;
+    const isCurrentlyCollapsed = sidebar.classList.contains("collapsed");
+    const shouldCollapse = forceState !== undefined ? forceState : !isCurrentlyCollapsed;
+
+    if (shouldCollapse) {
+      sidebar.classList.add("collapsed");
+      sliderTab?.classList.add("collapsed");
+      if (iconBtn) iconBtn.textContent = "▶";
+      if (iconTab) iconTab.textContent = "▶";
+      if (collapseBtn) collapseBtn.textContent = "▶";
+    } else {
+      sidebar.classList.remove("collapsed");
+      sliderTab?.classList.remove("collapsed");
+      if (iconBtn) iconBtn.textContent = "◀";
+      if (iconTab) iconTab.textContent = "◀";
+      if (collapseBtn) collapseBtn.textContent = "◀";
+    }
+  }
+
   function initToolbar() {
     document.getElementById("btn-tool-select")?.addEventListener("click", () => setTool("select"));
     document.getElementById("btn-tool-wire")?.addEventListener("click", () => setTool("wire"));
     document.getElementById("btn-tool-delete")?.addEventListener("click", () => setTool("delete"));
     document.getElementById("btn-add-symbol")?.addEventListener("click", () => openModal());
     document.getElementById("btn-clear-canvas")?.addEventListener("click", () => clearCanvas());
+
+    // Component Palette Slide / Collapse Controls
+    document.getElementById("btn-toggle-palette")?.addEventListener("click", () => togglePalette());
+    document.getElementById("btn-collapse-palette")?.addEventListener("click", () => togglePalette());
+    document.getElementById("palette-slider-tab")?.addEventListener("click", () => togglePalette());
 
     document.getElementById("btn-sim-toggle")?.addEventListener("click", () => {
       state.isSimRunning = !state.isSimRunning;
@@ -1029,6 +1136,49 @@
       height: "100%"
     });
 
+    if (spec.id === "POWER_RAIL") {
+      svg.appendChild(createSVGElement("rect", { x: -90, y: -42, width: 180, height: 84, rx: 5, fill: "#f8fafc", stroke: "#334155", "stroke-width": 1.5 }));
+      svg.appendChild(createSVGElement("rect", { x: -84, y: -36, width: 168, height: 32, rx: 3, fill: "#fee2e2", stroke: "#ef4444", "stroke-width": 1 }));
+      const tVcc = createSVGElement("text", { x: -76, y: -16, fill: "#b91c1c", "font-family": "DM Mono", "font-weight": "bold", "font-size": 10 });
+      tVcc.textContent = "+5V (VCC BUS)";
+      svg.appendChild(tVcc);
+      svg.appendChild(createSVGElement("rect", { x: -84, y: 4, width: 168, height: 32, rx: 3, fill: "#e0f2fe", stroke: "#0284c7", "stroke-width": 1 }));
+      const tGnd = createSVGElement("text", { x: -76, y: 24, fill: "#0369a1", "font-family": "DM Mono", "font-weight": "bold", "font-size": 10 });
+      tGnd.textContent = "GND (0V BUS)";
+      svg.appendChild(tGnd);
+      previewContainer.appendChild(svg);
+      return;
+    }
+
+    if (spec.id === "SW_RAIL_8") {
+      svg.appendChild(createSVGElement("rect", { x: -110, y: -36, width: 220, height: 72, rx: 5, fill: "#0f172a", stroke: "#334155", "stroke-width": 1.5 }));
+      const tHdr = createSVGElement("text", { x: 0, y: -20, "text-anchor": "middle", fill: "#38bdf8", "font-family": "DM Mono", "font-weight": "bold", "font-size": 10 });
+      tHdr.textContent = "8-BIT SWITCH RAIL (SW0-7)";
+      svg.appendChild(tHdr);
+      for (let i = 0; i < 8; i++) {
+        const sx = -96 + i * 27;
+        svg.appendChild(createSVGElement("rect", { x: sx, y: -6, width: 22, height: 16, rx: 2, fill: "#1e293b", stroke: "#475569", "stroke-width": 1 }));
+        svg.appendChild(createSVGElement("rect", { x: sx + 2, y: -4, width: 9, height: 12, rx: 1.5, fill: "#ef4444" }));
+        svg.appendChild(createSVGElement("circle", { cx: sx + 11, cy: 22, r: 2.5, fill: "#fffdf2", stroke: "#a00000", "stroke-width": 1 }));
+      }
+      previewContainer.appendChild(svg);
+      return;
+    }
+
+    if (spec.id === "LED_RAIL_8") {
+      svg.appendChild(createSVGElement("rect", { x: -110, y: -36, width: 220, height: 72, rx: 5, fill: "#0f172a", stroke: "#334155", "stroke-width": 1.5 }));
+      const tHdr = createSVGElement("text", { x: 0, y: -20, "text-anchor": "middle", fill: "#10b981", "font-family": "DM Mono", "font-weight": "bold", "font-size": 10 });
+      tHdr.textContent = "8-BIT LED RAIL (L0-7)";
+      svg.appendChild(tHdr);
+      for (let i = 0; i < 8; i++) {
+        const sx = -96 + i * 27;
+        svg.appendChild(createSVGElement("circle", { cx: sx + 11, cy: -6, r: 2.5, fill: "#fffdf2", stroke: "#a00000", "stroke-width": 1 }));
+        svg.appendChild(createSVGElement("circle", { cx: sx + 11, cy: 12, r: 6.5, fill: "#1e3a24", stroke: "#0f172a", "stroke-width": 1 }));
+      }
+      previewContainer.appendChild(svg);
+      return;
+    }
+
     if (spec.category === "power") {
       if (spec.id === "VCC") {
         svg.appendChild(createSVGElement("line", { x1: 0, y1: 15, x2: 0, y2: -15, stroke: "#a00000", "stroke-width": 2 }));
@@ -1214,7 +1364,7 @@
       ref: getNextRef(spec.refPrefix),
       x: gx,
       y: gy,
-      state: spec.customState ? { ...spec.customState } : {}
+      state: spec.customState ? JSON.parse(JSON.stringify(spec.customState)) : {}
     };
 
     state.components.push(comp);
@@ -1511,6 +1661,25 @@
       return { x: pinNum === 1 ? comp.x - 40 : comp.x + 40, y: comp.y };
     }
 
+    if (comp.type === "POWER_RAIL") {
+      // Dual power bus: Pins 1..4 (+5V top), Pins 5..8 (GND bottom)
+      if (pinNum <= 4) {
+        return { x: comp.x - 75 + (pinNum - 1) * 50, y: comp.y - 20 };
+      } else {
+        return { x: comp.x - 75 + (pinNum - 5) * 50, y: comp.y + 20 };
+      }
+    }
+
+    if (comp.type === "SW_RAIL_8") {
+      // 8-Bit Switch Rail: Pins 1..8 (SW0..SW7 outputs at bottom)
+      return { x: comp.x - 192 + (pinNum - 1) * 55, y: comp.y + 36 };
+    }
+
+    if (comp.type === "LED_RAIL_8") {
+      // 8-Bit LED Rail: Pins 1..8 (L0..L7 inputs at top)
+      return { x: comp.x - 192 + (pinNum - 1) * 55, y: comp.y - 34 };
+    }
+
     // Standard Dual-In-Line IC Packages (DIP-14, DIP-16)
     const dims = getComponentDims(comp.type);
     const boxX = comp.x - dims.w / 2;
@@ -1531,6 +1700,10 @@
   }
 
   function getComponentDims(type) {
+    if (type === "POWER_RAIL") return { w: 260, h: 72 };
+    if (type === "SW_RAIL_8") return { w: 480, h: 84 };
+    if (type === "LED_RAIL_8") return { w: 480, h: 84 };
+
     const spec = LIBRARY[type];
     if (spec.category === "power" || spec.category === "io" || spec.id === "DIODE") {
       return { w: 70, h: 50 };
@@ -1830,7 +2003,7 @@
           const comp = state.components.find((c) => c.id === compId);
           if (!comp) continue;
 
-          // Primary drivers: VCC, GND, SWITCH, CLOCK
+          // Primary drivers: VCC, GND, SWITCH, CLOCK, POWER_RAIL, SW_RAIL_8
           if (comp.type === "VCC") {
             netVal = 1;
             break;
@@ -1842,6 +2015,13 @@
             break;
           } else if (comp.type === "CLOCK") {
             netVal = comp.state?.value ? 1 : 0;
+            break;
+          } else if (comp.type === "POWER_RAIL") {
+            netVal = pinNum <= 4 ? 1 : 0;
+            break;
+          } else if (comp.type === "SW_RAIL_8") {
+            const vals = comp.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+            netVal = vals[pinNum - 1] ? 1 : 0;
             break;
           } else if (icOutputVoltages[pk] !== undefined) {
             // IC output pin driving this net
@@ -1910,6 +2090,31 @@
       if (!changed && pass >= 2) break;
     }
 
+    // Standalone driver voltages for standalone inspection / pins without connected wires
+    state.components.forEach((c) => {
+      if (c.type === "VCC") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = 1;
+      } else if (c.type === "GND") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = 0;
+      } else if (c.type === "SWITCH") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = c.state?.value ? 1 : 0;
+      } else if (c.type === "CLOCK") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = c.state?.value ? 1 : 0;
+      } else if (c.type === "POWER_RAIL") {
+        for (let i = 1; i <= 4; i++) {
+          if (pinVoltages[`${c.id}:${i}`] === undefined) pinVoltages[`${c.id}:${i}`] = 1;
+        }
+        for (let i = 5; i <= 8; i++) {
+          if (pinVoltages[`${c.id}:${i}`] === undefined) pinVoltages[`${c.id}:${i}`] = 0;
+        }
+      } else if (c.type === "SW_RAIL_8") {
+        const vals = c.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < 8; i++) {
+          if (pinVoltages[`${c.id}:${i + 1}`] === undefined) pinVoltages[`${c.id}:${i + 1}`] = vals[i] ? 1 : 0;
+        }
+      }
+    });
+
     // 3. Final Wire States (Equipotential wire logic levels)
     state.wires.forEach((w) => {
       const kFrom = `${w.from.compId}:${w.from.pinNum}`;
@@ -1934,6 +2139,25 @@
           wirePath.classList.add("state-low");
           wirePath.classList.remove("state-high");
         }
+      }
+    });
+
+    // Update terminal visual dots in real time
+    document.querySelectorAll(".pin-terminal-visual").forEach((vis) => {
+      const g = vis.parentElement;
+      if (!g) return;
+      const compId = g.getAttribute("data-comp-id");
+      const pinNum = g.getAttribute("data-pin-num");
+      if (!compId || !pinNum) return;
+      const volt = pinVoltages[`${compId}:${pinNum}`];
+      if (volt === 1) {
+        vis.classList.add("state-high");
+        vis.classList.remove("state-low");
+        vis.setAttribute("fill", "#00ff66");
+      } else if (volt === 0) {
+        vis.classList.add("state-low");
+        vis.classList.remove("state-high");
+        vis.setAttribute("fill", vis.classList.contains("unconnected") ? "#fffdf2" : "#0a8c2f");
       }
     });
 
@@ -1996,6 +2220,39 @@
           swText.textContent = swVal;
           swKnob.setAttribute("x", c.state.value ? c.x + 4 : c.x - 24);
           swKnob.setAttribute("fill", c.state.value ? "#22c55e" : "#ef4444");
+        }
+      } else if (c.type === "SW_RAIL_8") {
+        const vals = c.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < 8; i++) {
+          const val = vals[i] ? 1 : 0;
+          const knob = document.getElementById(`sw8-knob-${c.id}-${i}`);
+          const txt = document.getElementById(`sw8-val-${c.id}-${i}`);
+          const swCenterX = c.x - 192 + i * 55;
+          if (knob) {
+            knob.setAttribute("x", val === 1 ? (swCenterX + 2).toString() : (swCenterX - 18).toString());
+            knob.setAttribute("fill", val === 1 ? "#22c55e" : "#ef4444");
+          }
+          if (txt) {
+            txt.textContent = val.toString();
+            txt.setAttribute("x", val === 1 ? (swCenterX - 8).toString() : (swCenterX + 9).toString());
+          }
+        }
+      } else if (c.type === "LED_RAIL_8") {
+        for (let i = 0; i < 8; i++) {
+          const val = pinVoltages[`${c.id}:${i + 1}`] || 0;
+          const glow = document.getElementById(`led8-glow-${c.id}-${i}`);
+          const core = document.getElementById(`led8-core-${c.id}-${i}`);
+          const txt = document.getElementById(`led8-val-${c.id}-${i}`);
+          if (glow) {
+            glow.setAttribute("opacity", val === 1 ? "0.95" : "0.0");
+          }
+          if (core) {
+            core.setAttribute("fill", val === 1 ? "#00ff66" : "#1e3a24");
+          }
+          if (txt) {
+            txt.textContent = `[${val}]`;
+            txt.setAttribute("fill", val === 1 ? "#22c55e" : "#64748b");
+          }
         }
       }
     });
@@ -2153,6 +2410,21 @@
   function renderSingleComponent(g, c) {
     const spec = LIBRARY[c.type];
     const dims = getComponentDims(c.type);
+
+    if (c.type === "POWER_RAIL") {
+      renderPowerRail(g, c, spec, dims);
+      return;
+    }
+
+    if (c.type === "SW_RAIL_8") {
+      renderSwitchRail8(g, c, spec, dims);
+      return;
+    }
+
+    if (c.type === "LED_RAIL_8") {
+      renderLedRail8(g, c, spec, dims);
+      return;
+    }
 
     if (spec.category === "power") {
       renderPowerSymbol(g, c, spec);
@@ -2739,6 +3011,439 @@
     });
     refT.textContent = c.ref + " 1N4148";
     g.appendChild(refT);
+  }
+
+  function renderPowerRail(g, c, spec, dims) {
+    const boxX = c.x - dims.w / 2;
+    const boxY = c.y - dims.h / 2;
+
+    // Grab area for dragging
+    g.appendChild(createSVGElement("rect", {
+      x: boxX - 10,
+      y: boxY - 10,
+      width: dims.w + 20,
+      height: dims.h + 20,
+      class: "comp-grab-area"
+    }));
+
+    // Main carrier body
+    g.appendChild(createSVGElement("rect", {
+      x: boxX,
+      y: boxY,
+      width: dims.w,
+      height: dims.h,
+      rx: 6,
+      fill: "#f8fafc",
+      stroke: "#334155",
+      "stroke-width": 2,
+      class: "comp-body",
+      "pointer-events": "none"
+    }));
+
+    // Top Label / Title
+    const refT = createSVGElement("text", {
+      x: c.x,
+      y: boxY - 8,
+      "text-anchor": "middle",
+      fill: "#cc0000",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 12,
+      "pointer-events": "none"
+    });
+    refT.textContent = `${c.ref} • POWER BUS RAIL`;
+    g.appendChild(refT);
+
+    // --- TOP +5V BUS BAR ---
+    g.appendChild(createSVGElement("rect", {
+      x: boxX + 8,
+      y: boxY + 6,
+      width: dims.w - 16,
+      height: 26,
+      rx: 4,
+      fill: "#fee2e2",
+      stroke: "#ef4444",
+      "stroke-width": 1.2,
+      "pointer-events": "none"
+    }));
+
+    const vccBusLbl = createSVGElement("text", {
+      x: boxX + 16,
+      y: boxY + 23,
+      fill: "#b91c1c",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 11,
+      "pointer-events": "none"
+    });
+    vccBusLbl.textContent = "+5V (VCC)";
+    g.appendChild(vccBusLbl);
+
+    // Pins 1..4 (+5V Terminals)
+    for (let pNum = 1; pNum <= 4; pNum++) {
+      const pPos = getPinWorldPos(c, pNum);
+
+      // Pin Number Label
+      const pLbl = createSVGElement("text", {
+        x: pPos.x,
+        y: pPos.y - 8,
+        "text-anchor": "middle",
+        fill: "#991b1b",
+        "font-family": "DM Mono",
+        "font-size": 8,
+        "font-weight": "bold",
+        "pointer-events": "none"
+      });
+      pLbl.textContent = `P${pNum}`;
+      g.appendChild(pLbl);
+
+      g.appendChild(createPinTerminalGroup(c.id, pNum, pPos.x, pPos.y));
+    }
+
+    // --- BOTTOM GND BUS BAR ---
+    g.appendChild(createSVGElement("rect", {
+      x: boxX + 8,
+      y: boxY + 40,
+      width: dims.w - 16,
+      height: 26,
+      rx: 4,
+      fill: "#e0f2fe",
+      stroke: "#0284c7",
+      "stroke-width": 1.2,
+      "pointer-events": "none"
+    }));
+
+    const gndBusLbl = createSVGElement("text", {
+      x: boxX + 16,
+      y: boxY + 57,
+      fill: "#0369a1",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 11,
+      "pointer-events": "none"
+    });
+    gndBusLbl.textContent = "GND (0V)";
+    g.appendChild(gndBusLbl);
+
+    // Pins 5..8 (GND Terminals)
+    for (let pNum = 5; pNum <= 8; pNum++) {
+      const pPos = getPinWorldPos(c, pNum);
+
+      // Pin Number Label
+      const pLbl = createSVGElement("text", {
+        x: pPos.x,
+        y: pPos.y + 14,
+        "text-anchor": "middle",
+        fill: "#075985",
+        "font-family": "DM Mono",
+        "font-size": 8,
+        "font-weight": "bold",
+        "pointer-events": "none"
+      });
+      pLbl.textContent = `P${pNum}`;
+      g.appendChild(pLbl);
+
+      g.appendChild(createPinTerminalGroup(c.id, pNum, pPos.x, pPos.y));
+    }
+  }
+
+  function renderSwitchRail8(g, c, spec, dims) {
+    const boxX = c.x - dims.w / 2;
+    const boxY = c.y - dims.h / 2;
+
+    // Grab area for moving the component
+    g.appendChild(createSVGElement("rect", {
+      x: boxX - 10,
+      y: boxY - 10,
+      width: dims.w + 20,
+      height: dims.h + 20,
+      class: "comp-grab-area"
+    }));
+
+    // Industrial Dark Trainer Chassis
+    g.appendChild(createSVGElement("rect", {
+      x: boxX,
+      y: boxY,
+      width: dims.w,
+      height: dims.h,
+      rx: 6,
+      fill: "#0f172a",
+      stroke: "#334155",
+      "stroke-width": 2,
+      class: "comp-body",
+      "pointer-events": "none"
+    }));
+
+    // Title label
+    const title = createSVGElement("text", {
+      x: c.x,
+      y: boxY - 8,
+      "text-anchor": "middle",
+      fill: "#cc0000",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 12,
+      "pointer-events": "none"
+    });
+    title.textContent = `${c.ref} • 8-BIT LOGIC INPUT SWITCH BANK (SW0 - SW7)`;
+    g.appendChild(title);
+
+    // Channel label subtitle on chassis
+    const sub = createSVGElement("text", {
+      x: boxX + 14,
+      y: boxY + 16,
+      fill: "#38bdf8",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 9,
+      "pointer-events": "none"
+    });
+    sub.textContent = "LOGIC INPUTS (0/1)";
+    g.appendChild(sub);
+
+    const vals = c.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+
+    for (let i = 0; i < 8; i++) {
+      const pinNum = i + 1;
+      const swCenterX = c.x - 192 + i * 55;
+      const swCenterY = c.y - 4;
+      const val = vals[i] ? 1 : 0;
+      const pPos = getPinWorldPos(c, pinNum);
+
+      // Switch Channel Name Label
+      const swName = createSVGElement("text", {
+        x: swCenterX,
+        y: boxY + 16,
+        "text-anchor": "middle",
+        fill: "#94a3b8",
+        "font-family": "DM Mono",
+        "font-size": 10,
+        "font-weight": "bold",
+        "pointer-events": "none"
+      });
+      swName.textContent = `SW${i}`;
+      g.appendChild(swName);
+
+      // Switch Track / Bezel
+      g.appendChild(createSVGElement("rect", {
+        x: swCenterX - 18,
+        y: swCenterY - 10,
+        width: 36,
+        height: 20,
+        rx: 4,
+        fill: "#1e293b",
+        stroke: "#475569",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
+
+      // Sliding Knob
+      const knob = createSVGElement("rect", {
+        id: `sw8-knob-${c.id}-${i}`,
+        x: val === 1 ? swCenterX + 2 : swCenterX - 18,
+        y: swCenterY - 8,
+        width: 16,
+        height: 16,
+        rx: 3,
+        fill: val === 1 ? "#22c55e" : "#ef4444",
+        "pointer-events": "none"
+      });
+      g.appendChild(knob);
+
+      // Digital readout text inside bezel
+      const valTxt = createSVGElement("text", {
+        id: `sw8-val-${c.id}-${i}`,
+        x: val === 1 ? swCenterX - 8 : swCenterX + 9,
+        y: swCenterY + 4,
+        "text-anchor": "middle",
+        fill: "#ffffff",
+        "font-family": "DM Mono",
+        "font-weight": "bold",
+        "font-size": 10,
+        "pointer-events": "none"
+      });
+      valTxt.textContent = val.toString();
+      g.appendChild(valTxt);
+
+      // Terminal stem line down to terminal
+      g.appendChild(createSVGElement("line", {
+        x1: swCenterX,
+        y1: swCenterY + 10,
+        x2: swCenterX,
+        y2: pPos.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
+
+      // Output Terminal Group
+      g.appendChild(createPinTerminalGroup(c.id, pinNum, pPos.x, pPos.y));
+
+      // Transparent interactive hit area to toggle this individual switch
+      const hitRect = createSVGElement("rect", {
+        x: swCenterX - 20,
+        y: swCenterY - 12,
+        width: 40,
+        height: 24,
+        rx: 4,
+        fill: "transparent",
+        style: "cursor: pointer;"
+      });
+
+      hitRect.addEventListener("mousedown", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!c.state.values) c.state.values = [0, 0, 0, 0, 0, 0, 0, 0];
+        c.state.values[i] = c.state.values[i] ? 0 : 1;
+        runSimulation();
+      });
+
+      g.appendChild(hitRect);
+    }
+  }
+
+  function renderLedRail8(g, c, spec, dims) {
+    const boxX = c.x - dims.w / 2;
+    const boxY = c.y - dims.h / 2;
+
+    // Grab area for moving the component
+    g.appendChild(createSVGElement("rect", {
+      x: boxX - 10,
+      y: boxY - 10,
+      width: dims.w + 20,
+      height: dims.h + 20,
+      class: "comp-grab-area"
+    }));
+
+    // Industrial Dark Trainer Chassis
+    g.appendChild(createSVGElement("rect", {
+      x: boxX,
+      y: boxY,
+      width: dims.w,
+      height: dims.h,
+      rx: 6,
+      fill: "#0f172a",
+      stroke: "#334155",
+      "stroke-width": 2,
+      class: "comp-body",
+      "pointer-events": "none"
+    }));
+
+    // Title label
+    const title = createSVGElement("text", {
+      x: c.x,
+      y: boxY - 8,
+      "text-anchor": "middle",
+      fill: "#cc0000",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 12,
+      "pointer-events": "none"
+    });
+    title.textContent = `${c.ref} • 8-BIT LOGIC OUTPUT LED DISPLAY (L0 - L7)`;
+    g.appendChild(title);
+
+    // Channel label subtitle on chassis
+    const sub = createSVGElement("text", {
+      x: boxX + 14,
+      y: boxY + 74,
+      fill: "#10b981",
+      "font-family": "DM Mono",
+      "font-weight": "bold",
+      "font-size": 9,
+      "pointer-events": "none"
+    });
+    sub.textContent = "LOGIC MONITORS (L0 - L7)";
+    g.appendChild(sub);
+
+    for (let i = 0; i < 8; i++) {
+      const pinNum = i + 1;
+      const ledCenterX = c.x - 192 + i * 55;
+      const bulbCenterY = c.y + 4;
+      const pPos = getPinWorldPos(c, pinNum);
+      const initialVal = state.pinVoltages ? (state.pinVoltages[`${c.id}:${pinNum}`] || 0) : 0;
+
+      // Stem line from top input terminal down to bulb
+      g.appendChild(createSVGElement("line", {
+        x1: ledCenterX,
+        y1: pPos.y,
+        x2: ledCenterX,
+        y2: bulbCenterY - 12,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
+
+      // Input Terminal Group at top
+      g.appendChild(createPinTerminalGroup(c.id, pinNum, pPos.x, pPos.y));
+
+      // Outer bezel ring
+      g.appendChild(createSVGElement("circle", {
+        cx: ledCenterX,
+        cy: bulbCenterY,
+        r: 13,
+        fill: "#1e293b",
+        stroke: "#475569",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
+
+      // Glow filter circle
+      const glow = createSVGElement("circle", {
+        id: `led8-glow-${c.id}-${i}`,
+        cx: ledCenterX,
+        cy: bulbCenterY,
+        r: 18,
+        fill: "#00ff66",
+        opacity: initialVal === 1 ? "0.95" : "0.0",
+        class: "led-glow",
+        filter: "blur(6px)",
+        "pointer-events": "none"
+      });
+      g.appendChild(glow);
+
+      // Core bulb
+      const core = createSVGElement("circle", {
+        id: `led8-core-${c.id}-${i}`,
+        cx: ledCenterX,
+        cy: bulbCenterY,
+        r: 10,
+        fill: initialVal === 1 ? "#00ff66" : "#1e3a24",
+        stroke: "#0f172a",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      });
+      g.appendChild(core);
+
+      // Channel name below bulb
+      const ledName = createSVGElement("text", {
+        x: ledCenterX,
+        y: bulbCenterY + 24,
+        "text-anchor": "middle",
+        fill: "#94a3b8",
+        "font-family": "DM Mono",
+        "font-size": 10,
+        "font-weight": "bold",
+        "pointer-events": "none"
+      });
+      ledName.textContent = `L${i}`;
+      g.appendChild(ledName);
+
+      // Binary readout badge
+      const valTxt = createSVGElement("text", {
+        id: `led8-val-${c.id}-${i}`,
+        x: ledCenterX,
+        y: bulbCenterY + 34,
+        "text-anchor": "middle",
+        fill: initialVal === 1 ? "#22c55e" : "#64748b",
+        "font-family": "DM Mono",
+        "font-size": 9,
+        "font-weight": "bold",
+        "pointer-events": "none"
+      });
+      valTxt.textContent = `[${initialVal}]`;
+      g.appendChild(valTxt);
+    }
   }
 
   function createPinTerminalGroup(compId, pinNum, x, y) {

@@ -272,16 +272,77 @@
   overflow: hidden;
 }
 
-/* Sidebar Quick Palette */
+/* Sidebar Quick Palette with Smooth Slide Drawer Animation */
 .wb-palette-sidebar {
-  width: 240px;
+  width: 250px;
   background: #ffffff;
   border-right: 1px solid #dce1e6;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   z-index: 20;
-  transition: transform 0.2s ease;
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.wb-palette-sidebar.collapsed {
+  margin-left: -250px;
+}
+
+.wb-palette-collapse-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.wb-palette-collapse-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* Edge Slider Tab Handle (Click or Press P to Toggle) */
+.wb-palette-slider-tab {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 250px;
+  width: 22px;
+  height: 56px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
+  color: #475569;
+  font-size: 11px;
+  font-weight: bold;
+  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s ease, color 0.15s ease;
+  padding: 0;
+}
+
+.wb-palette-slider-tab.collapsed {
+  left: 0;
+}
+
+.wb-palette-slider-tab:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
 }
 
 .wb-palette-header {

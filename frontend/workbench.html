@@ -64,10 +64,7 @@
         <option value="7483_adder">Exp 2: 7483 4-Bit Binary Full Adder Test</option>
         <option value="7485_comparator">Exp 3: 7485 4-Bit Magnitude Comparator Test</option>
         <option value="74151_mux">Exp 4: 74151 8:1 Multiplexer Experiment</option>
-        <option value="74153_mux">Exp 5: 74153 4:1 Multiplexer Experiment</option>
-        <option value="74153_case1_3var">Exp 6: 74153 8:1 MUX: F(C,B,A) = Σm(0,1,3,4,7) [Report Case 1]</option>
-        <option value="74153_8to1_function">Exp 7: 74153 8:1 MUX: F(A,B,C,D) = Σm(0,1,2,4,7,8,9,11,12,14) [Report Case 2]</option>
-        <option value="diode_or">Exp 8: Diode OR Logic Gate Circuit</option>
+        <option value="diode_or">Exp 5: Diode OR Logic Gate Circuit</option>
       </select>
 
       <div class="wb-toolbar-divider"></div>
@@ -164,14 +161,6 @@
               <div class="wb-palette-item-info">
                 <span class="wb-palette-item-name">74151</span>
                 <span class="wb-palette-item-desc">8:1 Data MUX</span>
-              </div>
-              <span class="wb-palette-tag tag-ic">MUX</span>
-            </div>
-
-            <div class="wb-palette-item" data-type="74153">
-              <div class="wb-palette-item-info">
-                <span class="wb-palette-item-name">74153</span>
-                <span class="wb-palette-item-desc">Dual 4:1 Data MUX</span>
               </div>
               <span class="wb-palette-tag tag-ic">MUX</span>
             </div>
@@ -276,23 +265,6 @@
         <!-- Zoom group, wires, components dynamically rendered here -->
       </svg>
 
-      <!-- Floating Wire Action Pill (when a wire is selected) -->
-      <div class="wb-wire-action-pill" id="wire-action-pill" style="display: none;">
-        <span class="pill-badge">WIRE</span>
-        <span class="pill-info" id="wire-pill-info">U1.3 ➔ LED1.1</span>
-        <span class="pill-state" id="wire-pill-state">[HIGH]</span>
-        <button class="pill-btn-del" id="btn-wire-pill-delete" title="Delete this wire (Shortcut: Del or Backspace)">🗑 Disconnect</button>
-      </div>
-
-      <!-- Custom Pin / Terminal Context Menu -->
-      <div class="wb-context-menu" id="wb-context-menu" style="display: none;">
-        <div class="ctx-header" id="ctx-header">Pin 1 (1A)</div>
-        <div class="ctx-status" id="ctx-status">Signal: HIGH (1) • 1 wire(s)</div>
-        <div class="ctx-divider"></div>
-        <button class="ctx-item" id="ctx-btn-start-wire">⚡ Route Wire From Here</button>
-        <button class="ctx-item ctx-danger" id="ctx-btn-disconnect">🗑 Disconnect All Wires</button>
-      </div>
-
       <!-- Bottom Hint Bar -->
       <div class="wb-hint-bar">
         <span class="wb-hint-badge">HELP</span>
@@ -312,7 +284,7 @@
       <div class="modal-header-bar">
         <div class="modal-title-group">
           <h2 class="modal-title">Choose Symbol</h2>
-          <span class="modal-badge">Campus IC Library (13 items loaded)</span>
+          <span class="modal-badge">Campus IC Library (12 items loaded)</span>
         </div>
         <button class="modal-close-btn" id="btn-modal-close" title="Close">&times;</button>
       </div>

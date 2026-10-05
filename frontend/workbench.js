@@ -494,6 +494,161 @@
       }
     },
 
+    // --- Sequential & Counter ICs (DIP-14) ---
+    "7490": {
+      id: "7490",
+      name: "7490 (Decade / BCD Counter)",
+      category: "counters",
+      package: "DIP-14",
+      pinsCount: 14,
+      refPrefix: "U",
+      desc: "4-bit ripple decade counter containing a divide-by-two section (CP0 -> QA) and a divide-by-five section (CP1 -> QB, QC, QD). Gated zero reset (R0_1·R0_2) and gated preset-9 (R9_1·R9_2).",
+      datasheet: "VCC: Pin 5, GND: Pin 10. Clocks: CP0(14), CP1(1). Resets: R0(2,3), R9(6,7). Outputs: QA(12), QB(9), QC(8), QD(11).",
+      vccPin: 5,
+      gndPin: 10,
+      pins: [
+        { num: 1, name: "CP1", type: "in", side: "left" },
+        { num: 2, name: "R0(1)", type: "in", side: "left" },
+        { num: 3, name: "R0(2)", type: "in", side: "left" },
+        { num: 4, name: "NC", type: "pwr", side: "left" },
+        { num: 5, name: "VCC", type: "pwr", side: "left" },
+        { num: 6, name: "R9(1)", type: "in", side: "left" },
+        { num: 7, name: "R9(2)", type: "in", side: "left" },
+        { num: 14, name: "CP0", type: "in", side: "right" },
+        { num: 13, name: "NC", type: "pwr", side: "right" },
+        { num: 12, name: "QA", type: "out", side: "right" },
+        { num: 11, name: "QD", type: "out", side: "right" },
+        { num: 10, name: "GND", type: "pwr", side: "right" },
+        { num: 9, name: "QB", type: "out", side: "right" },
+        { num: 8, name: "QC", type: "out", side: "right" }
+      ],
+      customState: { qa: 0, qb: 0, qc: 0, qd: 0, lastClkA: 1, lastClkB: 1 },
+      evaluate: (inputs, comp) => {
+        if (!comp.state) {
+          comp.state = { qa: 0, qb: 0, qc: 0, qd: 0, lastClkA: 1, lastClkB: 1 };
+        }
+        const s = comp.state;
+
+        const r0_1 = inputs["2"] || 0;
+        const r0_2 = inputs["3"] || 0;
+        const r9_1 = inputs["6"] || 0;
+        const r9_2 = inputs["7"] || 0;
+
+        const isReset0 = (r0_1 === 1 && r0_2 === 1);
+        const isSet9 = (r9_1 === 1 && r9_2 === 1);
+
+        if (isSet9) {
+          s.qa = 1; s.qb = 0; s.qc = 0; s.qd = 1;
+        } else if (isReset0) {
+          s.qa = 0; s.qb = 0; s.qc = 0; s.qd = 0;
+        } else {
+          // Clock A: Pin 14 (Falling edge triggers QA toggle)
+          const clkA = inputs["14"] !== undefined ? inputs["14"] : 1;
+          const lastClkA = s.lastClkA !== undefined ? s.lastClkA : 1;
+          if (lastClkA === 1 && clkA === 0) {
+            s.qa = 1 - s.qa;
+          }
+          s.lastClkA = clkA;
+
+          // Clock B: Pin 1 (Falling edge triggers ÷5 advance)
+          const clkB = inputs["1"] !== undefined ? inputs["1"] : 1;
+          const lastClkB = s.lastClkB !== undefined ? s.lastClkB : 1;
+          if (lastClkB === 1 && clkB === 0) {
+            if (s.qd === 0 && s.qc === 0 && s.qb === 0) {
+              s.qb = 1; s.qc = 0; s.qd = 0;
+            } else if (s.qd === 0 && s.qc === 0 && s.qb === 1) {
+              s.qb = 0; s.qc = 1; s.qd = 0;
+            } else if (s.qd === 0 && s.qc === 1 && s.qb === 0) {
+              s.qb = 1; s.qc = 1; s.qd = 0;
+            } else if (s.qd === 0 && s.qc === 1 && s.qb === 1) {
+              s.qb = 0; s.qc = 0; s.qd = 1;
+            } else {
+              s.qb = 0; s.qc = 0; s.qd = 0;
+            }
+          }
+          s.lastClkB = clkB;
+        }
+
+        return {
+          "12": s.qa,
+          "9": s.qb,
+          "8": s.qc,
+          "11": s.qd
+        };
+      }
+    },
+
+    "7493": {
+      id: "7493",
+      name: "7493 (4-Bit Binary Counter)",
+      category: "counters",
+      package: "DIP-14",
+      pinsCount: 14,
+      refPrefix: "U",
+      desc: "4-bit binary ripple counter containing a divide-by-two section (CP0 -> QA) and a divide-by-eight section (CP1 -> QB, QC, QD). Gated master reset (R0_1·R0_2).",
+      datasheet: "VCC: Pin 5, GND: Pin 10. Clocks: CP0(14), CP1(1). Resets: R0(2,3). Outputs: QA(12), QB(9), QC(8), QD(11).",
+      vccPin: 5,
+      gndPin: 10,
+      pins: [
+        { num: 1, name: "CP1", type: "in", side: "left" },
+        { num: 2, name: "R0(1)", type: "in", side: "left" },
+        { num: 3, name: "R0(2)", type: "in", side: "left" },
+        { num: 4, name: "NC", type: "pwr", side: "left" },
+        { num: 5, name: "VCC", type: "pwr", side: "left" },
+        { num: 6, name: "NC", type: "pwr", side: "left" },
+        { num: 7, name: "NC", type: "pwr", side: "left" },
+        { num: 14, name: "CP0", type: "in", side: "right" },
+        { num: 13, name: "NC", type: "pwr", side: "right" },
+        { num: 12, name: "QA", type: "out", side: "right" },
+        { num: 11, name: "QD", type: "out", side: "right" },
+        { num: 10, name: "GND", type: "pwr", side: "right" },
+        { num: 9, name: "QB", type: "out", side: "right" },
+        { num: 8, name: "QC", type: "out", side: "right" }
+      ],
+      customState: { qa: 0, qb: 0, qc: 0, qd: 0, lastClkA: 1, lastClkB: 1 },
+      evaluate: (inputs, comp) => {
+        if (!comp.state) {
+          comp.state = { qa: 0, qb: 0, qc: 0, qd: 0, lastClkA: 1, lastClkB: 1 };
+        }
+        const s = comp.state;
+
+        const r0_1 = inputs["2"] || 0;
+        const r0_2 = inputs["3"] || 0;
+        const isReset0 = (r0_1 === 1 && r0_2 === 1);
+
+        if (isReset0) {
+          s.qa = 0; s.qb = 0; s.qc = 0; s.qd = 0;
+        } else {
+          // Clock A: Pin 14 (Falling edge triggers QA toggle)
+          const clkA = inputs["14"] !== undefined ? inputs["14"] : 1;
+          const lastClkA = s.lastClkA !== undefined ? s.lastClkA : 1;
+          if (lastClkA === 1 && clkA === 0) {
+            s.qa = 1 - s.qa;
+          }
+          s.lastClkA = clkA;
+
+          // Clock B: Pin 1 (Falling edge triggers 3-bit binary increment)
+          const clkB = inputs["1"] !== undefined ? inputs["1"] : 1;
+          const lastClkB = s.lastClkB !== undefined ? s.lastClkB : 1;
+          if (lastClkB === 1 && clkB === 0) {
+            const curVal = (s.qd << 2) | (s.qc << 1) | s.qb;
+            const nextVal = (curVal + 1) % 8;
+            s.qb = nextVal & 1;
+            s.qc = (nextVal >> 1) & 1;
+            s.qd = (nextVal >> 2) & 1;
+          }
+          s.lastClkB = clkB;
+        }
+
+        return {
+          "12": s.qa,
+          "9": s.qb,
+          "8": s.qc,
+          "11": s.qd
+        };
+      }
+    },
+
     // --- Power & Logic Terminals ---
     "VCC": {
       id: "VCC",
@@ -1057,6 +1212,7 @@
     const categories = [
       { id: "gates", title: "Logic Gate ICs (DIP-14)" },
       { id: "msi", title: "Combinational MSI ICs (DIP-16)" },
+      { id: "counters", title: "Sequential & Counters (DIP-14)" },
       { id: "discrete", title: "Diodes & Discrete" },
       { id: "power", title: "Power & Ground Symbols" },
       { id: "io", title: "Inputs, Switches & Probes" }
@@ -2043,7 +2199,7 @@
       // B. Evaluate ICs and Discrete components
       state.components.forEach((c) => {
         const spec = LIBRARY[c.type];
-        if (spec.category === "gates" || spec.category === "msi" || spec.id === "DIODE") {
+        if (spec.category === "gates" || spec.category === "msi" || spec.category === "counters" || spec.id === "DIODE") {
           // Check power rails (VCC and GND)
           if (spec.vccPin && spec.gndPin) {
             const vccVal = pinVoltages[`${c.id}:${spec.vccPin}`];
@@ -4025,6 +4181,168 @@
       state.wires.push({ id: "w2", from: { compId: swB.id, pinNum: 1 }, to: { compId: d2.id, pinNum: 1 }, state: 0 });
       state.wires.push({ id: "w3", from: { compId: d1.id, pinNum: 2 }, to: { compId: led.id, pinNum: 1 }, state: 0 });
       state.wires.push({ id: "w4", from: { compId: d2.id, pinNum: 2 }, to: { compId: led.id, pinNum: 1 }, state: 0 });
+
+    } else if (presetKey === "7490_decade") {
+      // Preset 9: 7490 BCD Decade Counter (Mod-10, 0..9)
+      const pwrRail = addComponentAt("POWER_RAIL", 460, 100);
+      const clk = addComponentAt("CLOCK", 160, 360);
+      const ic = addComponentAt("7490", 460, 360);
+      const ledRail = addComponentAt("LED_RAIL_8", 780, 360);
+
+      // Power: VCC to Pin 5, GND to Pin 10
+      state.wires.push({ id: "w_pwr_vcc", from: { compId: pwrRail.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 1 });
+      state.wires.push({ id: "w_pwr_gnd", from: { compId: pwrRail.id, pinNum: 5 }, to: { compId: ic.id, pinNum: 10 }, state: 0 });
+
+      // Inactive Resets: R0(1)[Pin 2], R0(2)[Pin 3], R9(1)[Pin 6], R9(2)[Pin 7] tied to GND
+      state.wires.push({ id: "w_r0_1", from: { compId: pwrRail.id, pinNum: 6 }, to: { compId: ic.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_r0_2", from: { compId: pwrRail.id, pinNum: 7 }, to: { compId: ic.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w_r9_1", from: { compId: pwrRail.id, pinNum: 8 }, to: { compId: ic.id, pinNum: 6 }, state: 0 });
+      state.wires.push({ id: "w_r9_2", from: { compId: pwrRail.id, pinNum: 8 }, to: { compId: ic.id, pinNum: 7 }, state: 0 });
+
+      // Clock Input: CLOCK Pin 1 -> Pin 14 (CP0)
+      state.wires.push({ id: "w_clk", from: { compId: clk.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 0 });
+
+      // Cascade Jumper: QA (Pin 12) -> CP1 (Pin 1)
+      state.wires.push({
+        id: "w_cascade",
+        from: { compId: ic.id, pinNum: 12 },
+        to: { compId: ic.id, pinNum: 1 },
+        waypoints: [{ x: 570, y: 310 }, { x: 570, y: 220 }, { x: 350, y: 220 }, { x: 350, y: 310 }],
+        state: 0
+      });
+
+      // Output Readouts to LED Rail (L0..L3)
+      state.wires.push({ id: "w_out_qa", from: { compId: ic.id, pinNum: 12 }, to: { compId: ledRail.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_out_qb", from: { compId: ic.id, pinNum: 9 },  to: { compId: ledRail.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_out_qc", from: { compId: ic.id, pinNum: 8 },  to: { compId: ledRail.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w_out_qd", from: { compId: ic.id, pinNum: 11 }, to: { compId: ledRail.id, pinNum: 4 }, state: 0 });
+
+    } else if (presetKey === "7490_mod6") {
+      // Preset 10: 7490 Mod-6 Counter (QC·QB Feedback Reset)
+      const pwrRail = addComponentAt("POWER_RAIL", 460, 100);
+      const clk = addComponentAt("CLOCK", 160, 360);
+      const ic = addComponentAt("7490", 460, 360);
+      const ledRail = addComponentAt("LED_RAIL_8", 780, 360);
+
+      // Power
+      state.wires.push({ id: "w_pwr_vcc", from: { compId: pwrRail.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 1 });
+      state.wires.push({ id: "w_pwr_gnd", from: { compId: pwrRail.id, pinNum: 5 }, to: { compId: ic.id, pinNum: 10 }, state: 0 });
+
+      // R9 tied to GND
+      state.wires.push({ id: "w_r9_1", from: { compId: pwrRail.id, pinNum: 8 }, to: { compId: ic.id, pinNum: 6 }, state: 0 });
+      state.wires.push({ id: "w_r9_2", from: { compId: pwrRail.id, pinNum: 8 }, to: { compId: ic.id, pinNum: 7 }, state: 0 });
+
+      // Mod-6 Feedback: QC (Pin 8) -> R0(1) (Pin 2), QB (Pin 9) -> R0(2) (Pin 3)
+      state.wires.push({
+        id: "w_fb_qc",
+        from: { compId: ic.id, pinNum: 8 },
+        to: { compId: ic.id, pinNum: 2 },
+        waypoints: [{ x: 570, y: 410 }, { x: 570, y: 490 }, { x: 350, y: 490 }, { x: 350, y: 330 }],
+        state: 0
+      });
+      state.wires.push({
+        id: "w_fb_qb",
+        from: { compId: ic.id, pinNum: 9 },
+        to: { compId: ic.id, pinNum: 3 },
+        waypoints: [{ x: 560, y: 390 }, { x: 560, y: 480 }, { x: 360, y: 480 }, { x: 360, y: 350 }],
+        state: 0
+      });
+
+      // Clock Input: CLOCK Pin 1 -> Pin 14 (CP0)
+      state.wires.push({ id: "w_clk", from: { compId: clk.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 0 });
+
+      // Cascade Jumper: QA (Pin 12) -> CP1 (Pin 1)
+      state.wires.push({
+        id: "w_cascade",
+        from: { compId: ic.id, pinNum: 12 },
+        to: { compId: ic.id, pinNum: 1 },
+        waypoints: [{ x: 570, y: 310 }, { x: 570, y: 220 }, { x: 350, y: 220 }, { x: 350, y: 310 }],
+        state: 0
+      });
+
+      // Output Readouts to LED Rail
+      state.wires.push({ id: "w_out_qa", from: { compId: ic.id, pinNum: 12 }, to: { compId: ledRail.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_out_qb", from: { compId: ic.id, pinNum: 9 },  to: { compId: ledRail.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_out_qc", from: { compId: ic.id, pinNum: 8 },  to: { compId: ledRail.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w_out_qd", from: { compId: ic.id, pinNum: 11 }, to: { compId: ledRail.id, pinNum: 4 }, state: 0 });
+
+    } else if (presetKey === "7493_mod16") {
+      // Preset 11: 7493 4-Bit Binary Counter (Mod-16, 0..15)
+      const pwrRail = addComponentAt("POWER_RAIL", 460, 100);
+      const clk = addComponentAt("CLOCK", 160, 360);
+      const ic = addComponentAt("7493", 460, 360);
+      const ledRail = addComponentAt("LED_RAIL_8", 780, 360);
+
+      // Power: VCC to Pin 5, GND to Pin 10
+      state.wires.push({ id: "w_pwr_vcc", from: { compId: pwrRail.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 1 });
+      state.wires.push({ id: "w_pwr_gnd", from: { compId: pwrRail.id, pinNum: 5 }, to: { compId: ic.id, pinNum: 10 }, state: 0 });
+
+      // Inactive Resets: R0(1)[Pin 2], R0(2)[Pin 3] tied to GND
+      state.wires.push({ id: "w_r0_1", from: { compId: pwrRail.id, pinNum: 6 }, to: { compId: ic.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_r0_2", from: { compId: pwrRail.id, pinNum: 7 }, to: { compId: ic.id, pinNum: 3 }, state: 0 });
+
+      // Clock Input: CLOCK Pin 1 -> Pin 14 (CP0)
+      state.wires.push({ id: "w_clk", from: { compId: clk.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 0 });
+
+      // Cascade Jumper: QA (Pin 12) -> CP1 (Pin 1)
+      state.wires.push({
+        id: "w_cascade",
+        from: { compId: ic.id, pinNum: 12 },
+        to: { compId: ic.id, pinNum: 1 },
+        waypoints: [{ x: 570, y: 310 }, { x: 570, y: 220 }, { x: 350, y: 220 }, { x: 350, y: 310 }],
+        state: 0
+      });
+
+      // Output Readouts to LED Rail (L0..L3)
+      state.wires.push({ id: "w_out_qa", from: { compId: ic.id, pinNum: 12 }, to: { compId: ledRail.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_out_qb", from: { compId: ic.id, pinNum: 9 },  to: { compId: ledRail.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_out_qc", from: { compId: ic.id, pinNum: 8 },  to: { compId: ledRail.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w_out_qd", from: { compId: ic.id, pinNum: 11 }, to: { compId: ledRail.id, pinNum: 4 }, state: 0 });
+
+    } else if (presetKey === "7493_mod12") {
+      // Preset 12: 7493 Mod-12 Counter (QD·QC Feedback Reset)
+      const pwrRail = addComponentAt("POWER_RAIL", 460, 100);
+      const clk = addComponentAt("CLOCK", 160, 360);
+      const ic = addComponentAt("7493", 460, 360);
+      const ledRail = addComponentAt("LED_RAIL_8", 780, 360);
+
+      // Power
+      state.wires.push({ id: "w_pwr_vcc", from: { compId: pwrRail.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 1 });
+      state.wires.push({ id: "w_pwr_gnd", from: { compId: pwrRail.id, pinNum: 5 }, to: { compId: ic.id, pinNum: 10 }, state: 0 });
+
+      // Mod-12 Feedback: QD (Pin 11) -> R0(1) (Pin 2), QC (Pin 8) -> R0(2) (Pin 3)
+      state.wires.push({
+        id: "w_fb_qd",
+        from: { compId: ic.id, pinNum: 11 },
+        to: { compId: ic.id, pinNum: 2 },
+        waypoints: [{ x: 570, y: 340 }, { x: 570, y: 490 }, { x: 350, y: 490 }, { x: 350, y: 330 }],
+        state: 0
+      });
+      state.wires.push({
+        id: "w_fb_qc",
+        from: { compId: ic.id, pinNum: 8 },
+        to: { compId: ic.id, pinNum: 3 },
+        waypoints: [{ x: 560, y: 410 }, { x: 560, y: 480 }, { x: 360, y: 480 }, { x: 360, y: 350 }],
+        state: 0
+      });
+
+      // Clock Input: CLOCK Pin 1 -> Pin 14 (CP0)
+      state.wires.push({ id: "w_clk", from: { compId: clk.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 0 });
+
+      // Cascade Jumper: QA (Pin 12) -> CP1 (Pin 1)
+      state.wires.push({
+        id: "w_cascade",
+        from: { compId: ic.id, pinNum: 12 },
+        to: { compId: ic.id, pinNum: 1 },
+        waypoints: [{ x: 570, y: 310 }, { x: 570, y: 220 }, { x: 350, y: 220 }, { x: 350, y: 310 }],
+        state: 0
+      });
+
+      // Output Readouts to LED Rail
+      state.wires.push({ id: "w_out_qa", from: { compId: ic.id, pinNum: 12 }, to: { compId: ledRail.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_out_qb", from: { compId: ic.id, pinNum: 9 },  to: { compId: ledRail.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_out_qc", from: { compId: ic.id, pinNum: 8 },  to: { compId: ledRail.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w_out_qd", from: { compId: ic.id, pinNum: 11 }, to: { compId: ledRail.id, pinNum: 4 }, state: 0 });
     }
 
     render();

@@ -25,6 +25,7 @@
         <a href="multiplexer.html">Multiplexer</a>
         <a href="comparator.html">Comparator</a>
         <a href="adder-subtractor.html">Adder</a>
+        <a href="index.html#mod-counter">Mod Counter</a>
         <a href="schematic.html" style="border-bottom-color: #e9bd4f; color: #ffffff;">Schematic</a>
         <a href="workbench.html" style="color: #e9bd4f; font-weight: 700;">⚡ IC Workbench</a>
       </nav>
@@ -62,6 +63,14 @@
       <button class="circuit-tab-btn" data-circuit="adder_subtractor_4bit">
         <span>4-Bit Adder/Subtractor</span>
         <span class="tab-badge">74LS83 + 74LS86</span>
+      </button>
+      <button class="circuit-tab-btn" data-circuit="counter_74ls90">
+        <span>Decade Counter</span>
+        <span class="tab-badge">IC 74LS90</span>
+      </button>
+      <button class="circuit-tab-btn" data-circuit="counter_74ls93">
+        <span>4-Bit Binary Counter</span>
+        <span class="tab-badge">IC 74LS93</span>
       </button>
     </div>
 
@@ -341,6 +350,129 @@
       </div>
     </div>
 
+    <!-- =====================================================================
+         CONTROL DECK 5: DECADE / BCD COUNTER (IC 74LS90)
+         ===================================================================== -->
+    <div class="circuit-control-deck circuit-deck-section" id="deck-counter90" style="display: none;">
+      <div class="deck-row">
+        <!-- Clock Controls -->
+        <div class="deck-group">
+          <span class="deck-group-label">CLOCK EXCITATION</span>
+          <div style="display: inline-flex; gap: 8px;">
+            <button class="btn-sm active" id="btn-clk-step-90" style="font-family: 'DM Mono', monospace; font-weight: 700;">⚡ Pulse Clock A (CP0)</button>
+            <button class="btn-sm" id="btn-clk-b-step-90" style="font-family: 'DM Mono', monospace;">⚡ Pulse Clock B (CP1)</button>
+            <button class="btn-sm" id="btn-clk-auto-90" style="font-family: 'DM Mono', monospace;">▶ Auto 1Hz</button>
+          </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="output-display-card">
+          <div>
+            <div class="output-display-label">BCD COUNT OUTPUT (QA..QD)</div>
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
+              <span class="status-badge" id="c90-mod-badge" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">Mod-10 (BCD)</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 800; color: #10b981;" id="c90-dec-val">0</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 14px; color: #64748b;" id="c90-bin-val">[QD..QA: 0000]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resets & Cascade Loop -->
+      <div class="deck-row" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+        <div class="deck-group">
+          <span class="deck-group-label">MASTER RESETS (R0: CLEAR TO 0000)</span>
+          <div class="bit-btn-group">
+            <button class="bit-toggle-btn" id="btn-r0-1-90" data-group="c90-r0" data-index="1" title="Reset-to-0 Gate Input 1"><span class="bit-label">R₀(1) [Pin 2]</span><span class="bit-val">0</span></button>
+            <button class="bit-toggle-btn" id="btn-r0-2-90" data-group="c90-r0" data-index="2" title="Reset-to-0 Gate Input 2"><span class="bit-label">R₀(2) [Pin 3]</span><span class="bit-val">0</span></button>
+          </div>
+        </div>
+
+        <div class="deck-group">
+          <span class="deck-group-label">MASTER PRESETS (R9: SET TO 1001)</span>
+          <div class="bit-btn-group">
+            <button class="bit-toggle-btn" id="btn-r9-1-90" data-group="c90-r9" data-index="1" title="Set-to-9 Gate Input 1"><span class="bit-label">R₉(1) [Pin 6]</span><span class="bit-val">0</span></button>
+            <button class="bit-toggle-btn" id="btn-r9-2-90" data-group="c90-r9" data-index="2" title="Set-to-9 Gate Input 2"><span class="bit-label">R₉(2) [Pin 7]</span><span class="bit-val">0</span></button>
+          </div>
+        </div>
+
+        <div class="deck-group">
+          <span class="deck-group-label">CASCADE LINK</span>
+          <button class="btn-sm active" id="btn-cascade-90" title="Connect QA (Pin 12) to CP1 (Pin 1)">🔗 QA ➔ CP1 (Jumper ON)</button>
+        </div>
+      </div>
+
+      <div class="action-presets-row">
+        <div class="preset-btn-list">
+          <span style="font-size: 12px; font-weight: 600; color: #64748b; align-self: center;">Presets:</span>
+          <button class="btn-sm" data-preset="c90-mod10">Mod-10 (BCD 0..9)</button>
+          <button class="btn-sm" data-preset="c90-mod6">Mod-6 (Reset at 6: QC·QB)</button>
+          <button class="btn-sm" data-preset="c90-mod5">Mod-5 (CP1 Alone)</button>
+          <button class="btn-sm" data-preset="c90-mod2">Mod-2 (CP0 Alone)</button>
+          <button class="btn-sm" data-preset="c90-force-r0">Master Reset (0000)</button>
+          <button class="btn-sm" data-preset="c90-force-r9">Preset-9 (1001)</button>
+          <button class="btn-sm" data-preset="c90-reset-count">Zero Count</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         CONTROL DECK 6: 4-BIT BINARY COUNTER (IC 74LS93)
+         ===================================================================== -->
+    <div class="circuit-control-deck circuit-deck-section" id="deck-counter93" style="display: none;">
+      <div class="deck-row">
+        <!-- Clock Controls -->
+        <div class="deck-group">
+          <span class="deck-group-label">CLOCK EXCITATION</span>
+          <div style="display: inline-flex; gap: 8px;">
+            <button class="btn-sm active" id="btn-clk-step-93" style="font-family: 'DM Mono', monospace; font-weight: 700;">⚡ Pulse Clock A (CP0)</button>
+            <button class="btn-sm" id="btn-clk-b-step-93" style="font-family: 'DM Mono', monospace;">⚡ Pulse Clock B (CP1)</button>
+            <button class="btn-sm" id="btn-clk-auto-93" style="font-family: 'DM Mono', monospace;">▶ Auto 1Hz</button>
+          </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="output-display-card">
+          <div>
+            <div class="output-display-label">BINARY COUNT OUTPUT (QA..QD)</div>
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
+              <span class="status-badge" id="c93-mod-badge" style="background:#ecfdf5; color:#065f46; border-color:#a7f3d0;">Mod-16 (0..15)</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 800; color: #10b981;" id="c93-dec-val">0</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 14px; color: #64748b;" id="c93-bin-val">[QD..QA: 0000]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resets & Cascade Loop -->
+      <div class="deck-row" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+        <div class="deck-group">
+          <span class="deck-group-label">MASTER RESETS (R0: CLEAR TO 0000)</span>
+          <div class="bit-btn-group">
+            <button class="bit-toggle-btn" id="btn-r0-1-93" data-group="c93-r0" data-index="1" title="Reset-to-0 Gate Input 1"><span class="bit-label">R₀(1) [Pin 2]</span><span class="bit-val">0</span></button>
+            <button class="bit-toggle-btn" id="btn-r0-2-93" data-group="c93-r0" data-index="2" title="Reset-to-0 Gate Input 2"><span class="bit-label">R₀(2) [Pin 3]</span><span class="bit-val">0</span></button>
+          </div>
+        </div>
+
+        <div class="deck-group">
+          <span class="deck-group-label">CASCADE LINK</span>
+          <button class="btn-sm active" id="btn-cascade-93" title="Connect QA (Pin 12) to CP1 (Pin 1)">🔗 QA ➔ CP1 (Jumper ON)</button>
+        </div>
+      </div>
+
+      <div class="action-presets-row">
+        <div class="preset-btn-list">
+          <span style="font-size: 12px; font-weight: 600; color: #64748b; align-self: center;">Presets:</span>
+          <button class="btn-sm" data-preset="c93-mod16">Mod-16 (0..15 Full)</button>
+          <button class="btn-sm" data-preset="c93-mod12">Mod-12 (Reset at 12: QD·QC)</button>
+          <button class="btn-sm" data-preset="c93-mod8">Mod-8 (CP1 Alone)</button>
+          <button class="btn-sm" data-preset="c93-mod2">Mod-2 (CP0 Alone)</button>
+          <button class="btn-sm" data-preset="c93-force-r0">Master Reset (0000)</button>
+          <button class="btn-sm" data-preset="c93-reset-count">Zero Count</button>
+        </div>
+      </div>
+    </div>
+
     <!-- API Status Pill (Shared) -->
     <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
       <div class="api-status-pill">
@@ -419,6 +551,34 @@
         <div class="flow-step-item">
           <div class="flow-step-title">2. Carry-Out & Borrow Flag</div>
           <div>For addition, C₄ is the carry-out (overflow). For subtraction, C₄=1 indicates no borrow (positive result); C₄=0 indicates a borrow occurred.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-explainer-card circuit-flow-card" id="flow-counter90" style="display: none;">
+      <h3>Decade / BCD Ripple Counter Architecture (IC 74LS90)</h3>
+      <div class="flow-steps">
+        <div class="flow-step-item">
+          <div class="flow-step-title">1. Dual-Section Cascading</div>
+          <div>Contains independent Section 1 (÷2: CP0 ➔ QA) and Section 2 (÷5: CP1 ➔ QB, QC, QD). Jumpering QA to CP1 produces full 10-state BCD decade counting (0–9).</div>
+        </div>
+        <div class="flow-step-item">
+          <div class="flow-step-title">2. Asynchronous Master Reset (R0) & Preset (R9)</div>
+          <div>Internal 2-input AND gates: R₀(1)·R₀(2)=1 resets all bits to 0000. R₉(1)·R₉(2)=1 sets outputs to BCD 9 (1001). For Mod-6, feeding QC and QB to R0 resets immediately when reaching 6 (0110₂).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-explainer-card circuit-flow-card" id="flow-counter93" style="display: none;">
+      <h3>4-Bit Binary Ripple Counter Architecture (IC 74LS93)</h3>
+      <div class="flow-steps">
+        <div class="flow-step-item">
+          <div class="flow-step-title">1. Binary Ripple Cascade</div>
+          <div>Contains independent Section 1 (÷2: CP0 ➔ QA) and Section 2 (÷8: CP1 ➔ QB, QC, QD ripple chain). Jumpering QA to CP1 produces a 16-state binary counter (0–15).</div>
+        </div>
+        <div class="flow-step-item">
+          <div class="flow-step-title">2. Truncation via Master Reset (R0)</div>
+          <div>R₀(1)·R₀(2)=1 asynchronously clears all flip-flops to 0000. For Mod-12 (digital clock), wiring QD and QC to R0 resets immediately at 12 (1100₂), creating a 0–11 cycle.</div>
         </div>
       </div>
     </div>

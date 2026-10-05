@@ -25,8 +25,9 @@
         <a href="#multiplexer">Multiplexer</a>
         <a href="#comparator">Comparator</a>
         <a href="#adder">Adder</a>
+        <a href="#mod-counter">Mod Counter</a>
         <a href="schematic.html">Schematic</a>
-        <a href="workbench.html" style="color: #e9bd4f; font-weight: 700;"> IC Workbench</a>
+        <a href="workbench.html" style="color: #e9bd4f; font-weight: 700;">⚡ IC Workbench</a>
       </nav>
     </div>
   </header>
@@ -213,6 +214,66 @@
 
         <aside class="reference-area">
           <h3>Topics Covered</h3>
+          <a href="adder-subtractor.html" class="reference-link">4-Bit Adder / Subtractor Simulator <span>↗</span></a>
+          <a href="schematic.html" class="reference-link">KiCad Adder Schematic <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Mod Counter -->
+    <section class="topic-section" id="mod-counter">
+      <div class="section-title">
+        <span class="section-number">05</span>
+        <div>
+          <p class="label">SEQUENTIAL LOGIC &amp; FREQUENCY DIVISION</p>
+          <h2>Modulo-N (Mod) Counter</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Simulators &amp; Schematics</h3>
+
+          <ul class="subtopic-list">
+            <li>
+              <a href="schematic.html?circuit=counter_74ls90" class="topic-card">
+                <strong>IC 74LS90 Decade / BCD Counter (Mod-10)</strong>
+                <span>
+                  Asynchronous ripple counter with dual divide-by-2 and divide-by-5 sections.
+                  Simulate BCD decade counting (0–9), Mod-2, Mod-5, and truncated Mod-6 (clock minutes/seconds)
+                  and Mod-7 counters with live reset gating.
+                </span>
+              </a>
+            </li>
+
+            <li>
+              <a href="schematic.html?circuit=counter_74ls93" class="topic-card">
+                <strong>IC 74LS93 4-Bit Binary Counter (Mod-16)</strong>
+                <span>
+                  4-bit binary ripple counter with divide-by-2 and divide-by-8 sections.
+                  Simulate 16-state binary counting (0–15), Mod-8, and truncated Mod-12
+                  (12-hour clock) counters with active-HIGH master reset.
+                </span>
+              </a>
+            </li>
+
+            <li>
+              <a href="workbench.html" class="topic-card">
+                <strong>IC Workbench: Mod-N Breadboard Lab</strong>
+                <span>
+                  Interactive KiCad EDA canvas: Place IC 74LS90 and 74LS93, wire dual VCC/GND rails,
+                  8-bit switch banks, 8-bit LED monitor rails, and 1 Hz clock generator with live pin propagation.
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="reference-area">
+          <h3>Topics Covered</h3>
+          <a href="schematic.html?circuit=counter_74ls90" class="reference-link">74LS90 Decade Counter Schematic <span>↗</span></a>
+          <a href="schematic.html?circuit=counter_74ls93" class="reference-link">74LS93 Binary Counter Schematic <span>↗</span></a>
+          <a href="workbench.html" class="reference-link">IC Workbench Mod-N Presets <span>↗</span></a>
         </aside>
       </div>
     </section>

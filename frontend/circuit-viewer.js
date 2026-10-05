@@ -47,6 +47,36 @@
       cin: null,
     },
 
+    // Circuit 5: Decade / BCD Counter (IC 74LS90)
+    counter90: {
+      qa: 0,
+      qb: 0,
+      qc: 0,
+      qd: 0,
+      r0_1: 0,
+      r0_2: 0,
+      r9_1: 0,
+      r9_2: 0,
+      cascade: 1, // 1 = Jumper QA (Pin 12) connected to CP1 (Pin 1)
+      autoRunning: false,
+      autoTimer: null,
+      mode: "mod10", // "mod10", "mod6", "mod5", "mod2"
+    },
+
+    // Circuit 6: 4-Bit Binary Counter (IC 74LS93)
+    counter93: {
+      qa: 0,
+      qb: 0,
+      qc: 0,
+      qd: 0,
+      r0_1: 0,
+      r0_2: 0,
+      cascade: 1, // 1 = Jumper QA (Pin 12) connected to CP1 (Pin 1)
+      autoRunning: false,
+      autoTimer: null,
+      mode: "mod16", // "mod16", "mod12", "mod8", "mod2"
+    },
+
     // Pan & Zoom
     viewBox: { x: 0, y: 0, w: 1200, h: 740 },
     initialViewBox: { x: 0, y: 0, w: 1200, h: 740 },
@@ -66,7 +96,10 @@
     initDOM();
     initPanZoom();
     bindEvents();
-    switchCircuit("mux_8to1");
+    const urlParams = new URLSearchParams(window.location.search);
+    const cParam = urlParams.get("circuit");
+    const valid = ["mux_8to1", "mux_4to1", "comparator_4bit", "adder_subtractor_4bit", "counter_74ls90", "counter_74ls93"];
+    switchCircuit(valid.includes(cParam) ? cParam : "mux_8to1");
   });
 
   function initDOM() {
@@ -191,6 +224,96 @@
       updateCircuit();
     });
 
+    // 74LS90 Decade Counter Controls
+    document.getElementById("btn-clk-step-90")?.addEventListener("click", () => {
+      stepCounter90("A");
+    });
+    document.getElementById("btn-clk-b-step-90")?.addEventListener("click", () => {
+      stepCounter90("B");
+    });
+    document.getElementById("btn-clk-auto-90")?.addEventListener("click", () => {
+      if (state.counter90.autoRunning) {
+        clearInterval(state.counter90.autoTimer);
+        state.counter90.autoRunning = false;
+      } else {
+        state.counter90.autoRunning = true;
+        state.counter90.autoTimer = setInterval(() => {
+          stepCounter90(state.counter90.mode === "mod5" ? "B" : "A");
+        }, 1000);
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-r0-1-90")?.addEventListener("click", () => {
+      state.counter90.r0_1 = 1 - state.counter90.r0_1;
+      if (state.counter90.r0_1 === 1 && state.counter90.r0_2 === 1) {
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-r0-2-90")?.addEventListener("click", () => {
+      state.counter90.r0_2 = 1 - state.counter90.r0_2;
+      if (state.counter90.r0_1 === 1 && state.counter90.r0_2 === 1) {
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-r9-1-90")?.addEventListener("click", () => {
+      state.counter90.r9_1 = 1 - state.counter90.r9_1;
+      if (state.counter90.r9_1 === 1 && state.counter90.r9_2 === 1) {
+        state.counter90.qa = 1; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 1;
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-r9-2-90")?.addEventListener("click", () => {
+      state.counter90.r9_2 = 1 - state.counter90.r9_2;
+      if (state.counter90.r9_1 === 1 && state.counter90.r9_2 === 1) {
+        state.counter90.qa = 1; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 1;
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-cascade-90")?.addEventListener("click", () => {
+      state.counter90.cascade = 1 - state.counter90.cascade;
+      updateCircuit();
+    });
+
+    // 74LS93 4-Bit Binary Counter Controls
+    document.getElementById("btn-clk-step-93")?.addEventListener("click", () => {
+      stepCounter93("A");
+    });
+    document.getElementById("btn-clk-b-step-93")?.addEventListener("click", () => {
+      stepCounter93("B");
+    });
+    document.getElementById("btn-clk-auto-93")?.addEventListener("click", () => {
+      if (state.counter93.autoRunning) {
+        clearInterval(state.counter93.autoTimer);
+        state.counter93.autoRunning = false;
+      } else {
+        state.counter93.autoRunning = true;
+        state.counter93.autoTimer = setInterval(() => {
+          stepCounter93(state.counter93.mode === "mod8" ? "B" : "A");
+        }, 1000);
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-r0-1-93")?.addEventListener("click", () => {
+      state.counter93.r0_1 = 1 - state.counter93.r0_1;
+      if (state.counter93.r0_1 === 1 && state.counter93.r0_2 === 1) {
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-r0-2-93")?.addEventListener("click", () => {
+      state.counter93.r0_2 = 1 - state.counter93.r0_2;
+      if (state.counter93.r0_1 === 1 && state.counter93.r0_2 === 1) {
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      }
+      updateCircuit();
+    });
+    document.getElementById("btn-cascade-93")?.addEventListener("click", () => {
+      state.counter93.cascade = 1 - state.counter93.cascade;
+      updateCircuit();
+    });
+
     // Presets
     document.querySelectorAll("[data-preset]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -200,7 +323,112 @@
     });
   }
 
+  function advanceDiv5_90() {
+    const qb = state.counter90.qb;
+    const qc = state.counter90.qc;
+    const qd = state.counter90.qd;
+    // BCD ÷5 counter states: (QD, QC, QB) -> 000, 001, 010, 011, 100
+    if (qd === 0 && qc === 0 && qb === 0) {
+      state.counter90.qb = 1; state.counter90.qc = 0; state.counter90.qd = 0;
+    } else if (qd === 0 && qc === 0 && qb === 1) {
+      state.counter90.qb = 0; state.counter90.qc = 1; state.counter90.qd = 0;
+    } else if (qd === 0 && qc === 1 && qb === 0) {
+      state.counter90.qb = 1; state.counter90.qc = 1; state.counter90.qd = 0;
+    } else if (qd === 0 && qc === 1 && qb === 1) {
+      state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 1;
+    } else {
+      state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+    }
+  }
+
+  function stepCounter90(clkSource) {
+    const r0 = state.counter90.r0_1 === 1 && state.counter90.r0_2 === 1;
+    const r9 = state.counter90.r9_1 === 1 && state.counter90.r9_2 === 1;
+
+    if (r9) {
+      state.counter90.qa = 1; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 1;
+      updateCircuit();
+      return;
+    }
+    if (r0) {
+      state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      updateCircuit();
+      return;
+    }
+
+    if (clkSource === "A") {
+      const prevQa = state.counter90.qa;
+      state.counter90.qa = 1 - prevQa;
+      if (state.counter90.cascade && prevQa === 1 && state.counter90.qa === 0) {
+        // High-to-Low falling edge on QA excites CP1
+        advanceDiv5_90();
+      }
+    } else if (clkSource === "B") {
+      advanceDiv5_90();
+    }
+
+    // Mod-6 check: QC·QB = 1 (Binary 6: 0110)
+    if (state.counter90.mode === "mod6") {
+      if (state.counter90.qc === 1 && state.counter90.qb === 1) {
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      }
+    }
+
+    updateCircuit();
+  }
+
+  function advanceDiv8_93() {
+    const qb = state.counter93.qb;
+    const qc = state.counter93.qc;
+    const qd = state.counter93.qd;
+    const curVal = (qd << 2) | (qc << 1) | qb;
+    const nextVal = (curVal + 1) % 8;
+    state.counter93.qb = nextVal & 1;
+    state.counter93.qc = (nextVal >> 1) & 1;
+    state.counter93.qd = (nextVal >> 2) & 1;
+  }
+
+  function stepCounter93(clkSource) {
+    const r0 = state.counter93.r0_1 === 1 && state.counter93.r0_2 === 1;
+    if (r0) {
+      state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      updateCircuit();
+      return;
+    }
+
+    if (clkSource === "A") {
+      const prevQa = state.counter93.qa;
+      state.counter93.qa = 1 - prevQa;
+      if (state.counter93.cascade && prevQa === 1 && state.counter93.qa === 0) {
+        // High-to-Low falling edge on QA excites CP1
+        advanceDiv8_93();
+      }
+    } else if (clkSource === "B") {
+      advanceDiv8_93();
+    }
+
+    // Mod-12 check: QD·QC = 1 (Binary 12: 1100)
+    if (state.counter93.mode === "mod12") {
+      if (state.counter93.qd === 1 && state.counter93.qc === 1) {
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      }
+    }
+
+    updateCircuit();
+  }
+
   function switchCircuit(circuitId) {
+    if (state.activeCircuit !== circuitId) {
+      if (state.counter90.autoRunning) {
+        clearInterval(state.counter90.autoTimer);
+        state.counter90.autoRunning = false;
+      }
+      if (state.counter93.autoRunning) {
+        clearInterval(state.counter93.autoTimer);
+        state.counter93.autoRunning = false;
+      }
+    }
+
     state.activeCircuit = circuitId;
 
     // Update tabs UI
@@ -226,6 +454,8 @@
     if (circuitId === "mux_4to1") return "mux4";
     if (circuitId === "comparator_4bit") return "comp4";
     if (circuitId === "adder_subtractor_4bit") return "addsub";
+    if (circuitId === "counter_74ls90") return "counter90";
+    if (circuitId === "counter_74ls93") return "counter93";
     return "mux8";
   }
 
@@ -255,6 +485,57 @@
       else if (preset === "sub-pos") { state.addSub4.mode = 1; state.addSub4.a = "1001"; state.addSub4.b = "0100"; }
       else if (preset === "sub-borrow") { state.addSub4.mode = 1; state.addSub4.a = "0011"; state.addSub4.b = "0111"; }
       else if (preset === "reset") { state.addSub4.mode = 0; state.addSub4.a = "0000"; state.addSub4.b = "0000"; }
+    } else if (c === "counter_74ls90") {
+      if (preset === "c90-mod10") {
+        state.counter90.mode = "mod10"; state.counter90.cascade = 1;
+        state.counter90.r0_1 = 0; state.counter90.r0_2 = 0;
+        state.counter90.r9_1 = 0; state.counter90.r9_2 = 0;
+      } else if (preset === "c90-mod6") {
+        state.counter90.mode = "mod6"; state.counter90.cascade = 1;
+        state.counter90.r0_1 = 0; state.counter90.r0_2 = 0;
+        state.counter90.r9_1 = 0; state.counter90.r9_2 = 0;
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      } else if (preset === "c90-mod5") {
+        state.counter90.mode = "mod5"; state.counter90.cascade = 0;
+        state.counter90.r0_1 = 0; state.counter90.r0_2 = 0;
+        state.counter90.r9_1 = 0; state.counter90.r9_2 = 0;
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      } else if (preset === "c90-mod2") {
+        state.counter90.mode = "mod2"; state.counter90.cascade = 0;
+        state.counter90.r0_1 = 0; state.counter90.r0_2 = 0;
+        state.counter90.r9_1 = 0; state.counter90.r9_2 = 0;
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      } else if (preset === "c90-force-r0") {
+        state.counter90.r0_1 = 1; state.counter90.r0_2 = 1;
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      } else if (preset === "c90-force-r9") {
+        state.counter90.r9_1 = 1; state.counter90.r9_2 = 1;
+        state.counter90.qa = 1; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 1;
+      } else if (preset === "c90-reset-count") {
+        state.counter90.qa = 0; state.counter90.qb = 0; state.counter90.qc = 0; state.counter90.qd = 0;
+      }
+    } else if (c === "counter_74ls93") {
+      if (preset === "c93-mod16") {
+        state.counter93.mode = "mod16"; state.counter93.cascade = 1;
+        state.counter93.r0_1 = 0; state.counter93.r0_2 = 0;
+      } else if (preset === "c93-mod12") {
+        state.counter93.mode = "mod12"; state.counter93.cascade = 1;
+        state.counter93.r0_1 = 0; state.counter93.r0_2 = 0;
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      } else if (preset === "c93-mod8") {
+        state.counter93.mode = "mod8"; state.counter93.cascade = 0;
+        state.counter93.r0_1 = 0; state.counter93.r0_2 = 0;
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      } else if (preset === "c93-mod2") {
+        state.counter93.mode = "mod2"; state.counter93.cascade = 0;
+        state.counter93.r0_1 = 0; state.counter93.r0_2 = 0;
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      } else if (preset === "c93-force-r0") {
+        state.counter93.r0_1 = 1; state.counter93.r0_2 = 1;
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      } else if (preset === "c93-reset-count") {
+        state.counter93.qa = 0; state.counter93.qb = 0; state.counter93.qc = 0; state.counter93.qd = 0;
+      }
     }
     updateCircuit();
   }
@@ -410,6 +691,52 @@
       }
       document.getElementById("btn-sub-add")?.classList.toggle("active", state.addSub4.mode === 0);
       document.getElementById("btn-sub-sub")?.classList.toggle("active", state.addSub4.mode === 1);
+    } else if (c === "counter_74ls90") {
+      const r0_1 = state.counter90.r0_1;
+      const r0_2 = state.counter90.r0_2;
+      const r9_1 = state.counter90.r9_1;
+      const r9_2 = state.counter90.r9_2;
+
+      const btnR01 = document.getElementById("btn-r0-1-90");
+      if (btnR01) { btnR01.classList.toggle("active", r0_1 === 1); btnR01.querySelector(".bit-val").textContent = r0_1; }
+      const btnR02 = document.getElementById("btn-r0-2-90");
+      if (btnR02) { btnR02.classList.toggle("active", r0_2 === 1); btnR02.querySelector(".bit-val").textContent = r0_2; }
+      const btnR91 = document.getElementById("btn-r9-1-90");
+      if (btnR91) { btnR91.classList.toggle("active", r9_1 === 1); btnR91.querySelector(".bit-val").textContent = r9_1; }
+      const btnR92 = document.getElementById("btn-r9-2-90");
+      if (btnR92) { btnR92.classList.toggle("active", r9_2 === 1); btnR92.querySelector(".bit-val").textContent = r9_2; }
+
+      const btnCas = document.getElementById("btn-cascade-90");
+      if (btnCas) {
+        btnCas.classList.toggle("active", state.counter90.cascade === 1);
+        btnCas.textContent = state.counter90.cascade === 1 ? "🔗 QA ➔ CP1 (Jumper ON)" : "⚠️ QA ➔ CP1 (Jumper OFF)";
+      }
+
+      const btnAuto = document.getElementById("btn-clk-auto-90");
+      if (btnAuto) {
+        btnAuto.classList.toggle("active", state.counter90.autoRunning);
+        btnAuto.textContent = state.counter90.autoRunning ? "⏹ Stop 1Hz" : "▶ Auto 1Hz";
+      }
+    } else if (c === "counter_74ls93") {
+      const r0_1 = state.counter93.r0_1;
+      const r0_2 = state.counter93.r0_2;
+
+      const btnR01 = document.getElementById("btn-r0-1-93");
+      if (btnR01) { btnR01.classList.toggle("active", r0_1 === 1); btnR01.querySelector(".bit-val").textContent = r0_1; }
+      const btnR02 = document.getElementById("btn-r0-2-93");
+      if (btnR02) { btnR02.classList.toggle("active", r0_2 === 1); btnR02.querySelector(".bit-val").textContent = r0_2; }
+
+      const btnCas = document.getElementById("btn-cascade-93");
+      if (btnCas) {
+        btnCas.classList.toggle("active", state.counter93.cascade === 1);
+        btnCas.textContent = state.counter93.cascade === 1 ? "🔗 QA ➔ CP1 (Jumper ON)" : "⚠️ QA ➔ CP1 (Jumper OFF)";
+      }
+
+      const btnAuto = document.getElementById("btn-clk-auto-93");
+      if (btnAuto) {
+        btnAuto.classList.toggle("active", state.counter93.autoRunning);
+        btnAuto.textContent = state.counter93.autoRunning ? "⏹ Stop 1Hz" : "▶ Auto 1Hz";
+      }
     }
   }
 
@@ -828,6 +1155,32 @@
         const op = mode === 0 ? "+" : "-";
         calcText.textContent = `Calculation: ${details.a_decimal} ${op} ${details.b_decimal} = ${details.result_decimal} (Decimal)`;
       }
+    } else if (c === "counter_74ls90") {
+      const dec = data.state?.details?.decimal !== undefined ? data.state.details.decimal : 0;
+      const bin = data.state?.details?.binary || "0000";
+      const modName = data.state?.details?.mod_title || "Mod-10 (BCD)";
+
+      const decEl = document.getElementById("c90-dec-val");
+      if (decEl) decEl.textContent = dec;
+
+      const binEl = document.getElementById("c90-bin-val");
+      if (binEl) binEl.textContent = `[QD..QA: ${bin}]`;
+
+      const modBadge = document.getElementById("c90-mod-badge");
+      if (modBadge) modBadge.textContent = modName;
+    } else if (c === "counter_74ls93") {
+      const dec = data.state?.details?.decimal !== undefined ? data.state.details.decimal : 0;
+      const bin = data.state?.details?.binary || "0000";
+      const modName = data.state?.details?.mod_title || "Mod-16 (Binary)";
+
+      const decEl = document.getElementById("c93-dec-val");
+      if (decEl) decEl.textContent = dec;
+
+      const binEl = document.getElementById("c93-bin-val");
+      if (binEl) binEl.textContent = `[QD..QA: ${bin}]`;
+
+      const modBadge = document.getElementById("c93-mod-badge");
+      if (modBadge) modBadge.textContent = modName;
     }
   }
 
@@ -841,6 +1194,18 @@
       return fallbackComp4(state.comp4.a, state.comp4.b, state.comp4.cascade_gt, state.comp4.cascade_lt, state.comp4.cascade_eq);
     } else if (circuitId === "adder_subtractor_4bit") {
       return fallbackAddSub4(state.addSub4.a, state.addSub4.b, state.addSub4.mode);
+    } else if (circuitId === "counter_74ls90") {
+      return fallbackCounter74LS90(
+        state.counter90.qa, state.counter90.qb, state.counter90.qc, state.counter90.qd,
+        state.counter90.r0_1, state.counter90.r0_2, state.counter90.r9_1, state.counter90.r9_2,
+        state.counter90.cascade, state.counter90.mode
+      );
+    } else if (circuitId === "counter_74ls93") {
+      return fallbackCounter74LS93(
+        state.counter93.qa, state.counter93.qb, state.counter93.qc, state.counter93.qd,
+        state.counter93.r0_1, state.counter93.r0_2,
+        state.counter93.cascade, state.counter93.mode
+      );
     }
   }
 
@@ -1226,6 +1591,319 @@
       state: {
         a, b, mode, sum: sumStr, carry_out: mode === 0 ? finalCout : null, borrow: borrowVal,
         details: { a_decimal: aDec, b_decimal: bDec, result_decimal: mode === 0 ? aDec + bDec : aDec - bDec },
+      },
+    };
+  }
+
+  function fallbackCounter74LS90(qa, qb, qc, qd, r0_1, r0_2, r9_1, r9_2, cascade, mode) {
+    const decVal = (qd << 3) | (qc << 2) | (qb << 1) | qa;
+    const binStr = `${qd}${qc}${qb}${qa}`;
+    const modTitle = mode === "mod10"
+      ? "Mod-10 (BCD Counter)"
+      : (mode === "mod6"
+        ? "Mod-6 Counter (QC·QB Reset)"
+        : (mode === "mod5" ? "Mod-5 (÷5 Section)" : "Mod-2 (÷2 Section)"));
+
+    const components = [];
+    const wires = [];
+    const junctions = [];
+
+    // Left Input Ports
+    components.push({
+      id: "PORT_CP0", ref: "CLK_A", value: "0", type: "port_input",
+      x: 80, y: 140, width: 60, height: 20,
+      pins: { out: { name: "CLK_A", pin_number: "", x: 140, y: 150, dx: 1.0, dy: 0.0, value: 0, direction: "output" } },
+    });
+    wires.push({ id: "w_cp0", net: "CP0", path: "M 140,150 L 420,150", value: 0 });
+
+    if (!cascade) {
+      components.push({
+        id: "PORT_CP1", ref: "CLK_B", value: "0", type: "port_input",
+        x: 80, y: 200, width: 60, height: 20,
+        pins: { out: { name: "CLK_B", pin_number: "", x: 140, y: 210, dx: 1.0, dy: 0.0, value: 0, direction: "output" } },
+      });
+      wires.push({ id: "w_cp1", net: "CP1", path: "M 140,210 L 420,210", value: 0 });
+    }
+
+    components.push({
+      id: "PORT_R0_1", ref: "R0(1)", value: String(r0_1), type: "port_select",
+      x: 80, y: 260, width: 60, height: 20,
+      pins: { out: { name: "R0(1)", pin_number: "", x: 140, y: 270, dx: 1.0, dy: 0.0, value: r0_1, direction: "output" } },
+    });
+    wires.push({ id: "w_r0_1", net: "R0_1", path: "M 140,270 L 420,270", value: r0_1 });
+
+    components.push({
+      id: "PORT_R0_2", ref: "R0(2)", value: String(r0_2), type: "port_select",
+      x: 80, y: 300, width: 60, height: 20,
+      pins: { out: { name: "R0(2)", pin_number: "", x: 140, y: 310, dx: 1.0, dy: 0.0, value: r0_2, direction: "output" } },
+    });
+    wires.push({ id: "w_r0_2", net: "R0_2", path: "M 140,310 L 420,310", value: r0_2 });
+
+    components.push({
+      id: "PORT_R9_1", ref: "R9(1)", value: String(r9_1), type: "port_select",
+      x: 80, y: 360, width: 60, height: 20,
+      pins: { out: { name: "R9(1)", pin_number: "", x: 140, y: 370, dx: 1.0, dy: 0.0, value: r9_1, direction: "output" } },
+    });
+    wires.push({ id: "w_r9_1", net: "R9_1", path: "M 140,370 L 420,370", value: r9_1 });
+
+    components.push({
+      id: "PORT_R9_2", ref: "R9(2)", value: String(r9_2), type: "port_select",
+      x: 80, y: 400, width: 60, height: 20,
+      pins: { out: { name: "R9(2)", pin_number: "", x: 140, y: 410, dx: 1.0, dy: 0.0, value: r9_2, direction: "output" } },
+    });
+    wires.push({ id: "w_r9_2", net: "R9_2", path: "M 140,410 L 420,410", value: r9_2 });
+
+    components.push({
+      id: "PORT_VCC", ref: "+5V", value: "1", type: "port_select",
+      x: 80, y: 460, width: 60, height: 20,
+      pins: { out: { name: "+5V", pin_number: "", x: 140, y: 470, dx: 1.0, dy: 0.0, value: 1, direction: "output" } },
+    });
+    wires.push({ id: "w_vcc", net: "VCC", path: "M 140,470 L 420,470", value: 1 });
+
+    // Center U1 IC 74LS90
+    components.push({
+      id: "U1", ref: "U1", value: "74LS90", type: "ic_block",
+      x: 420, y: 110, width: 220, height: 420,
+      pins: {
+        CP0:  { name: "CP0", pin_number: "14", x: 420, y: 150, dx: -1.0, dy: 0.0, value: 0, direction: "input" },
+        CP1:  { name: "CP1", pin_number: "1",  x: 420, y: 210, dx: -1.0, dy: 0.0, value: cascade ? qa : 0, direction: "input" },
+        R0_1: { name: "R0(1)", pin_number: "2", x: 420, y: 270, dx: -1.0, dy: 0.0, value: r0_1, direction: "input" },
+        R0_2: { name: "R0(2)", pin_number: "3", x: 420, y: 310, dx: -1.0, dy: 0.0, value: r0_2, direction: "input" },
+        R9_1: { name: "R9(1)", pin_number: "6", x: 420, y: 370, dx: -1.0, dy: 0.0, value: r9_1, direction: "input" },
+        R9_2: { name: "R9(2)", pin_number: "7", x: 420, y: 410, dx: -1.0, dy: 0.0, value: r9_2, direction: "input" },
+        VCC:  { name: "VCC", pin_number: "5",  x: 420, y: 470, dx: -1.0, dy: 0.0, value: 1, direction: "input" },
+        QA:   { name: "QA (÷2)", pin_number: "12", x: 640, y: 150, dx: 1.0, dy: 0.0, value: qa, direction: "output" },
+        QB:   { name: "QB", pin_number: "9",   x: 640, y: 230, dx: 1.0, dy: 0.0, value: qb, direction: "output" },
+        QC:   { name: "QC", pin_number: "8",   x: 640, y: 300, dx: 1.0, dy: 0.0, value: qc, direction: "output" },
+        QD:   { name: "QD (÷5)", pin_number: "11", x: 640, y: 370, dx: 1.0, dy: 0.0, value: qd, direction: "output" },
+        GND:  { name: "GND", pin_number: "10", x: 640, y: 470, dx: 1.0, dy: 0.0, value: 0, direction: "output" },
+      },
+    });
+
+    // Right Output Ports
+    components.push({
+      id: "PORT_QA", ref: "QA", value: String(qa), type: "port_output",
+      x: 820, y: 140, width: 60, height: 20,
+      pins: { in: { name: "QA", pin_number: "", x: 820, y: 150, dx: -1.0, dy: 0.0, value: qa, direction: "input" } },
+    });
+    wires.push({ id: "w_qa", net: "QA", path: "M 640,150 L 820,150", value: qa });
+
+    components.push({
+      id: "PORT_QB", ref: "QB", value: String(qb), type: "port_output",
+      x: 820, y: 220, width: 60, height: 20,
+      pins: { in: { name: "QB", pin_number: "", x: 820, y: 230, dx: -1.0, dy: 0.0, value: qb, direction: "input" } },
+    });
+    wires.push({ id: "w_qb", net: "QB", path: "M 640,230 L 820,230", value: qb });
+
+    components.push({
+      id: "PORT_QC", ref: "QC", value: String(qc), type: "port_output",
+      x: 820, y: 290, width: 60, height: 20,
+      pins: { in: { name: "QC", pin_number: "", x: 820, y: 300, dx: -1.0, dy: 0.0, value: qc, direction: "input" } },
+    });
+    wires.push({ id: "w_qc", net: "QC", path: "M 640,300 L 820,300", value: qc });
+
+    components.push({
+      id: "PORT_QD", ref: "QD", value: String(qd), type: "port_output",
+      x: 820, y: 360, width: 60, height: 20,
+      pins: { in: { name: "QD", pin_number: "", x: 820, y: 370, dx: -1.0, dy: 0.0, value: qd, direction: "input" } },
+    });
+    wires.push({ id: "w_qd", net: "QD", path: "M 640,370 L 820,370", value: qd });
+
+    components.push({
+      id: "PORT_GND", ref: "GND", value: "0", type: "port_output",
+      x: 820, y: 460, width: 60, height: 20,
+      pins: { in: { name: "GND", pin_number: "", x: 820, y: 470, dx: -1.0, dy: 0.0, value: 0, direction: "input" } },
+    });
+    wires.push({ id: "w_gnd", net: "GND", path: "M 640,470 L 820,470", value: 0 });
+
+    // Cascade Jumper Wire (QA -> CP1)
+    if (cascade) {
+      wires.push({
+        id: "w_cascade_jumper",
+        net: "QA_CASCADE",
+        path: "M 670,150 L 670,75 L 370,75 L 370,210 L 420,210",
+        value: qa,
+      });
+      junctions.push({ x: 670, y: 150, value: qa });
+    }
+
+    // Feedback Reset Wires for Mod-6 (QC -> R0_1, QB -> R0_2)
+    if (mode === "mod6") {
+      wires.push({
+        id: "w_mod6_qc",
+        net: "FEEDBACK_QC",
+        path: "M 700,300 L 700,535 L 330,535 L 330,270 L 420,270",
+        value: qc,
+      });
+      junctions.push({ x: 700, y: 300, value: qc });
+
+      wires.push({
+        id: "w_mod6_qb",
+        net: "FEEDBACK_QB",
+        path: "M 730,230 L 730,555 L 310,555 L 310,310 L 420,310",
+        value: qb,
+      });
+      junctions.push({ x: 730, y: 230, value: qb });
+    }
+
+    return {
+      circuit_id: "counter_74ls90",
+      title: "Decade / BCD Modulo Counter (IC 74LS90)",
+      sheet_info: { title: "IC 74LS90 DECADE / BCD COUNTER", file: "counter_74ls90.kicad_sch", size: "A4", rev: "v1.0" },
+      canvas: { width: 1100, height: 680 },
+      components, wires, junctions,
+      state: {
+        qa, qb, qc, qd, r0_1, r0_2, r9_1, r9_2, cascade, mode,
+        details: { decimal: decVal, binary: binStr, mod_title: modTitle },
+      },
+    };
+  }
+
+  function fallbackCounter74LS93(qa, qb, qc, qd, r0_1, r0_2, cascade, mode) {
+    const decVal = (qd << 3) | (qc << 2) | (qb << 1) | qa;
+    const binStr = `${qd}${qc}${qb}${qa}`;
+    const modTitle = mode === "mod16"
+      ? "Mod-16 (4-Bit Binary Counter)"
+      : (mode === "mod12"
+        ? "Mod-12 Counter (QD·QC Reset)"
+        : (mode === "mod8" ? "Mod-8 (÷8 Section)" : "Mod-2 (÷2 Section)"));
+
+    const components = [];
+    const wires = [];
+    const junctions = [];
+
+    // Left Input Ports
+    components.push({
+      id: "PORT_CP0", ref: "CLK_A", value: "0", type: "port_input",
+      x: 80, y: 140, width: 60, height: 20,
+      pins: { out: { name: "CLK_A", pin_number: "", x: 140, y: 150, dx: 1.0, dy: 0.0, value: 0, direction: "output" } },
+    });
+    wires.push({ id: "w_cp0", net: "CP0", path: "M 140,150 L 420,150", value: 0 });
+
+    if (!cascade) {
+      components.push({
+        id: "PORT_CP1", ref: "CLK_B", value: "0", type: "port_input",
+        x: 80, y: 200, width: 60, height: 20,
+        pins: { out: { name: "CLK_B", pin_number: "", x: 140, y: 210, dx: 1.0, dy: 0.0, value: 0, direction: "output" } },
+      });
+      wires.push({ id: "w_cp1", net: "CP1", path: "M 140,210 L 420,210", value: 0 });
+    }
+
+    components.push({
+      id: "PORT_R0_1", ref: "R0(1)", value: String(r0_1), type: "port_select",
+      x: 80, y: 270, width: 60, height: 20,
+      pins: { out: { name: "R0(1)", pin_number: "", x: 140, y: 280, dx: 1.0, dy: 0.0, value: r0_1, direction: "output" } },
+    });
+    wires.push({ id: "w_r0_1", net: "R0_1", path: "M 140,280 L 420,280", value: r0_1 });
+
+    components.push({
+      id: "PORT_R0_2", ref: "R0(2)", value: String(r0_2), type: "port_select",
+      x: 80, y: 310, width: 60, height: 20,
+      pins: { out: { name: "R0(2)", pin_number: "", x: 140, y: 320, dx: 1.0, dy: 0.0, value: r0_2, direction: "output" } },
+    });
+    wires.push({ id: "w_r0_2", net: "R0_2", path: "M 140,320 L 420,320", value: r0_2 });
+
+    components.push({
+      id: "PORT_VCC", ref: "+5V", value: "1", type: "port_select",
+      x: 80, y: 460, width: 60, height: 20,
+      pins: { out: { name: "+5V", pin_number: "", x: 140, y: 470, dx: 1.0, dy: 0.0, value: 1, direction: "output" } },
+    });
+    wires.push({ id: "w_vcc", net: "VCC", path: "M 140,470 L 420,470", value: 1 });
+
+    // Center U1 IC 74LS93
+    components.push({
+      id: "U1", ref: "U1", value: "74LS93", type: "ic_block",
+      x: 420, y: 110, width: 220, height: 420,
+      pins: {
+        CP0:  { name: "CP0", pin_number: "14", x: 420, y: 150, dx: -1.0, dy: 0.0, value: 0, direction: "input" },
+        CP1:  { name: "CP1", pin_number: "1",  x: 420, y: 210, dx: -1.0, dy: 0.0, value: cascade ? qa : 0, direction: "input" },
+        R0_1: { name: "R0(1)", pin_number: "2", x: 420, y: 280, dx: -1.0, dy: 0.0, value: r0_1, direction: "input" },
+        R0_2: { name: "R0(2)", pin_number: "3", x: 420, y: 320, dx: -1.0, dy: 0.0, value: r0_2, direction: "input" },
+        NC4:  { name: "NC", pin_number: "4",   x: 420, y: 380, dx: -1.0, dy: 0.0, value: 0, direction: "input" },
+        VCC:  { name: "VCC", pin_number: "5",  x: 420, y: 470, dx: -1.0, dy: 0.0, value: 1, direction: "input" },
+        QA:   { name: "QA (÷2)", pin_number: "12", x: 640, y: 150, dx: 1.0, dy: 0.0, value: qa, direction: "output" },
+        QB:   { name: "QB", pin_number: "9",   x: 640, y: 230, dx: 1.0, dy: 0.0, value: qb, direction: "output" },
+        QC:   { name: "QC", pin_number: "8",   x: 640, y: 300, dx: 1.0, dy: 0.0, value: qc, direction: "output" },
+        QD:   { name: "QD (÷8)", pin_number: "11", x: 640, y: 370, dx: 1.0, dy: 0.0, value: qd, direction: "output" },
+        GND:  { name: "GND", pin_number: "10", x: 640, y: 470, dx: 1.0, dy: 0.0, value: 0, direction: "output" },
+      },
+    });
+
+    // Right Output Ports
+    components.push({
+      id: "PORT_QA", ref: "QA", value: String(qa), type: "port_output",
+      x: 820, y: 140, width: 60, height: 20,
+      pins: { in: { name: "QA", pin_number: "", x: 820, y: 150, dx: -1.0, dy: 0.0, value: qa, direction: "input" } },
+    });
+    wires.push({ id: "w_qa", net: "QA", path: "M 640,150 L 820,150", value: qa });
+
+    components.push({
+      id: "PORT_QB", ref: "QB", value: String(qb), type: "port_output",
+      x: 820, y: 220, width: 60, height: 20,
+      pins: { in: { name: "QB", pin_number: "", x: 820, y: 230, dx: -1.0, dy: 0.0, value: qb, direction: "input" } },
+    });
+    wires.push({ id: "w_qb", net: "QB", path: "M 640,230 L 820,230", value: qb });
+
+    components.push({
+      id: "PORT_QC", ref: "QC", value: String(qc), type: "port_output",
+      x: 820, y: 290, width: 60, height: 20,
+      pins: { in: { name: "QC", pin_number: "", x: 820, y: 300, dx: -1.0, dy: 0.0, value: qc, direction: "input" } },
+    });
+    wires.push({ id: "w_qc", net: "QC", path: "M 640,300 L 820,300", value: qc });
+
+    components.push({
+      id: "PORT_QD", ref: "QD", value: String(qd), type: "port_output",
+      x: 820, y: 360, width: 60, height: 20,
+      pins: { in: { name: "QD", pin_number: "", x: 820, y: 370, dx: -1.0, dy: 0.0, value: qd, direction: "input" } },
+    });
+    wires.push({ id: "w_qd", net: "QD", path: "M 640,370 L 820,370", value: qd });
+
+    components.push({
+      id: "PORT_GND", ref: "GND", value: "0", type: "port_output",
+      x: 820, y: 460, width: 60, height: 20,
+      pins: { in: { name: "GND", pin_number: "", x: 820, y: 470, dx: -1.0, dy: 0.0, value: 0, direction: "input" } },
+    });
+    wires.push({ id: "w_gnd", net: "GND", path: "M 640,470 L 820,470", value: 0 });
+
+    // Cascade Jumper Wire (QA -> CP1)
+    if (cascade) {
+      wires.push({
+        id: "w_cascade_jumper",
+        net: "QA_CASCADE",
+        path: "M 670,150 L 670,75 L 370,75 L 370,210 L 420,210",
+        value: qa,
+      });
+      junctions.push({ x: 670, y: 150, value: qa });
+    }
+
+    // Feedback Reset Wires for Mod-12 (QD -> R0_1, QC -> R0_2)
+    if (mode === "mod12") {
+      wires.push({
+        id: "w_mod12_qd",
+        net: "FEEDBACK_QD",
+        path: "M 700,370 L 700,535 L 330,535 L 330,280 L 420,280",
+        value: qd,
+      });
+      junctions.push({ x: 700, y: 370, value: qd });
+
+      wires.push({
+        id: "w_mod12_qc",
+        net: "FEEDBACK_QC",
+        path: "M 730,300 L 730,555 L 310,555 L 310,320 L 420,320",
+        value: qc,
+      });
+      junctions.push({ x: 730, y: 300, value: qc });
+    }
+
+    return {
+      circuit_id: "counter_74ls93",
+      title: "4-Bit Binary Ripple Counter (IC 74LS93)",
+      sheet_info: { title: "IC 74LS93 4-BIT BINARY COUNTER", file: "counter_74ls93.kicad_sch", size: "A4", rev: "v1.0" },
+      canvas: { width: 1100, height: 680 },
+      components, wires, junctions,
+      state: {
+        qa, qb, qc, qd, r0_1, r0_2, cascade, mode,
+        details: { decimal: decVal, binary: binStr, mod_title: modTitle },
       },
     };
   }

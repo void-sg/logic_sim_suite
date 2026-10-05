@@ -674,10 +674,13 @@
       name: "Logic LED Indicator",
       category: "io",
       package: "LED-5mm",
-      pinsCount: 1,
+      pinsCount: 2,
       refPrefix: "LED",
-      desc: "Visual LED indicator. Lights up vibrant glowing green when signal is HIGH (1), turns off when LOW (0).",
-      pins: [{ num: 1, name: "IN", type: "in", side: "left", pos: 1 }],
+      desc: "Visual LED indicator. Lights up vibrant glowing green when signal is HIGH (1), turns off when LOW (0). Connect to either Left (Pin 1) or Right (Pin 2) terminal.",
+      pins: [
+        { num: 1, name: "IN_L", type: "in", side: "left", pos: 1 },
+        { num: 2, name: "IN_R", type: "in", side: "right", pos: 1 }
+      ],
       evaluate: () => ({})
     },
 
@@ -686,10 +689,13 @@
       name: "Digital Logic Probe",
       category: "io",
       package: "Probe",
-      pinsCount: 1,
+      pinsCount: 2,
       refPrefix: "PR",
-      desc: "Digital logic analyzer probe. Displays real-time binary state [0] or [1].",
-      pins: [{ num: 1, name: "IN", type: "in", side: "left", pos: 1 }],
+      desc: "Digital logic analyzer probe. Displays real-time binary state [0] or [1]. Connect to either Left (Pin 1) or Right (Pin 2) terminal.",
+      pins: [
+        { num: 1, name: "IN_L", type: "in", side: "left", pos: 1 },
+        { num: 2, name: "IN_R", type: "in", side: "right", pos: 1 }
+      ],
       evaluate: () => ({})
     },
 
@@ -1497,13 +1503,13 @@
     }
 
     if (comp.type === "LED") {
-      // Terminal on the left of the LED circle
-      return { x: comp.x - 42, y: comp.y };
+      // Pin 1 on left, Pin 2 on right
+      return { x: pinNum === 2 ? comp.x + 40 : comp.x - 40, y: comp.y };
     }
 
     if (comp.type === "PROBE") {
-      // Terminal on the left of the probe box
-      return { x: comp.x - 46, y: comp.y };
+      // Pin 1 on left, Pin 2 on right
+      return { x: pinNum === 2 ? comp.x + 44 : comp.x - 44, y: comp.y };
     }
 
     if (comp.type === "CLOCK") {
@@ -1804,7 +1810,7 @@
           const comp = state.components.find((c) => c.id === compId);
           if (!comp) continue;
 
-          // Primary drivers: VCC, GND, SWITCH, CLOCK
+          // Primary drivers: VCC, GND, SWITCH, CLOCK, POWER_RAIL, SW_RAIL_8
           if (comp.type === "VCC") {
             netVal = 1;
             break;
@@ -1816,6 +1822,13 @@
             break;
           } else if (comp.type === "CLOCK") {
             netVal = comp.state?.value ? 1 : 0;
+            break;
+          } else if (comp.type === "POWER_RAIL") {
+            netVal = pinNum <= 4 ? 1 : 0;
+            break;
+          } else if (comp.type === "SW_RAIL_8") {
+            const vals = comp.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+            netVal = vals[pinNum - 1] ? 1 : 0;
             break;
           } else if (icOutputVoltages[pk] !== undefined) {
             // IC output pin driving this net
@@ -1849,6 +1862,7 @@
               spec.pins.forEach((p) => {
                 if (p.type === "out") {
                   const pk = `${c.id}:${p.num}`;
+                  pinVoltages[pk] = 0;
                   if (icOutputVoltages[pk] !== 0) {
                     icOutputVoltages[pk] = 0;
                     changed = true;
@@ -1870,7 +1884,12 @@
 
           const outputs = spec.evaluate(inputValues, c);
           for (const [pinNum, val] of Object.entries(outputs)) {
-            pinVoltages[`${c.id}:${pinNum}`] = val;
+            const pk = `${c.id}:${pinNum}`;
+            pinVoltages[pk] = val;
+            if (icOutputVoltages[pk] !== val) {
+              icOutputVoltages[pk] = val;
+              changed = true;
+            }
           }
         }
       });
@@ -1878,6 +1897,31 @@
       // Stop once network has converged
       if (!changed && pass >= 2) break;
     }
+
+    // Standalone driver voltages for un-wired pins inspection
+    state.components.forEach((c) => {
+      if (c.type === "VCC") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = 1;
+      } else if (c.type === "GND") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = 0;
+      } else if (c.type === "SWITCH") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = c.state?.value ? 1 : 0;
+      } else if (c.type === "CLOCK") {
+        if (pinVoltages[`${c.id}:1`] === undefined) pinVoltages[`${c.id}:1`] = c.state?.value ? 1 : 0;
+      } else if (c.type === "POWER_RAIL") {
+        for (let i = 1; i <= 4; i++) {
+          if (pinVoltages[`${c.id}:${i}`] === undefined) pinVoltages[`${c.id}:${i}`] = 1;
+        }
+        for (let i = 5; i <= 8; i++) {
+          if (pinVoltages[`${c.id}:${i}`] === undefined) pinVoltages[`${c.id}:${i}`] = 0;
+        }
+      } else if (c.type === "SW_RAIL_8") {
+        const vals = c.state?.values || [0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < 8; i++) {
+          if (pinVoltages[`${c.id}:${i + 1}`] === undefined) pinVoltages[`${c.id}:${i + 1}`] = vals[i] ? 1 : 0;
+        }
+      }
+    });
 
     // 3. Final Wire States (Equipotential wire logic levels)
     state.wires.forEach((w) => {
@@ -1927,11 +1971,19 @@
 
     state.components.forEach((c) => {
       if (c.type === "LED") {
-        const inVal = pinVoltages[`${c.id}:1`] || 0;
+        const v1 = pinVoltages[`${c.id}:1`];
+        const v2 = pinVoltages[`${c.id}:2`];
+        let isLit = false;
+        if (v1 === 1 && v2 === 0) isLit = true;
+        else if (v2 === 1 && v1 === 0) isLit = true;
+        else if (v1 === 1 && (v2 === undefined || v2 === null)) isLit = true;
+        else if (v2 === 1 && (v1 === undefined || v1 === null)) isLit = true;
+        else if (v1 === 1 || v2 === 1) isLit = true;
+
         const ledGlow = document.getElementById(`led-glow-${c.id}`);
         const ledCore = document.getElementById(`led-core-${c.id}`);
         if (ledGlow && ledCore) {
-          if (inVal === 1) {
+          if (isLit) {
             ledGlow.setAttribute("opacity", "0.95");
             ledCore.setAttribute("fill", "#00ff66");
           } else {
@@ -1940,7 +1992,9 @@
           }
         }
       } else if (c.type === "PROBE") {
-        const inVal = pinVoltages[`${c.id}:1`] !== undefined ? pinVoltages[`${c.id}:1`] : "-";
+        const v1 = pinVoltages[`${c.id}:1`];
+        const v2 = pinVoltages[`${c.id}:2`];
+        const inVal = v1 !== undefined ? v1 : (v2 !== undefined ? v2 : "-");
         const probeText = document.getElementById(`probe-val-${c.id}`);
         if (probeText) {
           probeText.textContent = inVal;
@@ -2087,8 +2141,26 @@
           return;
         }
 
-        // If in wire mode and currently routing, ignore dragging
-        if (state.tool === "wire" && state.activeWire) return;
+        // If in wire mode and currently routing, auto-connect to the nearest pin on this component
+        if (state.activeWire) {
+          e.stopPropagation();
+          const coords = clientToSvgCoords(e.clientX, e.clientY);
+          const spec = LIBRARY[c.type];
+          if (spec && spec.pins && spec.pins.length > 0) {
+            let closestPin = spec.pins[0];
+            let minDist = Infinity;
+            spec.pins.forEach((p) => {
+              const pos = getPinWorldPos(c, p.num);
+              const dist = Math.hypot(coords.x - pos.x, coords.y - pos.y);
+              if (dist < minDist) {
+                minDist = dist;
+                closestPin = p;
+              }
+            });
+            completeWireToPin(c.id, closestPin.num);
+          }
+          return;
+        }
 
         e.stopPropagation();
         setSelectedItem({ type: "comp", id: c.id });
@@ -2437,14 +2509,17 @@
 
     } else if (c.type === "LED") {
       const ledR = 18;
-      const pPos = getPinWorldPos(c, 1);
-      const initialVal = state.pinVoltages[`${c.id}:1`] || 0;
+      const pPos1 = getPinWorldPos(c, 1);
+      const pPos2 = getPinWorldPos(c, 2);
+      const v1 = state.pinVoltages[`${c.id}:1`];
+      const v2 = state.pinVoltages[`${c.id}:2`];
+      const isLit = (v1 === 1 || v2 === 1);
 
       // Generous grab area
       g.appendChild(createSVGElement("rect", {
-        x: c.x - ledR - 25,
+        x: c.x - 50,
         y: c.y - ledR - 10,
-        width: ledR * 2 + 50,
+        width: 100,
         height: ledR * 2 + 20,
         class: "comp-grab-area"
       }));
@@ -2455,7 +2530,7 @@
         cy: c.y,
         r: 28,
         fill: "#00ff66",
-        opacity: initialVal === 1 ? "0.95" : "0.0",
+        opacity: isLit ? "0.95" : "0.0",
         class: "led-glow",
         filter: "blur(6px)",
         "pointer-events": "none"
@@ -2467,16 +2542,17 @@
         cx: c.x,
         cy: c.y,
         r: ledR,
-        fill: initialVal === 1 ? "#00ff66" : "#1e3a24",
+        fill: isLit ? "#00ff66" : "#1e3a24",
         stroke: "#0f172a",
         "stroke-width": 2,
         "pointer-events": "none"
       });
       g.appendChild(bulb);
 
+      // Left lead line
       g.appendChild(createSVGElement("line", {
-        x1: pPos.x,
-        y1: pPos.y,
+        x1: pPos1.x,
+        y1: pPos1.y,
         x2: c.x - ledR,
         y2: c.y,
         stroke: "#a00000",
@@ -2484,7 +2560,22 @@
         "pointer-events": "none"
       }));
 
-      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+      // Right lead line
+      g.appendChild(createSVGElement("line", {
+        x1: c.x + ledR,
+        y1: c.y,
+        x2: pPos2.x,
+        y2: pPos2.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
+
+      // Left terminal pin (Pin 1)
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos1.x, pPos1.y));
+
+      // Right terminal pin (Pin 2)
+      g.appendChild(createPinTerminalGroup(c.id, 2, pPos2.x, pPos2.y));
 
       const refT = createSVGElement("text", {
         x: c.x,
@@ -2502,13 +2593,16 @@
     } else if (c.type === "PROBE") {
       const boxW = 46;
       const boxH = 34;
-      const pPos = getPinWorldPos(c, 1);
-      const initialVal = state.pinVoltages[`${c.id}:1`] !== undefined ? state.pinVoltages[`${c.id}:1`] : "-";
+      const pPos1 = getPinWorldPos(c, 1);
+      const pPos2 = getPinWorldPos(c, 2);
+      const v1 = state.pinVoltages[`${c.id}:1`];
+      const v2 = state.pinVoltages[`${c.id}:2`];
+      const initialVal = v1 !== undefined ? v1 : (v2 !== undefined ? v2 : "-");
 
       g.appendChild(createSVGElement("rect", {
-        x: c.x - boxW / 2 - 25,
+        x: c.x - 55,
         y: c.y - boxH / 2 - 10,
-        width: boxW + 40,
+        width: 110,
         height: boxH + 20,
         class: "comp-grab-area"
       }));
@@ -2539,9 +2633,10 @@
       valText.textContent = initialVal;
       g.appendChild(valText);
 
+      // Left lead line
       g.appendChild(createSVGElement("line", {
-        x1: pPos.x,
-        y1: pPos.y,
+        x1: pPos1.x,
+        y1: pPos1.y,
         x2: c.x - boxW / 2,
         y2: c.y,
         stroke: "#a00000",
@@ -2549,7 +2644,22 @@
         "pointer-events": "none"
       }));
 
-      g.appendChild(createPinTerminalGroup(c.id, 1, pPos.x, pPos.y));
+      // Right lead line
+      g.appendChild(createSVGElement("line", {
+        x1: c.x + boxW / 2,
+        y1: c.y,
+        x2: pPos2.x,
+        y2: pPos2.y,
+        stroke: "#a00000",
+        "stroke-width": 1.5,
+        "pointer-events": "none"
+      }));
+
+      // Left terminal pin (Pin 1)
+      g.appendChild(createPinTerminalGroup(c.id, 1, pPos1.x, pPos1.y));
+
+      // Right terminal pin (Pin 2)
+      g.appendChild(createPinTerminalGroup(c.id, 2, pPos2.x, pPos2.y));
 
       const refT = createSVGElement("text", {
         x: c.x,

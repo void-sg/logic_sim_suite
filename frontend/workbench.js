@@ -33,13 +33,13 @@
         { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
         { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
         { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 }
       ],
       evaluate: (inputs) => {
         const in1 = inputs["1"] !== undefined ? inputs["1"] : 1;
@@ -79,13 +79,13 @@
         { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
         { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
         { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 }
       ],
       evaluate: (inputs) => {
         return {
@@ -116,13 +116,13 @@
         { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
         { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
         { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 }
       ],
       evaluate: (inputs) => {
         return {
@@ -153,13 +153,13 @@
         { num: 5, name: "2B", type: "in", side: "left", pos: 5 },
         { num: 6, name: "2Y", type: "out", side: "left", pos: 6 },
         { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
-        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
-        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 13, name: "4B", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 12, name: "4A", type: "in", side: "right", pos: 3 },
+        { num: 11, name: "4Y", type: "out", side: "right", pos: 4 },
+        { num: 10, name: "3B", type: "in", side: "right", pos: 5 },
+        { num: 9, name: "3A", type: "in", side: "right", pos: 6 },
+        { num: 8, name: "3Y", type: "out", side: "right", pos: 7 }
       ],
       evaluate: (inputs) => {
         return {
@@ -190,13 +190,13 @@
         { num: 5, name: "2A", type: "in", side: "left", pos: 5 },
         { num: 6, name: "2B", type: "in", side: "left", pos: 6 },
         { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "3A", type: "in", side: "right", pos: 7 },
-        { num: 9, name: "3B", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "3Y", type: "out", side: "right", pos: 5 },
-        { num: 11, name: "4A", type: "in", side: "right", pos: 4 },
-        { num: 12, name: "4B", type: "in", side: "right", pos: 3 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 13, name: "4Y", type: "out", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 12, name: "4B", type: "in", side: "right", pos: 3 },
+        { num: 11, name: "4A", type: "in", side: "right", pos: 4 },
+        { num: 10, name: "3Y", type: "out", side: "right", pos: 5 },
+        { num: 9, name: "3B", type: "in", side: "right", pos: 6 },
+        { num: 8, name: "3A", type: "in", side: "right", pos: 7 }
       ],
       evaluate: (inputs) => {
         return {
@@ -227,13 +227,13 @@
         { num: 5, name: "3A", type: "in", side: "left", pos: 5 },
         { num: 6, name: "3Y", type: "out", side: "left", pos: 6 },
         { num: 7, name: "GND", type: "pwr", side: "left", pos: 7 },
-        { num: 8, name: "4Y", type: "out", side: "right", pos: 7 },
-        { num: 9, name: "4A", type: "in", side: "right", pos: 6 },
-        { num: 10, name: "5Y", type: "out", side: "right", pos: 5 },
-        { num: 11, name: "5A", type: "in", side: "right", pos: 4 },
-        { num: 12, name: "6Y", type: "out", side: "right", pos: 3 },
+        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 13, name: "6A", type: "in", side: "right", pos: 2 },
-        { num: 14, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 12, name: "6Y", type: "out", side: "right", pos: 3 },
+        { num: 11, name: "5A", type: "in", side: "right", pos: 4 },
+        { num: 10, name: "5Y", type: "out", side: "right", pos: 5 },
+        { num: 9, name: "4A", type: "in", side: "right", pos: 6 },
+        { num: 8, name: "4Y", type: "out", side: "right", pos: 7 }
       ],
       evaluate: (inputs) => {
         return {
@@ -289,14 +289,14 @@
         { num: 6, name: "W", type: "out", side: "left", pos: 6 },
         { num: 7, name: "~G", type: "in", side: "left", pos: 7 },
         { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
-        { num: 9, name: "C", type: "in", side: "right", pos: 8 },
-        { num: 10, name: "B", type: "in", side: "right", pos: 7 },
-        { num: 11, name: "A", type: "in", side: "right", pos: 6 },
-        { num: 12, name: "D7", type: "in", side: "right", pos: 5 },
-        { num: 13, name: "D6", type: "in", side: "right", pos: 4 },
-        { num: 14, name: "D5", type: "in", side: "right", pos: 3 },
+        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 15, name: "D4", type: "in", side: "right", pos: 2 },
-        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 14, name: "D5", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "D6", type: "in", side: "right", pos: 4 },
+        { num: 12, name: "D7", type: "in", side: "right", pos: 5 },
+        { num: 11, name: "A", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "B", type: "in", side: "right", pos: 7 },
+        { num: 9, name: "C", type: "in", side: "right", pos: 8 }
       ],
       evaluate: (inputs) => {
         const strobe = inputs["7"] || 0; // ~G active low
@@ -326,6 +326,73 @@
       }
     },
 
+    "74153": {
+      id: "74153",
+      name: "74153 (Dual 4:1 Multiplexer)",
+      category: "msi",
+      package: "DIP-16",
+      pinsCount: 16,
+      refPrefix: "U",
+      desc: "Dual 4-line to 1-line data selectors/multiplexers. Contains two independent 4:1 MUX sections sharing common select lines (S0, S1) with separate active-low strobes (1~G, 2~G).",
+      datasheet: "VCC: Pin 16, GND: Pin 8. Select: S1(2), S0(14). MUX 1: 1~G(1), 1D0(6), 1D1(5), 1D2(4), 1D3(3) -> 1Y(7). MUX 2: 2~G(15), 2D0(10), 2D1(11), 2D2(12), 2D3(13) -> 2Y(9).",
+      vccPin: 16,
+      gndPin: 8,
+      pins: [
+        { num: 1, name: "1~G", type: "in", side: "left", pos: 1 },
+        { num: 2, name: "S1", type: "in", side: "left", pos: 2 },
+        { num: 3, name: "1D3", type: "in", side: "left", pos: 3 },
+        { num: 4, name: "1D2", type: "in", side: "left", pos: 4 },
+        { num: 5, name: "1D1", type: "in", side: "left", pos: 5 },
+        { num: 6, name: "1D0", type: "in", side: "left", pos: 6 },
+        { num: 7, name: "1Y", type: "out", side: "left", pos: 7 },
+        { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
+        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 },
+        { num: 15, name: "2~G", type: "in", side: "right", pos: 2 },
+        { num: 14, name: "S0", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "2D3", type: "in", side: "right", pos: 4 },
+        { num: 12, name: "2D2", type: "in", side: "right", pos: 5 },
+        { num: 11, name: "2D1", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "2D0", type: "in", side: "right", pos: 7 },
+        { num: 9, name: "2Y", type: "out", side: "right", pos: 8 }
+      ],
+      evaluate: (inputs) => {
+        const s1 = inputs["2"] || 0;
+        const s0 = inputs["14"] || 0;
+        const sel = (s1 << 1) | s0;
+
+        // Section 1: 1~G active low
+        const strobe1 = inputs["1"] || 0;
+        let y1 = 0;
+        if (strobe1 === 0) {
+          const data1 = [
+            inputs["6"] || 0, // 1D0
+            inputs["5"] || 0, // 1D1
+            inputs["4"] || 0, // 1D2
+            inputs["3"] || 0  // 1D3
+          ];
+          y1 = data1[sel] || 0;
+        }
+
+        // Section 2: 2~G active low
+        const strobe2 = inputs["15"] || 0;
+        let y2 = 0;
+        if (strobe2 === 0) {
+          const data2 = [
+            inputs["10"] || 0, // 2D0
+            inputs["11"] || 0, // 2D1
+            inputs["12"] || 0, // 2D2
+            inputs["13"] || 0  // 2D3
+          ];
+          y2 = data2[sel] || 0;
+        }
+
+        return {
+          "7": y1,
+          "9": y2
+        };
+      }
+    },
+
     "7485": {
       id: "7485",
       name: "7485 (4-Bit Magnitude Comparator)",
@@ -346,14 +413,14 @@
         { num: 6, name: "O_EQ", type: "out", side: "left", pos: 6 },
         { num: 7, name: "O_LT", type: "out", side: "left", pos: 7 },
         { num: 8, name: "GND", type: "pwr", side: "left", pos: 8 },
-        { num: 9, name: "B0", type: "in", side: "right", pos: 8 },
-        { num: 10, name: "A0", type: "in", side: "right", pos: 7 },
-        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
-        { num: 12, name: "A1", type: "in", side: "right", pos: 5 },
-        { num: 13, name: "A2", type: "in", side: "right", pos: 4 },
-        { num: 14, name: "B2", type: "in", side: "right", pos: 3 },
+        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 },
         { num: 15, name: "A3", type: "in", side: "right", pos: 2 },
-        { num: 16, name: "VCC", type: "pwr", side: "right", pos: 1 }
+        { num: 14, name: "B2", type: "in", side: "right", pos: 3 },
+        { num: 13, name: "A2", type: "in", side: "right", pos: 4 },
+        { num: 12, name: "A1", type: "in", side: "right", pos: 5 },
+        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "A0", type: "in", side: "right", pos: 7 },
+        { num: 9, name: "B0", type: "in", side: "right", pos: 8 }
       ],
       evaluate: (inputs) => {
         const aVal = ((inputs["15"] || 0) << 3) | ((inputs["13"] || 0) << 2) | ((inputs["12"] || 0) << 1) | (inputs["10"] || 0);
@@ -402,14 +469,14 @@
         { num: 6, name: "S2", type: "out", side: "left", pos: 6 },
         { num: 7, name: "B2", type: "in", side: "left", pos: 7 },
         { num: 8, name: "A2", type: "in", side: "left", pos: 8 },
-        { num: 9, name: "S1", type: "out", side: "right", pos: 8 },
-        { num: 10, name: "A1", type: "in", side: "right", pos: 7 },
-        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
-        { num: 12, name: "GND", type: "pwr", side: "right", pos: 5 },
-        { num: 13, name: "C0", type: "in", side: "right", pos: 4 },
-        { num: 14, name: "C4", type: "out", side: "right", pos: 3 },
+        { num: 16, name: "B4", type: "in", side: "right", pos: 1 },
         { num: 15, name: "S4", type: "out", side: "right", pos: 2 },
-        { num: 16, name: "B4", type: "in", side: "right", pos: 1 }
+        { num: 14, name: "C4", type: "out", side: "right", pos: 3 },
+        { num: 13, name: "C0", type: "in", side: "right", pos: 4 },
+        { num: 12, name: "GND", type: "pwr", side: "right", pos: 5 },
+        { num: 11, name: "B1", type: "in", side: "right", pos: 6 },
+        { num: 10, name: "A1", type: "in", side: "right", pos: 7 },
+        { num: 9, name: "S1", type: "out", side: "right", pos: 8 }
       ],
       evaluate: (inputs) => {
         const aVal = ((inputs["1"] || 0) << 3) | ((inputs["3"] || 0) << 2) | ((inputs["8"] || 0) << 1) | (inputs["10"] || 0);
@@ -3558,6 +3625,180 @@
       state.wires.push({ id: "w3", from: { compId: swS0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 11 }, state: 0 });
       state.wires.push({ id: "w4", from: { compId: ic.id, pinNum: 5 }, to: { compId: ledY.id, pinNum: 1 }, state: 0 });
       state.wires.push({ id: "w5", from: { compId: ic.id, pinNum: 6 }, to: { compId: ledW.id, pinNum: 1 }, state: 1 });
+
+    } else if (presetKey === "74153_mux") {
+      // Preset 5: 74153 Dual 4:1 Multiplexer Experiment
+      const vcc = addComponentAt("VCC", 550, 130);
+      const gnd = addComponentAt("GND", 370, 450);
+      const swD0 = addComponentAt("SWITCH", 180, 180);
+      swD0.state.value = 1; // Default HIGH so channel 00 output is immediately active
+      const swD1 = addComponentAt("SWITCH", 180, 230);
+      const swD2 = addComponentAt("SWITCH", 180, 280);
+      swD2.state.value = 1;
+      const swD3 = addComponentAt("SWITCH", 180, 330);
+      const swS0 = addComponentAt("SWITCH", 180, 390);
+      const swS1 = addComponentAt("SWITCH", 180, 450);
+      const ic = addComponentAt("74153", 460, 280);
+      const led1Y = addComponentAt("LED", 720, 260);
+      const prb1Y = addComponentAt("PROBE", 720, 330);
+
+      // Power & Enable: Pin 16: VCC, Pin 8: GND, Pin 1: 1~G (Active-low Strobe tied to GND to enable MUX 1)
+      state.wires.push({ id: "w_pwr_vcc", from: { compId: vcc.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_pwr_gnd", from: { compId: ic.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_strobe1", from: { compId: ic.id, pinNum: 1 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Signal Connections for MUX 1: 1D0 (Pin 6), 1D1 (Pin 5), 1D2 (Pin 4), 1D3 (Pin 3), S0 (Pin 14), S1 (Pin 2), Output 1Y (Pin 7)
+      state.wires.push({ id: "w1", from: { compId: swD0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 6 }, state: 1 });
+      state.wires.push({ id: "w2", from: { compId: swD1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 5 }, state: 0 });
+      state.wires.push({ id: "w3", from: { compId: swD2.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 4 }, state: 1 });
+      state.wires.push({ id: "w4", from: { compId: swD3.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 3 }, state: 0 });
+      state.wires.push({ id: "w5", from: { compId: swS0.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 14 }, state: 0 });
+      state.wires.push({ id: "w6", from: { compId: swS1.id, pinNum: 1 }, to: { compId: ic.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w7", from: { compId: ic.id, pinNum: 7 }, to: { compId: led1Y.id, pinNum: 1 }, state: 1 });
+      state.wires.push({ id: "w8", from: { compId: ic.id, pinNum: 7 }, to: { compId: prb1Y.id, pinNum: 1 }, state: 1 });
+
+    } else if (presetKey === "74153_case1_3var") {
+      // Preset 6: Case 1 from Report - F(C,B,A) = Σm(0,1,3,4,7) using 74LS153 as 8:1 MUX
+      const vcc = addComponentAt("VCC", 520, 110);
+      const gnd = addComponentAt("GND", 520, 620);
+
+      // 3 Switches: C (MSB / Strobe), B (Middle / S1), A (LSB / S0)
+      const swC = addComponentAt("SWITCH", 140, 220);
+      swC.ref = "SW_C";
+      const swB = addComponentAt("SWITCH", 140, 310);
+      swB.ref = "SW_B";
+      const swA = addComponentAt("SWITCH", 140, 400);
+      swA.ref = "SW_A";
+
+      // Chips: 74153 Dual 4:1 MUX, 7404 Hex Inverter, 7432 OR Gate
+      const icMux = addComponentAt("74153", 400, 320);
+      const icNot = addComponentAt("7404", 660, 240);
+      const icOr  = addComponentAt("7432", 660, 470);
+
+      // Output Indicators
+      const led = addComponentAt("LED", 860, 450);
+      const prb = addComponentAt("PROBE", 860, 520);
+
+      // Power & Ground
+      state.wires.push({ id: "w_pwr1", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_pwr2", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_pwr3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icOr.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_gnd1", from: { compId: icMux.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd2", from: { compId: icNot.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd3", from: { compId: icOr.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // Select & Strobe Connections:
+      // Variable C controls Strobes: C -> 1~G (Pin 1), C -> 7404 Pin 1 (1A), 7404 Pin 2 (1Y) -> 2~G (Pin 15)
+      state.wires.push({ id: "w_sc1", from: { compId: swC.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sc2", from: { compId: swC.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sc_inv", from: { compId: icNot.id, pinNum: 2 }, to: { compId: icMux.id, pinNum: 15 }, state: 1 });
+
+      // Variable B -> S1 (Pin 2)
+      state.wires.push({ id: "w_sb", from: { compId: swB.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 2 }, state: 0 });
+      // Variable A -> S0 (Pin 14)
+      state.wires.push({ id: "w_sa", from: { compId: swA.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 14 }, state: 0 });
+
+      // Data Inputs - from PDF Page 6 Table:
+      // 1I0 (Pin 6) = 1 (VCC) - m0 = 1
+      state.wires.push({ id: "w_1i0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 6 }, state: 1 });
+      // 1I1 (Pin 5) = 1 (VCC) - m1 = 1
+      state.wires.push({ id: "w_1i1", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 5 }, state: 1 });
+      // 1I2 (Pin 4) = 0 (GND) - m2 = 0
+      state.wires.push({ id: "w_1i2", from: { compId: gnd.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 4 }, state: 0 });
+      // 1I3 (Pin 3) = 1 (VCC) - m3 = 1
+      state.wires.push({ id: "w_1i3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 3 }, state: 1 });
+
+      // 2I0 (Pin 10) = 1 (VCC) - m4 = 1
+      state.wires.push({ id: "w_2i0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 10 }, state: 1 });
+      // 2I1 (Pin 11) = 0 (GND) - m5 = 0
+      state.wires.push({ id: "w_2i1", from: { compId: gnd.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 11 }, state: 0 });
+      // 2I2 (Pin 12) = 0 (GND) - m6 = 0
+      state.wires.push({ id: "w_2i2", from: { compId: gnd.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 12 }, state: 0 });
+      // 2I3 (Pin 13) = 1 (VCC) - m7 = 1
+      state.wires.push({ id: "w_2i3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 13 }, state: 1 });
+
+      // Outputs & OR Gate (7432)
+      state.wires.push({ id: "w_out1", from: { compId: icMux.id, pinNum: 7 }, to: { compId: icOr.id, pinNum: 1 }, state: 1 });
+      state.wires.push({ id: "w_out2", from: { compId: icMux.id, pinNum: 9 }, to: { compId: icOr.id, pinNum: 2 }, state: 0 });
+      state.wires.push({
+        id: "w_out_led",
+        from: { compId: icOr.id, pinNum: 3 },
+        to: { compId: led.id, pinNum: 1 },
+        waypoints: [{ x: 550, y: 440 }, { x: 550, y: 570 }, { x: 800, y: 570 }, { x: 800, y: 450 }],
+        state: 1
+      });
+      state.wires.push({
+        id: "w_out_prb",
+        from: { compId: icOr.id, pinNum: 3 },
+        to: { compId: prb.id, pinNum: 1 },
+        waypoints: [{ x: 550, y: 440 }, { x: 550, y: 570 }, { x: 800, y: 570 }, { x: 800, y: 520 }],
+        state: 1
+      });
+
+    } else if (presetKey === "74153_8to1_function") {
+      // Preset 7: Implement f(ABCD) = Σm(0,1,2,4,7,8,9,11,12,14) using IC 74153 + 7404 + 7432
+      const vcc = addComponentAt("VCC", 520, 110);
+      const gnd = addComponentAt("GND", 520, 620);
+
+      // Switches on the left: A (MSB), B, C, D (LSB)
+      const swA = addComponentAt("SWITCH", 140, 190);
+      swA.ref = "SW_A";
+      const swB = addComponentAt("SWITCH", 140, 260);
+      swB.ref = "SW_B";
+      const swC = addComponentAt("SWITCH", 140, 330);
+      swC.ref = "SW_C";
+      const swD = addComponentAt("SWITCH", 140, 400);
+      swD.ref = "SW_D";
+
+      // Chips
+      const icMux = addComponentAt("74153", 400, 320); // Dual 4:1 MUX
+      const icNot = addComponentAt("7404", 660, 240);  // Hex Inverter
+      const icOr  = addComponentAt("7432", 660, 470);  // Quad OR Gate
+
+      // Output Indicators
+      const led = addComponentAt("LED", 860, 450);
+      const prb = addComponentAt("PROBE", 860, 520);
+
+      // 1. Power & Ground Connections
+      state.wires.push({ id: "w_pwr1", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 16 }, state: 1 });
+      state.wires.push({ id: "w_pwr2", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 14 }, state: 1 });
+      state.wires.push({ id: "w_pwr3", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icOr.id, pinNum: 14 }, state: 1 });
+
+      state.wires.push({ id: "w_gnd1", from: { compId: icMux.id, pinNum: 8 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd2", from: { compId: icNot.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_gnd3", from: { compId: icOr.id, pinNum: 7 }, to: { compId: gnd.id, pinNum: 1 }, state: 0 });
+
+      // 2. Select & Strobe Connections
+      state.wires.push({ id: "w_sa1", from: { compId: swA.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sa2", from: { compId: swA.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 1 }, state: 0 });
+      state.wires.push({ id: "w_sa_inv", from: { compId: icNot.id, pinNum: 2 }, to: { compId: icMux.id, pinNum: 15 }, state: 1 });
+
+      // Variable B -> S1 (Pin 2)
+      state.wires.push({ id: "w_sb", from: { compId: swB.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 2 }, state: 0 });
+
+      // Variable C -> S0 (Pin 14)
+      state.wires.push({ id: "w_sc", from: { compId: swC.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 14 }, state: 0 });
+
+      // Variable D Inversion: swD -> 7404 Pin 3 (2A), Pin 4 (2Y) produces D_bar
+      state.wires.push({ id: "w_sd_in", from: { compId: swD.id, pinNum: 1 }, to: { compId: icNot.id, pinNum: 3 }, state: 0 });
+
+      // 3. Data Inputs - MUX 1 (A = 0):
+      state.wires.push({ id: "w_1d0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 6 }, state: 1 });
+      state.wires.push({ id: "w_1d1", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 5 }, state: 1 });
+      state.wires.push({ id: "w_1d2", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 4 }, state: 1 });
+      state.wires.push({ id: "w_1d3", from: { compId: swD.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 3 }, state: 0 });
+
+      // 4. Data Inputs - MUX 2 (A = 1):
+      state.wires.push({ id: "w_2d0", from: { compId: vcc.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 10 }, state: 1 });
+      state.wires.push({ id: "w_2d1", from: { compId: swD.id, pinNum: 1 }, to: { compId: icMux.id, pinNum: 11 }, state: 0 });
+      state.wires.push({ id: "w_2d2", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 12 }, state: 1 });
+      state.wires.push({ id: "w_2d3", from: { compId: icNot.id, pinNum: 4 }, to: { compId: icMux.id, pinNum: 13 }, state: 1 });
+
+      // 5. Outputs & OR Gate (7432)
+      state.wires.push({ id: "w_out1", from: { compId: icMux.id, pinNum: 7 }, to: { compId: icOr.id, pinNum: 1 }, state: 1 });
+      state.wires.push({ id: "w_out2", from: { compId: icMux.id, pinNum: 9 }, to: { compId: icOr.id, pinNum: 2 }, state: 0 });
+      state.wires.push({ id: "w_out_led", from: { compId: icOr.id, pinNum: 3 }, to: { compId: led.id, pinNum: 1 }, state: 1 });
+      state.wires.push({ id: "w_out_prb", from: { compId: icOr.id, pinNum: 3 }, to: { compId: prb.id, pinNum: 1 }, state: 1 });
 
     } else if (presetKey === "diode_or") {
       // Preset 5: Diode OR Gate

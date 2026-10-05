@@ -8,7 +8,7 @@ async function convertBits() {
   resultBox.textContent = "Converting...";
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/convert", {
+    const response = await fetch(`${API_BASE}/convert`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ from_code: fromCode, to_code: toCode, bits: bits }),

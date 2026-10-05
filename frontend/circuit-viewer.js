@@ -8,7 +8,7 @@
  */
 
 (function () {
-  const API_BASE = "http://127.0.0.1:8000";
+  // API_BASE is loaded from config.js
   const SVG_NS = "http://www.w3.org/2000/svg";
 
   // Application State

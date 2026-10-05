@@ -85,11 +85,7 @@ function localUniversalConvert(fromCode, toCode, bits) {
 }
 
 async function universalConvert(fromCode, toCode, bits) {
-  const hosts = [
-    window.location.hostname ? `http://${window.location.hostname}:8000` : null,
-    "http://127.0.0.1:8000",
-    "http://localhost:8000"
-  ].filter((v, i, a) => v && a.indexOf(v) === i);
+  const hosts = [API_BASE].filter(Boolean);
 
   // 1. Try Python backend first
   for (const host of hosts) {
@@ -206,11 +202,7 @@ function localUniversalAddSubtract(a, b, mode = 0, cin = null) {
 }
 
 async function universalAddSubtract(a, b, mode = 0, cin = null) {
-  const hosts = [
-    window.location.hostname ? `http://${window.location.hostname}:8000` : null,
-    "http://127.0.0.1:8000",
-    "http://localhost:8000"
-  ].filter((v, i, a) => v && a.indexOf(v) === i);
+  const hosts = [API_BASE].filter(Boolean);
 
   for (const host of hosts) {
     try {
@@ -321,11 +313,7 @@ function localUniversalCompare(a, b, cascadeIn = null) {
 }
 
 async function universalCompare(a, b, cascadeIn = null) {
-  const hosts = [
-    window.location.hostname ? `http://${window.location.hostname}:8000` : null,
-    "http://127.0.0.1:8000",
-    "http://localhost:8000"
-  ].filter((v, i, a) => v && a.indexOf(v) === i);
+  const hosts = [API_BASE].filter(Boolean);
 
   for (const host of hosts) {
     try {
@@ -475,11 +463,7 @@ function localUniversalMux(select, inputs, strobe = 0) {
 }
 
 async function universalMux(select, inputs, strobe = 0) {
-  const hosts = [
-    window.location.hostname ? `http://${window.location.hostname}:8000` : null,
-    "http://127.0.0.1:8000",
-    "http://localhost:8000"
-  ].filter((v, i, a) => v && a.indexOf(v) === i);
+  const hosts = [API_BASE].filter(Boolean);
 
   for (const host of hosts) {
     try {

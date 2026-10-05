@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multiplexers in Digital Logic | Visual Study Guide</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]});"></script>
+<style>
+:root{
+  --navy:#14233b;--blue:#2c6ee8;--ink:#172130;--muted:#667387;
+  --line:#d9e1ec;--white:#fff;--soft:#f5f8fc;--green:#138a5b;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f7f9fc;color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;line-height:1.65}
+.site-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-wrap{max-width:1180px;margin:auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--navy)}
+.brand-mark{width:38px;height:38px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:900;font-size:12px}
+.brand small{display:block;color:var(--muted);font:10px "DM Mono",monospace;letter-spacing:1px;margin-top:2px}
+.main-nav a{color:var(--blue);text-decoration:none;font-weight:700;font-size:14px}
+.intro{max-width:1080px;margin:0 auto;padding:46px 24px 70px}
+.meta-tag{display:inline-block;background:#e2e8f0;color:var(--navy);font:600 11px "DM Mono",monospace;padding:5px 10px;border-radius:5px;margin-bottom:15px}
+.label{font:700 12px "DM Mono",monospace;letter-spacing:1.4px;color:var(--blue)}
+h1{font-size:clamp(32px,5vw,54px);line-height:1.08;letter-spacing:-1.5px;color:var(--navy);margin:8px 0 18px}
+h3{font-size:25px;color:var(--navy);margin-top:38px}
+h4{color:var(--navy)}
+.intro-text{font-size:16px;color:#344256}
+.note-callout{background:#eff6ff;border-left:4px solid var(--blue);padding:14px 18px;border-radius:0 8px 8px 0;margin:18px 0;font-size:14px}
+.topic-section{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px;margin:26px 0;box-shadow:0 8px 30px rgba(20,35,59,.045)}
+.badge-group{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.badge{background:#eef2f8;color:var(--blue);border:1px solid var(--line);padding:7px 12px;border-radius:6px;font:700 12px "DM Mono",monospace}
+.data-table{width:100%;border-collapse:collapse;margin:16px 0;font:13px "DM Mono",monospace}
+.data-table th,.data-table td{padding:10px 12px;text-align:center;border:1px solid var(--line)}
+.data-table th{background:var(--navy);color:#fff}
+.data-table tr:nth-child(even){background:#f8fafc}
+.grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.formula-box{background:#fff;padding:15px 18px;border:1px solid var(--line);border-radius:8px;font:14px "DM Mono",monospace;margin:14px 0;line-height:1.8;overflow:auto}
+.highlight-card,.gate-card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:18px}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin:18px 0}
+.gate-card h4{margin:0 0 8px;color:var(--blue);font-size:14px}
+.visual-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:22px 0}
+.visual-card{margin:0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(20,35,59,.06)}
+.diagram-wrap{padding:14px;background:linear-gradient(180deg,#fbfdff,#f3f7fd)}
+.diagram-wrap svg,.wide-svg{width:100%;height:auto;display:block}
+.visual-card figcaption{padding:12px 15px;font-size:13px;color:#53657e;border-top:1px solid var(--line)}
+.source-strip,.attribution{margin:18px 0;padding:14px 17px;background:#f1f5f9;border:1px solid var(--line);border-radius:9px;font-size:13px;color:#526177}
+.source-strip a,.attribution a{color:var(--blue);font-weight:700;text-decoration:none}
+.image-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin:20px 0;box-shadow:0 7px 24px rgba(20,35,59,.05)}
+.panel-title{font-weight:800;color:var(--navy);margin-bottom:14px}
+.selection-flow{display:grid;grid-template-columns:1fr 45px 110px 45px 1fr;align-items:center;gap:8px;margin:10px 0}
+.flow-box{padding:14px;border:1px solid var(--line);border-radius:8px;background:#f8fafc;text-align:center}
+.flow-box span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.flow-box.output{border-color:#9bd7bf;background:#f0fbf6}
+.flow-arrow{font-size:25px;text-align:center;color:var(--blue)}
+.mux-mini{background:#eef4ff;border:2px solid #214a8a;border-radius:8px;padding:13px;text-align:center;font-weight:900;color:var(--navy)}
+.mux-mini small{font-weight:500;color:var(--muted)}
+.selection-table{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.selection-table div{background:#f8fafc;border:1px solid var(--line);padding:10px;text-align:center;border-radius:7px}
+.selection-table span{display:block;color:var(--blue);font-weight:800;margin-top:4px}
+.compact{font-size:13px}
+.gate-visual-grid{margin-bottom:22px}
+.small-diagram{padding:10px}
+.attribution{margin-top:28px}
+footer{border-top:1px solid var(--line);padding:25px;text-align:center;color:var(--muted);font:12px "DM Mono",monospace}
+@media(max-width:800px){
+ .grid-2col,.visual-grid{grid-template-columns:1fr}
+ .selection-flow{grid-template-columns:1fr}
+ .flow-arrow{transform:rotate(90deg)}
+ .selection-table{grid-template-columns:1fr 1fr}
+ .intro{padding-left:16px;padding-right:16px}
+ .topic-section{padding:18px}
+}
+
+.gfg-gallery{display:grid;gap:22px;margin:20px 0}
+.gfg-gallery.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gfg-gallery.three{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gfg-image{margin:0;background:#fff;border:1px solid #d9e1ec;border-radius:8px;padding:14px;text-align:center;overflow:hidden}
+.gfg-image img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain;margin:auto;background:#fff}
+.gfg-image figcaption{font-size:11px;color:#667387;margin-top:9px}
+.gfg-image a,.gfg-source a{color:#2c6ee8;font-weight:700;text-decoration:none}
+.gfg-source{background:#f1f5f9;border:1px solid #d9e1ec;border-radius:8px;padding:13px 16px;font-size:13px;margin:18px 0}
+.gfg-section-images{margin:22px 0}
+.gfg-section-images h4,.gfg-gate-gallery h4{color:#14233b;margin:20px 0 10px}
+.gfg-gate-gallery{margin:20px 0}
+@media(max-width:800px){
+  .gfg-gallery.two,.gfg-gallery.three{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span><strong>Digital Electronics</strong><small>LOGIC SIMULATION</small></span></a>
+    <nav class="main-nav"><a href="index.html#multiplexer">← Back to Multiplexer</a></nav>
+  </div>
+</header>
+<main class="intro">
+
+<span class="meta-tag">GEEKSFORGEEKS REFERENCE COMPREHENSIVE STUDY GUIDE</span>
+<p class="label">COMBINATIONAL DIGITAL LOGIC</p>
+<h1>Multiplexers in Digital Logic (Complete Study Guide)</h1>
+<p class="intro-text">
+      A <strong>multiplexer (MUX)</strong> is a combinational circuit that selects one signal from several available inputs and forwards the selected signal to one output. The number of select lines depends on the number of inputs: an MUX with \(2^n\) inputs needs \(n\) select lines.
+    </p>
+<div class="note-callout">
+      <strong>Quick idea:</strong> Think of a multiplexer as a digital selector: the select lines decide which one of the available inputs is connected to the output.
+    </div>
+    <div class="note-callout">
+<ul>
+<li>Multiplexers are also known as <strong>"N-to-1 selectors"</strong>, <strong>parallel-to-serial converters</strong>, <strong>many-to-one circuits</strong>, and <strong>universal logic circuits</strong>.</li>
+<li>They are mainly used to increase the amount of data that can be sent over a network within a certain amount of time and bandwidth.</li>
+</ul>
+</div>
+<!-- GFG VISUAL OVERVIEW -->
+<div class="gfg-gallery two">
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/20240514100639/2-1-Multiplexer-%282%29.png" alt="GeeksforGeeks 2 to 1 multiplexer block diagram with truth table" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/1-78.png" alt="GeeksforGeeks 4 to 1 multiplexer block diagram" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+</div>
+<div class="gfg-source">
+  <strong>Diagrams:</strong> Directly embedded from GeeksforGeeks' MUX article. The diagrams are retained as published and attributed to GeeksforGeeks.
+  <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">View source article ↗</a>
+</div>
+<!-- SECTION 1: TYPES OF MUX -->
+<section class="topic-section">
+<h3>1. Types of Multiplexers</h3>
+<p class="intro-text" style="margin-top: 0;">
+        Multiplexers are classified based on the number of data input channels:
+      </p>
+<div class="badge-group">
+<span class="badge">2 : 1 Mux (1 select line)</span>
+<span class="badge">4 : 1 Mux (2 select lines)</span>
+<span class="badge">8 : 1 Mux (3 select lines)</span>
+<span class="badge">16 : 1 Mux (4 select lines)</span>
+</div>
+</section>
+<!-- SECTION 2: 2x1 MULTIPLEXER -->
+<section class="topic-section">
+<h3>2. 2x1 Multiplexer</h3>
+<p class="intro-text" style="margin-top: 0;">
+        The <strong>2x1 MUX</strong> is a fundamental circuit also known as a 2-to-1 multiplexer used to choose one signal from two inputs and transmit it to the single output line. It has two input lines (\(I_0, I_1\)), one output line (\(Y\)), and a single selection line (\(S_0\)).
+      </p>
+<div class="grid-2col">
+<div>
+<h4 style="margin: 0 0 8px; font-size: 14px;">Truth Table of 2:1 MUX</h4>
+<table class="data-table">
+<thead>
+<tr>
+<th>Select Line (\(S_0\))</th>
+<th>Selected Output (\(Y\))</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>0</strong> (LOW)</td><td><strong>\(I_0\)</strong></td></tr>
+<tr><td><strong>1</strong> (HIGH)</td><td><strong>\(I_1\)</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div>
+<h4 style="margin: 0 0 8px; font-size: 14px;">Logical Expression of 2x1 MUX</h4>
+<p class="intro-text" style="margin: 0; font-size: 13px;">
+            Using the Truth Table, the logical expression for the 2:1 MUX is:
+          </p>
+<div class="formula-box">
+            $$Y = \overline{S_0} \cdot I_0 + S_0 \cdot I_1$$
+          </div>
+</div>
+</div>
+<h4 style="margin: 16px 0 8px; font-size: 14px;">Circuit Diagram of 2x1 Multiplexer</h4>
+<figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/20240519081155/Circuit-diagram-%281%29.webp" alt="GeeksforGeeks circuit diagram of a 2 to 1 multiplexer" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+</section>
+<!-- SECTION 3: 4x1 MULTIPLEXER -->
+<section class="topic-section">
+<h3>3. 4x1 Multiplexer</h3>
+<p class="intro-text" style="margin-top: 0;">
+        A <strong>4x1 MUX</strong> provides four possible data inputs and uses two select lines to determine which input reaches the output. Therefore, it has \(I_0\) through \(I_3\) as data inputs, \(S_1,S_0\) as control lines, and \(Y\) as the output. Since \(2^2=4\), two select lines are sufficient.
+      </p>
+<div class="grid-2col">
+<div>
+<h4 style="margin: 0 0 8px; font-size: 14px;">Truth Table of 4x1 MUX</h4>
+<table class="data-table">
+<thead>
+<tr>
+<th>\(S_1\) (MSB)</th>
+<th>\(S_0\) (LSB)</th>
+<th>Output (\(Y\))</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>0</td><td>0</td><td><strong>\(I_0\)</strong></td></tr>
+<tr><td>0</td><td>1</td><td><strong>\(I_1\)</strong></td></tr>
+<tr><td>1</td><td>0</td><td><strong>\(I_2\)</strong></td></tr>
+<tr><td>1</td><td>1</td><td><strong>\(I_3\)</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div>
+<h4 style="margin: 0 0 8px; font-size: 14px;">Logical Expression of 4x1 MUX</h4>
+<div class="formula-box">
+            $$Y = \overline{S_1}\,\overline{S_0}\,I_0 + \overline{S_1}\,S_0\,I_1 + S_1\,\overline{S_0}\,I_2 + S_1\,S_0\,I_3$$
+          </div>
+<p class="intro-text" style="font-size: 13px;">
+            The circuit uses <strong>4 three-input AND gates</strong>, <strong>2 NOT gates</strong>, and <strong>1 four-input OR gate</strong>.
+          </p>
+</div>
+</div>
+</section>
+
+<div class="image-panel">
+  <div class="panel-title">Visual: 4:1 MUX selection map</div>
+  <svg class="wide-svg" viewBox="0 0 900 360" role="img" aria-label="4 to 1 multiplexer selection diagram">
+    <polygon points="335,55 625,90 625,270 335,305" fill="#eef4ff" stroke="#214a8a" stroke-width="5"/>
+    <text x="480" y="150" text-anchor="middle" font-size="30" font-weight="800" fill="#14233b">4 : 1 MUX</text>
+    <text x="480" y="182" text-anchor="middle" font-size="18" fill="#53657e">2 select lines</text>
+    <g stroke="#172130" stroke-width="3">
+      <line x1="70" y1="80" x2="335" y2="80"/><line x1="70" y1="135" x2="335" y2="135"/>
+      <line x1="70" y1="225" x2="335" y2="225"/><line x1="70" y1="280" x2="335" y2="280"/>
+    </g>
+    <g font-size="21" font-family="monospace" fill="#172130">
+      <text x="35" y="87">I₀</text><text x="35" y="142">I₁</text>
+      <text x="35" y="232">I₂</text><text x="35" y="287">I₃</text>
+    </g>
+    <line x1="625" y1="180" x2="815" y2="180" stroke="#138a5b" stroke-width="5"/>
+    <text x="828" y="188" font-size="22" font-weight="800" fill="#138a5b">Y</text>
+    <g stroke="#2c6ee8" stroke-width="4">
+      <line x1="430" y1="305" x2="430" y2="345"/><line x1="540" y1="292" x2="540" y2="345"/>
+    </g>
+    <text x="430" y="358" text-anchor="middle" font-size="18" fill="#2c6ee8">S₁</text>
+    <text x="540" y="358" text-anchor="middle" font-size="18" fill="#2c6ee8">S₀</text>
+  </svg>
+  <div class="selection-table">
+    <div><b>S₁S₀</b><span>00 → I₀</span></div>
+    <div><b>S₁S₀</b><span>01 → I₁</span></div>
+    <div><b>S₁S₀</b><span>10 → I₂</span></div>
+    <div><b>S₁S₀</b><span>11 → I₃</span></div>
+  </div>
+</div>
+
+
+<div class="gfg-section-images">
+  <h4>4:1 MUX — Block Diagram</h4>
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/1-78.png" alt="GeeksforGeeks 4 to 1 multiplexer block diagram" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+  <h4>4:1 MUX — Logic Circuit</h4>
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/3-58.png" alt="GeeksforGeeks 4 to 1 multiplexer logic circuit" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+</div>
+<!-- SECTION 4: IMPLEMENTATION OF LOGIC GATES USING 2:1 MUX -->
+<section class="topic-section">
+<h3>4. Implementation of Different Logic Gates with 2:1 Mux</h3>
+<p class="intro-text" style="margin-top: 0;">
+        A multiplexer can also be used as a building block for Boolean logic. By choosing suitable values for the data inputs and select line, common logic functions can be realized with 2:1 MUX units:
+      </p>
+
+<div class="visual-grid gate-visual-grid">
+  <figure class="visual-card">
+    <div class="diagram-wrap small-diagram">
+      <svg viewBox="0 0 700 220" role="img" aria-label="Logic gate realization using 2 to 1 mux">
+        <rect x="270" y="55" width="150" height="90" rx="8" fill="#eef4ff" stroke="#214a8a" stroke-width="4"/>
+        <text x="345" y="95" text-anchor="middle" font-size="22" font-weight="800" fill="#14233b">2:1 MUX</text>
+        <text x="345" y="123" text-anchor="middle" font-size="16" fill="#53657e">I₀=0, I₁=Y</text>
+        <line x1="80" y1="100" x2="270" y2="100" stroke="#172130" stroke-width="3"/>
+        <text x="55" y="107" font-size="19" fill="#172130">X = S₀</text>
+        <line x1="420" y1="100" x2="610" y2="100" stroke="#138a5b" stroke-width="4"/>
+        <text x="625" y="107" font-size="20" font-weight="800" fill="#138a5b">X·Y</text>
+      </svg>
+    </div>
+    <figcaption>Example: AND realization with I₀=0 and I₁=Y.</figcaption>
+  </figure>
+  <figure class="visual-card">
+    <div class="diagram-wrap small-diagram">
+      <svg viewBox="0 0 700 220" role="img" aria-label="XOR realization using 2 to 1 mux">
+        <rect x="270" y="55" width="150" height="90" rx="8" fill="#eef4ff" stroke="#214a8a" stroke-width="4"/>
+        <text x="345" y="95" text-anchor="middle" font-size="22" font-weight="800" fill="#14233b">2:1 MUX</text>
+        <text x="345" y="123" text-anchor="middle" font-size="16" fill="#53657e">I₀=Y, I₁=Ȳ</text>
+        <line x1="80" y1="100" x2="270" y2="100" stroke="#172130" stroke-width="3"/>
+        <text x="55" y="107" font-size="19" fill="#172130">X = S₀</text>
+        <line x1="420" y1="100" x2="610" y2="100" stroke="#138a5b" stroke-width="4"/>
+        <text x="625" y="107" font-size="20" font-weight="800" fill="#138a5b">X ⊕ Y</text>
+      </svg>
+    </div>
+    <figcaption>Example: XOR realization by selecting Y or Ȳ.</figcaption>
+  </figure>
+</div>
+
+
+<div class="gfg-gate-gallery">
+  <h4>Visual Implementations Using 2:1 MUX</h4>
+  <div class="gfg-gallery three">
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/4-35.png" alt="GeeksforGeeks NOT gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/5-26.png" alt="GeeksforGeeks AND gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/6-21.png" alt="GeeksforGeeks OR gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/7-14.png" alt="GeeksforGeeks NAND gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/8-8.png" alt="GeeksforGeeks NOR gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/9-9.png" alt="GeeksforGeeks XOR gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+    <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/10-4.png" alt="GeeksforGeeks XNOR gate using 2 to 1 MUX" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+  </div>
+</div>
+
+<div class="gate-grid">
+<!-- NOT GATE -->
+<div class="gate-card">
+<h4>1. NOT Gate using 2:1 Mux</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">Connect input \(A\) to select line \(S_0\). Connect \(I_0 = 1\) and \(I_1 = 0\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{A}\cdot 1 + A\cdot 0 = \mathbf{\overline{A}}$$
+          </div>
+</div>
+<!-- AND GATE -->
+<div class="gate-card">
+<h4>2. AND Gate using 2:1 Mux</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">Connect \(X\) to select line \(S_0\), \(I_0 = 0\), and \(I_1 = Y\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{X}\cdot 0 + X\cdot Y = \mathbf{X \cdot Y}$$
+          </div>
+</div>
+<!-- OR GATE -->
+<div class="gate-card">
+<h4>3. OR Gate using 2:1 Mux</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">Connect \(X\) to select line \(S_0\), \(I_0 = Y\), and \(I_1 = 1\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{X}\cdot Y + X\cdot 1 = \mathbf{X + Y}$$
+          </div>
+</div>
+<!-- NAND GATE -->
+<div class="gate-card">
+<h4>4. NAND Gate using 2:1 Mux (Requires 2 MUX)</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">MUX 1 acts as NOT gate (\(\overline{Y}\)). In MUX 2: \(S_0 = X, I_0 = 1, I_1 = \overline{Y}\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{X}\cdot 1 + X\cdot \overline{Y} = \mathbf{\overline{X \cdot Y}}$$
+          </div>
+</div>
+<!-- NOR GATE -->
+<div class="gate-card">
+<h4>5. NOR Gate using 2:1 Mux (Requires 2 MUX)</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">MUX 1 generates \(\overline{Y}\). In MUX 2: \(S_0 = X, I_0 = \overline{Y}, I_1 = 0\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{X}\cdot \overline{Y} + X\cdot 0 = \mathbf{\overline{X + Y}}$$
+          </div>
+</div>
+<!-- XOR GATE -->
+<div class="gate-card">
+<h4>6. EX-OR Gate using 2:1 Mux (Requires 2 MUX)</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">MUX 1 generates \(\overline{Y}\). In MUX 2: \(S_0 = X, I_0 = Y, I_1 = \overline{Y}\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{X}\cdot Y + X\cdot \overline{Y} = \mathbf{X \oplus Y}$$
+          </div>
+</div>
+<!-- XNOR GATE -->
+<div class="gate-card">
+<h4>7. EX-NOR Gate using 2:1 Mux (Requires 2 MUX)</h4>
+<p style="font-size: 12px; margin: 0 0 8px;">MUX 1 generates \(\overline{Y}\). In MUX 2: \(S_0 = X, I_0 = \overline{Y}, I_1 = Y\).</p>
+<div style="font-family: 'DM Mono', monospace; font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid var(--line);">
+            $$Y = \overline{X}\cdot \overline{Y} + X\cdot Y = \mathbf{X \odot Y}$$
+          </div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: HIGHER ORDER MUX USING LOWER ORDER MUX -->
+<section class="topic-section">
+<h3>5. Implementation of Higher Order MUX using Lower Order MUX</h3>
+<div class="grid-2col">
+<div class="highlight-card">
+<h4>4:1 MUX using 2:1 MUX</h4>
+<p class="intro-text" style="font-size: 13px; margin: 0;">
+            A 4:1 MUX requires <strong>three (3)</strong> 2:1 multiplexers:
+            <br/>• Stage 1: Two 2:1 MUX driven by select line \(S_0\).
+            <br/>• Stage 2: One 2:1 MUX driven by select line \(S_1\).
+          </p>
+</div>
+<div class="highlight-card">
+<h4>General Formula for 2ⁿ:1 MUX using 2:1 MUX</h4>
+<p class="intro-text" style="font-size: 13px; margin: 0;">
+            When only 2:1 MUXes are available, constructing a \(2^n:1\) MUX requires <strong>\(2^n-1\)</strong> individual 2:1 units. The MUXes are arranged as a selection tree:
+            <br/>• <strong>8:1 MUX:</strong> \(2^3 - 1 = \mathbf{7}\)
+            <br/>• <strong>16:1 MUX:</strong> \(2^4 - 1 = \mathbf{15}\)
+            <br/>• <strong>64:1 MUX:</strong> \(2^6 - 1 = \mathbf{63}\)
+          </p>
+</div>
+</div>
+
+<div class="gfg-section-images">
+  <h4>4:1 MUX Using 2:1 MUX</h4>
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/20240923132052/Multiplexers-in-Digital-Logic.webp" alt="GeeksforGeeks 4 to 1 multiplexer implemented using 2 to 1 multiplexers" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+</div>
+<h4 style="margin: 18px 0 8px; font-size: 14px;">Tree Reduction Formula: B:1 MUX using A:1 MUX</h4>
+<p class="intro-text" style="margin-top: 0; font-size: 13px;">
+        To build a \(B:1\) MUX from smaller \(A:1\) MUXes, repeatedly divide the number of required inputs by \(A\) until the final stage contains one MUX. Adding the MUX counts at every stage gives the total:
+        $$\frac{B}{A} = K_1, \quad \frac{K_1}{A} = K_2, \quad \frac{K_2}{A} = K_3 \quad \dots \quad K_N = 1$$
+        $$\text{Total MUXes Required} = K_1 + K_2 + K_3 + \dots + K_N$$
+      </p>
+<div class="formula-box">
+<strong>Example: Implement 64:1 MUX using 4:1 MUX</strong><br/>
+        • Step 1: \(64 / 4 = 16\)<br/>
+        • Step 2: \(16 / 4 = 4\)<br/>
+        • Step 3: \(4 / 4 = 1\)<br/>
+<strong>Total 4:1 MUX Required</strong> = \(16 + 4 + 1 = \mathbf{21}\).
+      </div>
+</section>
+<!-- SECTION 6: IMPLEMENTATION OF BOOLEAN FUNCTIONS WITH DON'T CARES -->
+<section class="topic-section">
+<h3>6. Implementing Boolean Functions using 4:1 MUX</h3>
+<p class="intro-text" style="margin-top: 0;">
+        As an example, consider the following Boolean function and its specified don't-care condition:
+        $$f(A, B, C) = \sum m(1, 2, 3, 5, 6) \quad \text{with Don't Care } d(7)$$
+      </p>
+<div class="grid-2col">
+<div class="highlight-card">
+<h4>Option A: AB as Select Lines</h4>
+<table class="data-table" style="margin: 10px 0;">
+<thead>
+<tr><th>Minterms (\(C=0, C=1\))</th><th>Select \(AB\)</th><th>Data Input</th></tr>
+</thead>
+<tbody>
+<tr><td>\(m_0(0), m_1(1)\)</td><td>00</td><td><strong>\(I_0 = C\)</strong></td></tr>
+<tr><td>\(m_2(1), m_3(1)\)</td><td>01</td><td><strong>\(I_1 = 1\)</strong></td></tr>
+<tr><td>\(m_4(0), m_5(1)\)</td><td>10</td><td><strong>\(I_2 = C\)</strong></td></tr>
+<tr><td>\(m_6(1), m_7(X)\)</td><td>11</td><td><strong>\(I_3 = 1\)</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="highlight-card">
+<h4>Option B: AC as Select Lines</h4>
+<table class="data-table" style="margin: 10px 0;">
+<thead>
+<tr><th>Minterms (\(B=0, B=1\))</th><th>Select \(AC\)</th><th>Data Input</th></tr>
+</thead>
+<tbody>
+<tr><td>\(m_0(0), m_2(1)\)</td><td>00</td><td><strong>\(I_0 = B\)</strong></td></tr>
+<tr><td>\(m_1(1), m_3(1)\)</td><td>01</td><td><strong>\(I_1 = 1\)</strong></td></tr>
+<tr><td>\(m_4(0), m_6(1)\)</td><td>10</td><td><strong>\(I_2 = B\)</strong></td></tr>
+<tr><td>\(m_5(1), m_7(X)\)</td><td>11</td><td><strong>\(I_3 = 1\)</strong></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="gfg-section-images">
+  <h4>Don't-Care Implementation — AB as Select</h4>
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/13-2.png" alt="GeeksforGeeks Boolean function implementation using AB as select lines" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+  <h4>Don't-Care Implementation — AC as Select</h4>
+  <figure class="gfg-image">
+      <img src="https://media.geeksforgeeks.org/wp-content/uploads/14-1.png" alt="GeeksforGeeks Boolean function implementation using AC as select lines" loading="lazy">
+      <figcaption>GeeksforGeeks diagram — <a href="https://www.geeksforgeeks.org/digital-logic/multiplexers-in-digital-logic/" target="_blank" rel="noopener">source</a></figcaption>
+    </figure>
+</div>
+</section>
+<!-- SECTION 7: APPLICATIONS OF MUX -->
+<section class="topic-section">
+<h3>7. Applications of Multiplexers</h3>
+<ul style="font-size: 14px; line-height: 1.8; color: var(--ink); padding-left: 20px;">
+<li><strong>Data Routing:</strong> Selecting one signal path from several sources and connecting the chosen source to a common channel.</li>
+<li><strong>Data Selection:</strong> Choosing among registers, processor signals, sensor buses, or other digital sources according to control signals.</li>
+<li><strong>Analog-to-Digital Conversion (ADC):</strong> Sharing one ADC among multiple analog sources by selecting which sensor signal is sampled.</li>
+<li><strong>Address Decoding &amp; Memory Banking:</strong> Selecting memory blocks in RAM and ROM subsystems.</li>
+<li><strong>Boolean Function Implementation:</strong> Realizing different combinational functions by programming the MUX data inputs and select lines appropriately.</li>
+</ul>
+</section>
+
+<div class="attribution">
+  <strong>Visual/source note:</strong> Theory, equations, tables and page structure are based on the supplied project HTML.
+  The MUX diagrams shown on this page are embedded directly from GeeksforGeeks and are attributed to GeeksforGeeks.
+  <a href="https://www.geeksforgeeks.org/multiplexers-in-digital-logic/" target="_blank" rel="noopener">GeeksforGeeks — Multiplexers in Digital Logic ↗</a>
+</div>
+
+</main>
+<footer>Digital Electronics Laboratory · Visual Multiplexer Study Reference</footer>
+</body>
+</html>

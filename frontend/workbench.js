@@ -1834,10 +1834,10 @@
         }
       });
 
-      // Evaluate Complex ICs (7400, 7408, 7432, 7486, 7402, 7404, 74151, 7485, 7483, DIODE)
+      // Evaluate Complex ICs (7400, 7408, 7432, 7486, 7402, 7404, 74151, 7485, 7483, 7490, 7493, DIODE)
       state.components.forEach((c) => {
         const spec = LIBRARY[c.type];
-        if (spec.category === "gates" || spec.category === "msi" || spec.id === "DIODE") {
+        if (spec.category === "gates" || spec.category === "msi" || spec.category === "counters" || spec.id === "DIODE") {
           // Check power rails (VCC and GND)
           if (spec.vccPin && spec.gndPin) {
             const vccVal = pinVoltages[`${c.id}:${spec.vccPin}`];

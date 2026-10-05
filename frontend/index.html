@@ -34,11 +34,11 @@
 
   <main id="home">
     <section class="intro">
-      <p class="label">COMBINATIONAL LOGIC</p>
+      <p class="label">COMBINATIONAL & SEQUENTIAL LOGIC</p>
       <h1>Digital Electronics<br>Study References</h1>
       <p class="intro-text">
         Reference material for code converters, multiplexers, comparators,
-        and adders. Select a topic above to view its subtopics and study links.
+        adders, and modulo counters. Select a topic above to view its subtopics and study links.
       </p>
       <div style="margin-top: 18px;">
         <a href="workbench.html" style="display: inline-flex; align-items: center; gap: 8px; background: #2c6ee8; color: #ffffff; padding: 10px 20px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 14px; box-shadow: 0 4px 12px rgba(44, 110, 232, 0.25);">
@@ -216,6 +216,73 @@
 
         <aside class="reference-area">
           <h3>Topics Covered</h3>
+          <a href="adder-reference.html" class="reference-link">Binary Adders, Subtractors & IC 7483 <span>↗</span></a>
+          <a href="adder-subtractor.html" class="reference-link">Launch Adder/Subtractor Simulator <span>↗</span></a>
+          <a href="schematic.html" class="reference-link">KiCad Schematic Viewer <span>↗</span></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Mod Counter -->
+    <section class="topic-section" id="mod-counter">
+      <div class="section-title">
+        <span class="section-number">05</span>
+        <div>
+          <p class="label">SEQUENTIAL LOGIC & FREQUENCY DIVISION</p>
+          <h2>Mod Counter</h2>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <div class="subtopic-area">
+          <h3>Simulators</h3>
+
+          <ul class="subtopic-list">
+            <li>
+              <a href="schematic.html?circuit=counter_74ls90" class="topic-card">
+                <strong>IC 74LS90 Decade / BCD Ripple Counter Simulator</strong>
+                <span>
+                  Interactive KiCad-style schematic: dual-block divide-by-2 and divide-by-5 sections, 
+                  10-state BCD natural counting (0000₂ to 1001₂), active-HIGH master clear (R₀) and set-to-9 preset (R₉) gates, 
+                  manual/auto 1Hz clock pulses, and truncated Mod-6 digital clock truncation.
+                </span>
+              </a>
+            </li>
+
+            <li>
+              <a href="schematic.html?circuit=counter_74ls93" class="topic-card">
+                <strong>IC 74LS93 4-Bit Binary Ripple Counter Simulator</strong>
+                <span>
+                  Interactive KiCad-style schematic: 4 master-slave flip-flops configured in divide-by-2 and divide-by-8 sections, 
+                  pure 16-state binary sequence (0000₂ to 1111₂), master clear gating (R₀(1)·R₀(2)), negative-edge clock triggering, 
+                  and truncated Mod-12 12-hour clock operation.
+                </span>
+              </a>
+            </li>
+
+            <li>
+              <a href="workbench.html" class="topic-card">
+                <strong>Interactive IC Workbench: Modulo Counter Breadboard Lab</strong>
+                <span>
+                  Full breadboard virtual lab: place DIP-14 IC 7490 & 7493 components from the palette, 
+                  wire VCC (+5V Pin 5) and GND (0V Pin 10) power rails, wire 1Hz clock pulses and logic switches, 
+                  probe real-time 8-bit LED bus outputs, and load pre-built Mod-10, Mod-6, Mod-16, and Mod-12 experiment presets.
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="reference-area">
+          <h3>Topics Covered</h3>
+          <a href="mod-counter-reference.html" class="reference-link">Modulo-N Counters: Theory, Truth Tables & K-Maps <span>↗</span></a>
+          <a href="mod-counter-reference.html#ic7490" class="reference-link">IC 74LS90 Decade Counter Engineering Guide <span>↗</span></a>
+          <a href="mod-counter-reference.html#ic7493" class="reference-link">IC 74LS93 4-Bit Binary Counter Guide <span>↗</span></a>
+          <a href="mod-counter-reference.html#kmaps" class="reference-link">K-Maps & Synchronous Counter Synthesis <span>↗</span></a>
+          <a href="mod-counter-reference.html#cascading" class="reference-link">Cascading & Multi-IC Modulo Matrix <span>↗</span></a>
+          <a href="schematic.html?circuit=counter_74ls90" class="reference-link">Launch 74LS90 KiCad Schematic <span>↗</span></a>
+          <a href="schematic.html?circuit=counter_74ls93" class="reference-link">Launch 74LS93 KiCad Schematic <span>↗</span></a>
+          <a href="workbench.html" class="reference-link">Launch Virtual IC Workbench Lab <span>↗</span></a>
         </aside>
       </div>
     </section>

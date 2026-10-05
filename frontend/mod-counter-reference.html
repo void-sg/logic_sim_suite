@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modulo-N Counters (IC 74LS90, 74LS93) | Master Engineering Reference</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]});"></script>
+
+  <style>
+    .meta-tag {
+      display: inline-block;
+      background: #e2e8f0;
+      color: var(--navy);
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 14px 0 22px;
+    }
+
+    .badge {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-counter {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1.5px solid #a7f3d0;
+    }
+
+    .badge-ic {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1.5px solid #bfdbfe;
+    }
+
+    .badge-warn {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1.5px solid #fde68a;
+    }
+
+    .badge-reset {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1.5px solid #fecaca;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      border: 1px solid var(--line);
+    }
+
+    .data-table th, 
+    .data-table td {
+      padding: 10px 14px;
+      text-align: center;
+      border: 1px solid var(--line);
+    }
+
+    .data-table th {
+      background: var(--navy);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .data-table tr:hover {
+      background: #f1f5f9;
+    }
+
+    .data-table .highlight-row {
+      background: #fef9c3 !important;
+      font-weight: 700;
+      color: #854d0e;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 18px 0;
+    }
+
+    .grid-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin: 18px 0;
+    }
+
+    .formula-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--blue);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-family: "DM Mono", monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .note-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: #92400e;
+      line-height: 1.6;
+    }
+
+    .danger-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #ef4444;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: #991b1b;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    .card h4 {
+      margin: 0 0 10px;
+      color: var(--navy);
+      font-size: 16px;
+    }
+
+    .pin-diagram {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: "DM Mono", monospace;
+      font-size: 12.5px;
+      padding: 20px;
+      border-radius: 8px;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      border: 1px solid #1e293b;
+    }
+
+    /* K-Map Layout & Grouping Styles */
+    .kmap-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 22px;
+      margin: 20px 0;
+    }
+
+    .kmap-card {
+      border: 1.5px solid #cbd5e1;
+      background: var(--white);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      text-align: center;
+    }
+
+    .kmap-card h4 {
+      margin: 0 0 14px;
+      font-size: 15px;
+      color: var(--navy);
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 8px;
+    }
+
+    .kmap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+      margin: 0 auto;
+    }
+
+    .kmap-table th, .kmap-table td {
+      border: 1px solid #64748b;
+      padding: 10px 6px;
+      text-align: center;
+      position: relative;
+    }
+
+    .kmap-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .kmap-diag {
+      position: relative;
+      background: linear-gradient(to top right, #f1f5f9 48%, #64748b 49%, #64748b 51%, #f1f5f9 52%) !important;
+    }
+
+    .kmap-diag .row-var {
+      position: absolute;
+      bottom: 4px;
+      left: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .kmap-diag .col-var {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .cell-idx {
+      position: absolute;
+      bottom: 2px;
+      right: 3px;
+      font-size: 9px;
+      color: #94a3b8;
+    }
+
+    /* K-Map Group Highlighting */
+    .grp-red {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+      font-weight: 700;
+    }
+
+    .grp-blue {
+      background: #dbeafe !important;
+      color: #1e40af !important;
+      font-weight: 700;
+    }
+
+    .grp-green {
+      background: #dcfce7 !important;
+      color: #166534 !important;
+      font-weight: 700;
+    }
+
+    .grp-purple {
+      background: #f3e8ff !important;
+      color: #6b21a8 !important;
+      font-weight: 700;
+    }
+
+    .grp-amber {
+      background: #fef3c7 !important;
+      color: #92400e !important;
+      font-weight: 700;
+    }
+
+    .kmap-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+      justify-content: center;
+      font-family: "DM Mono", monospace;
+      font-size: 11.5px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      display: inline-block;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .action-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(44, 110, 232, 0.3);
+    }
+
+    .btn-secondary {
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #1e293b;
+    }
+
+    .btn-secondary:hover {
+      background: #1e293b;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2col, .grid-3col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>MASTER ENGINEERING REFERENCE</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="index.html#converter">Converter</a>
+        <a href="index.html#multiplexer">Multiplexer</a>
+        <a href="index.html#comparator">Comparator</a>
+        <a href="index.html#adder">Adder</a>
+        <a href="index.html#mod-counter" style="color: #e9bd4f; font-weight: 700;">Mod Counter</a>
+        <a href="schematic.html">Schematic</a>
+        <a href="workbench.html" style="color: #e9bd4f;">⚡ IC Workbench</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: auto; padding: 32px 24px;">
+    
+    <!-- Hero Header -->
+    <div style="margin-bottom: 36px;">
+      <span class="meta-tag">SEQUENTIAL LOGIC & FREQUENCY DIVISION · ENGINEERING REPORT</span>
+      <h1 style="font-size: 38px; color: var(--navy); margin: 8px 0 12px; letter-spacing: -1px;">
+        Modulo-N (Mod) Counters: Architectural Theory, IC 74LS90, IC 74LS93 & K-Map Synthesis
+      </h1>
+      <p style="color: var(--muted); font-size: 16px; max-width: 960px; line-height: 1.6;">
+        A comprehensive academic and engineering guide covering Asynchronous (Ripple) vs. Synchronous (Parallel) counters,
+        glitch physics in truncated modulo circuits, hardware pinouts for TTL 74LS90 and 74LS93, 
+        cascaded high-modulus configurations, state tables, and Karnaugh map minimization for synchronous counter design.
+      </p>
+
+      <div class="badge-group">
+        <span class="badge badge-counter">✓ Modulo-N / Divide-by-N</span>
+        <span class="badge badge-ic">✓ IC 74LS90 (Decade / BCD)</span>
+        <span class="badge badge-ic">✓ IC 74LS93 (4-Bit Binary)</span>
+        <span class="badge badge-warn">✓ Truncated Resets (Mod-6, Mod-12)</span>
+        <span class="badge badge-counter">✓ K-Map State Synthesis</span>
+      </div>
+
+      <div class="action-links">
+        <a href="schematic.html?circuit=counter_74ls90" class="btn-action btn-primary">⚡ Launch 74LS90 KiCad Schematic</a>
+        <a href="schematic.html?circuit=counter_74ls93" class="btn-action btn-primary">⚡ Launch 74LS93 KiCad Schematic</a>
+        <a href="workbench.html" class="btn-action btn-secondary">⚡ Open Virtual IC Workbench Breadboard Lab</a>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         SECTION 1: MATHEMATICAL FOUNDATIONS & FLIP-FLOP CRITERIA
+         ===================================================================== -->
+    <section class="card" id="foundations" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">1. Executive Summary & Mathematical Foundations</h2>
+      
+      <p>
+        A <strong>Modulo-N Counter</strong> (or <strong>Mod-N Counter</strong>) is a sequential digital logic circuit
+        that cycles repetitively through a predetermined sequence of exactly \(N\) distinct binary states 
+        (\(0, 1, 2, \dots, N-1\)) before resetting back to its initial state (\(0\)).
+      </p>
+
+      <div class="formula-box">
+        <strong>Key Mathematical Properties:</strong><br>
+        1. <strong>Modulus (\(N\)):</strong> The total count of unique states traversed by the counter.<br>
+        2. <strong>Frequency Division (\(\div N\)):</strong> A counter with modulus \(N\) divides the incoming master clock frequency by \(N\):
+        \[ f_{\text{out}} = \frac{f_{\text{in}}}{N} \]
+        The output waveform taken from the most significant flip-flop (MSB) has an exact frequency of \(f_{\text{in}} / N\).<br>
+        3. <strong>Flip-Flop Requirement Inequality:</strong> To build a counter with modulus \(N\), the minimum number of binary storage flip-flops (\(n\)) is governed by:
+        \[ 2^n \ge N \iff n = \lceil \log_2 N \rceil \]
+      </div>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">Standard Modulo Requirements Table</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Target Modulus (\(N\))</th>
+            <th>Required Flip-Flops (\(n\))</th>
+            <th>Natural Capacity (\(2^n\))</th>
+            <th>State Count Range</th>
+            <th>Classification</th>
+            <th>Typical Engineering Application</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Mod-2 (\(\div 2\))</strong></td>
+            <td>1</td>
+            <td>2</td>
+            <td>0 to 1</td>
+            <td>Natural (Power-of-2)</td>
+            <td>Toggle Flip-Flop, 50% Duty-Cycle Halver</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-5 (\(\div 5\))</strong></td>
+            <td>3</td>
+            <td>8</td>
+            <td>0 to 4</td>
+            <td>Truncated (\(N < 2^n\))</td>
+            <td>74LS90 Section 2 (Divide-by-5)</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-6 (\(\div 6\))</strong></td>
+            <td>3</td>
+            <td>8</td>
+            <td>0 to 5</td>
+            <td>Truncated (\(N < 2^n\))</td>
+            <td>Digital Clock: Seconds & Minutes Tens Digit (\(0 \to 5\))</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-7 (\(\div 7\))</strong></td>
+            <td>3</td>
+            <td>8</td>
+            <td>0 to 6</td>
+            <td>Truncated (\(N < 2^n\))</td>
+            <td>Calendar: Days of the Week (\(0 \to 6\))</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-8 (\(\div 8\))</strong></td>
+            <td>3</td>
+            <td>8</td>
+            <td>0 to 7</td>
+            <td>Natural (Power-of-2)</td>
+            <td>74LS93 Section 2 (3-bit Octal Ripple)</td>
+          </tr>
+          <tr class="highlight-row">
+            <td><strong>Mod-10 (\(\div 10\))</strong></td>
+            <td>4</td>
+            <td>16</td>
+            <td>0 to 9</td>
+            <td>Truncated (BCD Decade)</td>
+            <td>74LS90 Decade Counter, 7-Segment Display Driver</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-12 (\(\div 12\))</strong></td>
+            <td>4</td>
+            <td>16</td>
+            <td>0 to 11</td>
+            <td>Truncated (\(N < 2^n\))</td>
+            <td>12-Hour Digital Clock Hours Digit</td>
+          </tr>
+          <tr class="highlight-row">
+            <td><strong>Mod-16 (\(\div 16\))</strong></td>
+            <td>4</td>
+            <td>16</td>
+            <td>0 to 15</td>
+            <td>Natural (4-Bit Binary)</td>
+            <td>74LS93 Full 4-Bit Binary Counter, Hexadecimal Math</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-24 (\(\div 24\))</strong></td>
+            <td>5</td>
+            <td>32</td>
+            <td>0 to 23</td>
+            <td>Truncated (\(N < 2^n\))</td>
+            <td>24-Hour Military Time Digital Clock</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-60 (\(\div 60\))</strong></td>
+            <td>6</td>
+            <td>64</td>
+            <td>0 to 59</td>
+            <td>Truncated Cascaded</td>
+            <td>Digital Clock: Cascaded Seconds & Minutes Stages (\(10 \times 6\))</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-100 (\(\div 100\))</strong></td>
+            <td>7</td>
+            <td>128</td>
+            <td>0 to 99</td>
+            <td>Truncated Cascaded</td>
+            <td>2-Digit BCD Decade Frequency Counter</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-256 (\(\div 256\))</strong></td>
+            <td>8</td>
+            <td>256</td>
+            <td>0 to 255</td>
+            <td>Natural (8-Bit Binary)</td>
+            <td>Cascaded Dual 74LS93, Byte Baud Rate Generator</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 2: CLASSIFICATION & GLITCH PHYSICS
+         ===================================================================== -->
+    <section class="card" id="classification" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">2. Classification & Glitch Physics</h2>
+      
+      <div class="grid-2col">
+        <div class="card" style="border: 1.5px solid #bfdbfe; background: #fbfdff;">
+          <h4 style="color: #1d4ed8;">Asynchronous (Ripple) Counters</h4>
+          <ul style="font-size: 13.5px; line-height: 1.7; padding-left: 20px; color: var(--ink);">
+            <li><strong>Clocking:</strong> Only the first stage (\(Q_A\)) receives the master external clock. Subsequent flip-flops are clocked by the output of the preceding stage (\(Q_{n-1}\)).</li>
+            <li><strong>Propagation Delay:</strong> Cumulative across all stages:
+              \[ t_{\text{delay(total)}} = n \times t_{pd} \]
+            </li>
+            <li><strong>Hardware Simplicity:</strong> No lookahead gating required; extremely simple wiring.</li>
+            <li><strong>Speed Limitation:</strong> Maximum operating clock frequency drops as stages are added (\(f_{\max} < 1 / (n \cdot t_{pd})\)).</li>
+            <li><strong>Benchmark ICs:</strong> IC 74LS90 (Decade), IC 74LS93 (4-bit binary), CD4040.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border: 1.5px solid #a7f3d0; background: #fbfdff;">
+          <h4 style="color: #047857;">Synchronous (Parallel) Counters</h4>
+          <ul style="font-size: 13.5px; line-height: 1.7; padding-left: 20px; color: var(--ink);">
+            <li><strong>Clocking:</strong> All flip-flops in the counter receive the identical master clock pulse simultaneously.</li>
+            <li><strong>Propagation Delay:</strong> Constant, equal to a single flip-flop plus steering gate delay:
+              \[ t_{\text{delay(total)}} = t_{pd} + t_{\text{gate}} \]
+            </li>
+            <li><strong>Hardware Complexity:</strong> Requires combinational lookahead steering logic (AND gates or K-map minimized control networks).</li>
+            <li><strong>High-Speed Operation:</strong> No cumulative ripple delay; ideal for gigahertz processors and DSP pipelines.</li>
+            <li><strong>Benchmark ICs:</strong> IC 74LS160 (BCD Synchronous), IC 74LS161 / 74LS163 (4-bit Binary Synchronous).</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">Glitch Physics & Asynchronous Reset Dynamics</h3>
+      <div class="note-box">
+        <strong>How Truncated Asynchronous Resets Work in Hardware:</strong><br>
+        To force an \(n\)-bit counter to cycle through \(N\) states (\(0\) through \(N-1\)), we decode the binary representation of state \(N\) using combinational AND/NAND gates and feed the output to the active Master Reset pins (\(R_0\)).
+        <ol style="margin: 8px 0 0 16px; padding: 0;">
+          <li>The counter counts cleanly from state \(0\) up through state \(N-1\).</li>
+          <li>On the next clock falling edge, the flip-flops momentarily switch to state \(N\).</li>
+          <li>Within \(\approx 10\text{--}30\,\text{ns}\) (the internal propagation delay of the reset gating), the Master Reset triggers, forcing all flip-flops immediately back to \(0000_2\).</li>
+          <li>Because this reset spike lasts only a few nanoseconds, human eyes, 7-segment displays, and standard digital peripherals never see state \(N\). Exactly \(N\) stable states (\(0\) to \(N-1\)) are observed!</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 3: IC 74LS90 DECADE / BCD COUNTER
+         ===================================================================== -->
+    <section class="card" id="ic7490" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">3. IC 74LS90: Decade / BCD Ripple Counter Engineering Guide</h2>
+      
+      <p>
+        The <strong>74LS90 / 7490</strong> is a versatile asynchronous ripple counter housed in a standard 14-pin DIP package.
+        It contains two separate, independent internal counter sections:
+        <strong>Section 1:</strong> a divide-by-2 (\(\div 2\)) single flip-flop stage, and 
+        <strong>Section 2:</strong> a divide-by-5 (\(\div 5\)) 3-flip-flop ripple stage.
+      </p>
+
+      <div class="grid-2col">
+        <div>
+          <h4 style="color: var(--navy);">74LS90 14-Pin DIP Package Diagram</h4>
+          <div class="pin-diagram">
+              IC 74LS90 DIP-14 TOP VIEW
+                   .-----\_/-----.
+ (Clock B / Mod-5) | 1  CP1  CP0 14 | (Clock A / Mod-2)
+(Reset-0 Gate 1)   | 2  R01   NC 13 | (No Connection)
+(Reset-0 Gate 2)   | 3  R02   QA 12 | (Output Bit 0 - LSB)
+  (No Connection)  | 4   NC   QD 11 | (Output Bit 3 - MSB)
+ (+5V Power Rail)  | 5  VCC  GND 10 | (0V System Ground)
+(Set-to-9 Gate 1)  | 6  R91   QB  9 | (Output Bit 1)
+(Set-to-9 Gate 2)  | 7  R92   QC  8 | (Output Bit 2)
+                   '-------------'</div>
+          
+          <div class="danger-box" style="margin-top: 14px;">
+            <strong>⚠️ CRITICAL POWER PIN WARNING:</strong><br>
+            Unlike conventional 7400-series DIP-14 chips which place \(V_{CC}\) on Pin 14 and \(GND\) on Pin 7,
+            the <strong>74LS90 and 74LS93 use non-standard power pins: Pin 5 = \(V_{CC}\) (+5V) and Pin 10 = \(GND\) (0V)</strong>.
+            Wiring Pin 14 to power will short the clock line!
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color: var(--navy);">Pin Function Descriptions</h4>
+          <table class="data-table" style="font-size: 12px;">
+            <thead>
+              <tr>
+                <th>Pin #</th>
+                <th>Symbol</th>
+                <th>Type</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>CP1 (I/P B)</strong></td><td>Clock In</td><td>Clock pulse input for Mod-5 section (Falling edge \(\downarrow\))</td></tr>
+              <tr><td>2</td><td><strong>\(R_{0(1)}\)</strong></td><td>Input</td><td>Master Reset-to-0 gate input 1 (ANDed with pin 3)</td></tr>
+              <tr><td>3</td><td><strong>\(R_{0(2)}\)</strong></td><td>Input</td><td>Master Reset-to-0 gate input 2 (ANDed with pin 2)</td></tr>
+              <tr><td>4</td><td><strong>NC</strong></td><td>-</td><td>No internal connection</td></tr>
+              <tr style="background:#fef2f2;"><td>5</td><td><strong>\(V_{CC}\)</strong></td><td>Power</td><td><strong>+5V DC Power Supply Rail</strong></td></tr>
+              <tr><td>6</td><td><strong>\(R_{9(1)}\)</strong></td><td>Input</td><td>Set-to-9 (Preset) gate input 1 (ANDed with pin 7)</td></tr>
+              <tr><td>7</td><td><strong>\(R_{9(2)}\)</strong></td><td>Input</td><td>Set-to-9 (Preset) gate input 2 (ANDed with pin 6)</td></tr>
+              <tr><td>8</td><td><strong>QC</strong></td><td>Output</td><td>Bit 2 output (Binary weight \(2^2 = 4\))</td></tr>
+              <tr><td>9</td><td><strong>QB</strong></td><td>Output</td><td>Bit 1 output (Binary weight \(2^1 = 2\))</td></tr>
+              <tr style="background:#fef2f2;"><td>10</td><td><strong>GND</strong></td><td>Power</td><td><strong>0V Ground System Reference</strong></td></tr>
+              <tr><td>11</td><td><strong>QD</strong></td><td>Output</td><td>Bit 3 output / MSB (Binary weight \(2^3 = 8\))</td></tr>
+              <tr><td>12</td><td><strong>QA</strong></td><td>Output</td><td>Bit 0 output / LSB (Binary weight \(2^0 = 1\), Mod-2)</td></tr>
+              <tr><td>13</td><td><strong>NC</strong></td><td>-</td><td>No internal connection</td></tr>
+              <tr><td>14</td><td><strong>CP0 (I/P A)</strong></td><td>Clock In</td><td>Clock pulse input for Mod-2 section (Falling edge \(\downarrow\))</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">74LS90 Reset & Preset (Set-to-9) Truth Table</h3>
+      <p style="font-size: 13.5px;">
+        The master clear and preset functions operate asynchronously through internal 2-input AND gates:
+        \[ \text{Reset Condition} = R_{0(1)} \cdot R_{0(2)} \qquad \text{Set-to-9 Condition} = R_{9(1)} \cdot R_{9(2)} \]
+      </p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th colspan="2">Reset-to-0 Inputs</th>
+            <th colspan="2">Set-to-9 Inputs</th>
+            <th colspan="4">Output Bits</th>
+            <th rowspan="2">Operating Mode / Action</th>
+          </tr>
+          <tr>
+            <th>\(R_{0(1)}\) (Pin 2)</th>
+            <th>\(R_{0(2)}\) (Pin 3)</th>
+            <th>\(R_{9(1)}\) (Pin 6)</th>
+            <th>\(R_{9(2)}\) (Pin 7)</th>
+            <th>\(Q_D\) (Pin 11)</th>
+            <th>\(Q_C\) (Pin 8)</th>
+            <th>\(Q_B\) (Pin 9)</th>
+            <th>\(Q_A\) (Pin 12)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #fee2e2; font-weight: 700; color: #991b1b;">
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>X</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>Asynchronous Master CLEAR (Forced 0000)</td>
+          </tr>
+          <tr style="background: #fee2e2; font-weight: 700; color: #991b1b;">
+            <td>1</td>
+            <td>1</td>
+            <td>X</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>Asynchronous Master CLEAR (Forced 0000)</td>
+          </tr>
+          <tr style="background: #fef3c7; font-weight: 700; color: #92400e;">
+            <td>X</td>
+            <td>X</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>Asynchronous Master PRESET to BCD 9 (1001)</td>
+          </tr>
+          <tr>
+            <td>X</td>
+            <td>0</td>
+            <td>X</td>
+            <td>0</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td>X</td>
+            <td>0</td>
+            <td>X</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td>X</td>
+            <td>X</td>
+            <td>0</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+          <tr>
+            <td>X</td>
+            <td>0</td>
+            <td>0</td>
+            <td>X</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">74LS90 Mod-10 (BCD / Decade) Count Sequence (0 through 9)</h3>
+      <p style="font-size: 13.5px;">
+        To configure the 74LS90 as a <strong>Mod-10 Decade Counter</strong>:
+        connect Master Clock to Pin 14 (\(\text{CP0}\)), jumper Pin 12 (\(Q_A\)) to Pin 1 (\(\text{CP1}\)),
+        and tie all reset pins (\(R_{0(1)}, R_{0(2)}, R_{9(1)}, R_{9(2)}\)) to \(GND\).
+      </p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Clock Pulse</th>
+            <th>\(Q_D\) (Bit 3 - MSB)</th>
+            <th>\(Q_C\) (Bit 2)</th>
+            <th>\(Q_B\) (Bit 1)</th>
+            <th>\(Q_A\) (Bit 0 - LSB)</th>
+            <th>Decimal Value</th>
+            <th>Internal Operation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><strong>0</strong></td><td>Initial / Cleared State</td></tr>
+          <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td><strong>1</strong></td><td>QA toggles to 1</td></tr>
+          <tr><td>2</td><td>0</td><td>0</td><td>1</td><td>0</td><td><strong>2</strong></td><td>QA falling edge triggers Mod-5 stage (QB=1)</td></tr>
+          <tr><td>3</td><td>0</td><td>0</td><td>1</td><td>1</td><td><strong>3</strong></td><td>QA toggles to 1</td></tr>
+          <tr><td>4</td><td>0</td><td>1</td><td>0</td><td>0</td><td><strong>4</strong></td><td>QA falling edge advances Mod-5 (QC=1, QB=0)</td></tr>
+          <tr><td>5</td><td>0</td><td>1</td><td>0</td><td>1</td><td><strong>5</strong></td><td>QA toggles to 1</td></tr>
+          <tr><td>6</td><td>0</td><td>1</td><td>1</td><td>0</td><td><strong>6</strong></td><td>QA falling edge advances Mod-5 (QC=1, QB=1)</td></tr>
+          <tr><td>7</td><td>0</td><td>1</td><td>1</td><td>1</td><td><strong>7</strong></td><td>QA toggles to 1</td></tr>
+          <tr><td>8</td><td>1</td><td>0</td><td>0</td><td>0</td><td><strong>8</strong></td><td>QA falling edge advances Mod-5 (QD=1, QC=0, QB=0)</td></tr>
+          <tr><td>9</td><td>1</td><td>0</td><td>0</td><td>1</td><td><strong>9</strong></td><td>QA toggles to 1 (Max BCD state)</td></tr>
+          <tr class="highlight-row"><td>10 (Rollover)</td><td>0</td><td>0</td><td>0</td><td>0</td><td><strong>0</strong></td><td>Natural BCD rollover back to 0000</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">Specialized 74LS90 Truncated Circuits</h3>
+      <div class="grid-2col">
+        <div class="card" style="border-left: 4px solid #10b981;">
+          <h4 style="color: #047857;">Truncated Mod-6 Counter (Digital Clocks)</h4>
+          <p style="font-size: 13px; line-height: 1.6; margin: 6px 0;">
+            Used for the <strong>Seconds Tens</strong> and <strong>Minutes Tens</strong> digits of real-time digital clocks (\(0 \to 5\)):
+          </p>
+          <ul style="font-size: 12.5px; padding-left: 18px; line-height: 1.7; margin: 0;">
+            <li>Wire Clock to Pin 14; jumper \(Q_A\) (Pin 12) to Pin 1 (\(\text{CP1}\)).</li>
+            <li>Connect \(Q_B\) (Pin 9) directly to \(R_{0(1)}\) (Pin 2).</li>
+            <li>Connect \(Q_C\) (Pin 8) directly to \(R_{0(2)}\) (Pin 3).</li>
+            <li>Ground \(R_{9(1)}\) and \(R_{9(2)}\).</li>
+            <li><strong>Operation:</strong> Counts \(0, 1, 2, 3, 4, 5\). When count reaches 6 (\(0110_2\)), \(Q_C=1\) and \(Q_B=1\), activating \(R_{0(1)} \cdot R_{0(2)}=1\) and resetting to 0000 in \(\approx 15\,\text{ns}\).</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #3b82f6;">
+          <h4 style="color: #1d4ed8;">Truncated Mod-7 Counter (Days of the Week)</h4>
+          <p style="font-size: 13px; line-height: 1.6; margin: 6px 0;">
+            Counts 7 discrete states (\(0, 1, 2, 3, 4, 5, 6\)) for weekly scheduling:
+          </p>
+          <ul style="font-size: 12.5px; padding-left: 18px; line-height: 1.7; margin: 0;">
+            <li>Reset condition is state \(7_{10} = 0111_2 \implies Q_A=1, Q_B=1, Q_C=1\).</li>
+            <li>Connect \(Q_A\) and \(Q_B\) into a 2-input AND gate (74LS08).</li>
+            <li>Connect the AND output to \(R_{0(1)}\) (Pin 2).</li>
+            <li>Connect \(Q_C\) directly to \(R_{0(2)}\) (Pin 3).</li>
+            <li>When count hits 7, all three bits trigger Master Clear instantly.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 4: IC 74LS93 4-BIT BINARY COUNTER
+         ===================================================================== -->
+    <section class="card" id="ic7493" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">4. IC 74LS93: 4-Bit Binary Ripple Counter Engineering Guide</h2>
+
+      <p>
+        The <strong>74LS93 / 7493</strong> is a monolithic 4-bit binary ripple counter in a 14-pin DIP package.
+        It consists of four master-slave flip-flops partitioned into:
+        <strong>Section 1:</strong> a single flip-flop functioning as a divide-by-2 (\(\div 2\)) counter, and
+        <strong>Section 2:</strong> a 3 flip-flop ripple chain functioning as a divide-by-8 (\(\div 8\)) counter.
+        Unlike the 74LS90, the 74LS93 has <strong>no Set-to-9 preset pins</strong> (Pins 6 and 7 are NC).
+      </p>
+
+      <div class="grid-2col">
+        <div>
+          <h4 style="color: var(--navy);">74LS93 14-Pin DIP Package Diagram</h4>
+          <div class="pin-diagram">
+              IC 74LS93 DIP-14 TOP VIEW
+                   .-----\_/-----.
+ (Clock B / Mod-8) | 1  CP1  CP0 14 | (Clock A / Mod-2)
+(Reset-0 Gate 1)   | 2  R01   NC 13 | (No Connection)
+(Reset-0 Gate 2)   | 3  R02   QA 12 | (Output Bit 0 - LSB)
+  (No Connection)  | 4   NC   QD 11 | (Output Bit 3 - MSB)
+ (+5V Power Rail)  | 5  VCC  GND 10 | (0V System Ground)
+  (No Connection)  | 6   NC   QB  9 | (Output Bit 1)
+  (No Connection)  | 7   NC   QC  8 | (Output Bit 2)
+                   '-------------'</div>
+
+          <div class="note-box" style="margin-top: 14px;">
+            <strong>TTL Floating Pin Rule:</strong><br>
+            In bipolar TTL technology, unconnected input pins float to Logic HIGH (1).
+            Therefore, <strong>Pin 2 (\(R_{0(1)}\)) and Pin 3 (\(R_{0(2)}\)) MUST be actively grounded</strong> to \(GND\)
+            to enable normal counting. Leaving them floating locks the counter permanently in reset (0000)!
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color: var(--navy);">Pin Function Descriptions</h4>
+          <table class="data-table" style="font-size: 12px;">
+            <thead>
+              <tr>
+                <th>Pin #</th>
+                <th>Symbol</th>
+                <th>Type</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>CP1 (I/P B)</strong></td><td>Clock In</td><td>Clock pulse input for \(\div 8\) Mod-8 counter (Falling edge \(\downarrow\))</td></tr>
+              <tr><td>2</td><td><strong>\(R_{0(1)}\)</strong></td><td>Input</td><td>Master Reset gate input 1 (ANDed with pin 3)</td></tr>
+              <tr><td>3</td><td><strong>\(R_{0(2)}\)</strong></td><td>Input</td><td>Master Reset gate input 2 (ANDed with pin 2)</td></tr>
+              <tr><td>4</td><td><strong>NC</strong></td><td>-</td><td>No internal connection</td></tr>
+              <tr style="background:#fef2f2;"><td>5</td><td><strong>\(V_{CC}\)</strong></td><td>Power</td><td><strong>+5V DC Power Supply Rail</strong></td></tr>
+              <tr><td>6</td><td><strong>NC</strong></td><td>-</td><td>No internal connection (NC on 74LS93)</td></tr>
+              <tr><td>7</td><td><strong>NC</strong></td><td>-</td><td>No internal connection (NC on 74LS93)</td></tr>
+              <tr><td>8</td><td><strong>QC</strong></td><td>Output</td><td>Bit 2 output (Binary weight \(2^2 = 4\))</td></tr>
+              <tr><td>9</td><td><strong>QB</strong></td><td>Output</td><td>Bit 1 output (Binary weight \(2^1 = 2\))</td></tr>
+              <tr style="background:#fef2f2;"><td>10</td><td><strong>GND</strong></td><td>Power</td><td><strong>0V Ground System Reference</strong></td></tr>
+              <tr><td>11</td><td><strong>QD</strong></td><td>Output</td><td>Bit 3 output / MSB (Binary weight \(2^3 = 8\))</td></tr>
+              <tr><td>12</td><td><strong>QA</strong></td><td>Output</td><td>Bit 0 output / LSB (Binary weight \(2^0 = 1\), Mod-2)</td></tr>
+              <tr><td>13</td><td><strong>NC</strong></td><td>-</td><td>No internal connection</td></tr>
+              <tr><td>14</td><td><strong>CP0 (I/P A)</strong></td><td>Clock In</td><td>Clock pulse input for \(\div 2\) Mod-2 counter (Falling edge \(\downarrow\))</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">74LS93 Asynchronous Master Reset Truth Table</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Reset Input \(R_{0(1)}\) (Pin 2)</th>
+            <th>Reset Input \(R_{0(2)}\) (Pin 3)</th>
+            <th>\(Q_D\) (MSB)</th>
+            <th>\(Q_C\)</th>
+            <th>\(Q_B\)</th>
+            <th>\(Q_A\) (LSB)</th>
+            <th>Operating Mode / Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #fee2e2; font-weight: 700; color: #991b1b;">
+            <td>1 (HIGH)</td>
+            <td>1 (HIGH)</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>Asynchronous Master Reset (Forced 0000)</td>
+          </tr>
+          <tr>
+            <td>0 (LOW)</td>
+            <td>0 (LOW)</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+          <tr>
+            <td>0 (LOW)</td>
+            <td>1 (HIGH)</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+          <tr>
+            <td>1 (HIGH)</td>
+            <td>0 (LOW)</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Count</td>
+            <td>Normal Counting Mode (Clock Active)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">74LS93 Complete 16-State Binary Count Table (0 through 15)</h3>
+      <p style="font-size: 13.5px;">
+        Configured as a <strong>Mod-16 Binary Up-Counter</strong> by tying Master Clock to Pin 14,
+        jumpering Pin 12 (\(Q_A\)) to Pin 1 (\(\text{CP1}\)), and grounding Pins 2 & 3.
+      </p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Clock Pulse</th>
+            <th>\(Q_D\) (Pin 11)</th>
+            <th>\(Q_C\) (Pin 8)</th>
+            <th>\(Q_B\) (Pin 9)</th>
+            <th>\(Q_A\) (Pin 12)</th>
+            <th>Hex Value</th>
+            <th>Decimal Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0x0</td><td><strong>0</strong></td></tr>
+          <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0x1</td><td><strong>1</strong></td></tr>
+          <tr><td>2</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0x2</td><td><strong>2</strong></td></tr>
+          <tr><td>3</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0x3</td><td><strong>3</strong></td></tr>
+          <tr><td>4</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0x4</td><td><strong>4</strong></td></tr>
+          <tr><td>5</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0x5</td><td><strong>5</strong></td></tr>
+          <tr><td>6</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0x6</td><td><strong>6</strong></td></tr>
+          <tr><td>7</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0x7</td><td><strong>7</strong></td></tr>
+          <tr><td>8</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0x8</td><td><strong>8</strong></td></tr>
+          <tr><td>9</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0x9</td><td><strong>9</strong></td></tr>
+          <tr><td>10</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0xA</td><td><strong>10</strong></td></tr>
+          <tr><td>11</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0xB</td><td><strong>11</strong></td></tr>
+          <tr><td>12</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0xC</td><td><strong>12</strong></td></tr>
+          <tr><td>13</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0xD</td><td><strong>13</strong></td></tr>
+          <tr><td>14</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0xE</td><td><strong>14</strong></td></tr>
+          <tr><td>15</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0xF</td><td><strong>15</strong></td></tr>
+          <tr class="highlight-row"><td>16 (Rollover)</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0x0</td><td><strong>0</strong> (Full 4-Bit Binary Rollover)</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--navy); font-size: 17px; margin-top: 24px;">Specialized 74LS93 Truncated & Cascaded Circuits</h3>
+      <div class="grid-2col">
+        <div class="card" style="border-left: 4px solid #f59e0b;">
+          <h4 style="color: #b45309;">Truncated Mod-12 Counter (12-Hour Digital Clock)</h4>
+          <p style="font-size: 13px; line-height: 1.6; margin: 6px 0;">
+            Used to count hours \(0 \to 11\) in a standard 12-hour digital clock:
+          </p>
+          <ul style="font-size: 12.5px; padding-left: 18px; line-height: 1.7; margin: 0;">
+            <li>Wire Clock to Pin 14; jumper \(Q_A\) (Pin 12) to Pin 1 (\(\text{CP1}\)).</li>
+            <li>Reset state is \(12_{10} = 1100_2 \implies Q_D=1, Q_C=1\).</li>
+            <li>Connect \(Q_C\) (Pin 8) directly to \(R_{0(1)}\) (Pin 2).</li>
+            <li>Connect \(Q_D\) (Pin 11) directly to \(R_{0(2)}\) (Pin 3).</li>
+            <li>No external gates required! The internal AND gate automatically resets the chip to 0000 upon reaching 12.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #6366f1;">
+          <h4 style="color: #4338ca;">Cascaded Mod-24 Counter (24-Hour Military Time)</h4>
+          <p style="font-size: 13px; line-height: 1.6; margin: 6px 0;">
+            Uses two cascaded 74LS93 chips (Lower nibble IC 1, Upper nibble IC 2):
+          </p>
+          <ul style="font-size: 12.5px; padding-left: 18px; line-height: 1.7; margin: 0;">
+            <li>Cascade: Connect \(Q_D\) of IC 1 to Pin 14 of IC 2.</li>
+            <li>Reset condition is \(24_{10} = 0001\,1000_2 \implies Q_{A2}=1\) and \(Q_{D1}=1\).</li>
+            <li>Feed \(Q_{A2}\) (IC 2 Pin 12) and \(Q_{D1}\) (IC 1 Pin 11) into a 2-input AND gate (74LS08).</li>
+            <li>Connect the AND output to the \(R_0\) reset pins of both ICs to clear to \(0000\,0000_2\).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 5: MULTI-IC CASCADING & HIGH MODULUS MATRIX
+         ===================================================================== -->
+    <section class="card" id="cascading" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">5. Multi-IC Cascading Matrix & High Modulus Implementations</h2>
+
+      <p>
+        Higher modulus values are synthesized by cascading multiple counter stages.
+        In ripple cascading, the most significant output bit (\(Q_D\)) of the lower stage is tied directly to the clock input
+        of the succeeding stage.
+      </p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Target Modulus</th>
+            <th>Observed States</th>
+            <th>Hardware IC Architecture</th>
+            <th>Inter-Stage Ripple Wiring</th>
+            <th>Feedback Reset Equation / Gating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Mod-20 (\(\div 20\))</strong></td>
+            <td>0 to 19</td>
+            <td>IC 1 (74LS90 Mod-10) + IC 2 (74LS90 Mod-2)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Natural rollover (\(10 \times 2 = 20\)); no feedback gates needed.</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-24 (\(\div 24\))</strong></td>
+            <td>0 to 23</td>
+            <td>IC 1 (74LS93 Mod-16) + IC 2 (74LS93 Mod-16)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Reset at \(24_{10} = 0001\,1000_2 \implies Q_{A2} \cdot Q_{D1}\) into 7408 AND gate.</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-32 (\(\div 32\))</strong></td>
+            <td>0 to 31</td>
+            <td>IC 1 (74LS93 Mod-16) + IC 2 (74LS93 Mod-2)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Natural rollover (\(16 \times 2 = 32\)); pure 5-bit binary ripple.</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-50 (\(\div 50\))</strong></td>
+            <td>0 to 49</td>
+            <td>IC 1 (74LS90 Mod-10) + IC 2 (74LS90 Mod-5)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP1}\) (Pin 1)</td>
+            <td>Natural rollover (\(10 \times 5 = 50\)).</td>
+          </tr>
+          <tr class="highlight-row">
+            <td><strong>Mod-60 (\(\div 60\))</strong></td>
+            <td>0 to 59</td>
+            <td>IC 1 (74LS90 Mod-10) + IC 2 (74LS90 Mod-6)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>IC 2 has \(Q_{C2} \cdot Q_{B2} \to R_0\) reset loop (60s / 60min Digital Clock).</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-90 (\(\div 90\))</strong></td>
+            <td>0 to 89</td>
+            <td>IC 1 (74LS90 Mod-10) + IC 2 (74LS90 Mod-10)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Reset at Tens digit = 9 (\(1001_2\)): \(Q_{D2} \cdot Q_{A2} \to R_0\) of both ICs.</td>
+          </tr>
+          <tr>
+            <td><strong>Mod-96 (\(\div 96\))</strong></td>
+            <td>0 to 95</td>
+            <td>IC 1 (74LS90 Mod-10) + IC 2 (74LS90 Mod-10)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Reset at \(96_{10}\) (\(\text{IC}_2=9, \text{IC}_1=6\)): \((Q_{D2} \cdot Q_{A2} \cdot Q_{C1} \cdot Q_{B1}) \to R_0\).</td>
+          </tr>
+          <tr class="highlight-row">
+            <td><strong>Mod-100 (\(\div 100\))</strong></td>
+            <td>0 to 99</td>
+            <td>IC 1 (74LS90 Units) + IC 2 (74LS90 Tens)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Natural 2-digit BCD decade rollover (\(10 \times 10 = 100\)).</td>
+          </tr>
+          <tr class="highlight-row">
+            <td><strong>Mod-256 (\(\div 256\))</strong></td>
+            <td>0 to 255</td>
+            <td>IC 1 (74LS93 Lower) + IC 2 (74LS93 Upper)</td>
+            <td>IC 1 \(Q_D \to\) IC 2 \(\text{CP0}\) (Pin 14)</td>
+            <td>Natural 8-bit pure binary ripple (\(16 \times 16 = 256\)). Full byte count.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 6: ARCHITECTURAL COMPARISON: 74LS90 vs 74LS93
+         ===================================================================== -->
+    <section class="card" id="comparison" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">6. Benchmark Hardware Comparison: IC 74LS90 vs IC 74LS93</h2>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Architectural Attribute</th>
+            <th>IC 74LS90 (Decade / BCD Counter)</th>
+            <th>IC 74LS93 (4-Bit Binary Counter)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Package Type</strong></td>
+            <td>14-Pin DIP</td>
+            <td>14-Pin DIP</td>
+          </tr>
+          <tr>
+            <td><strong>Primary Classification</strong></td>
+            <td>Decade / BCD Asynchronous Up-Counter (\(\div 10\))</td>
+            <td>4-Bit Binary Asynchronous Up-Counter (\(\div 16\))</td>
+          </tr>
+          <tr>
+            <td><strong>Internal Stage 1</strong></td>
+            <td>\(\div 2\) (Mod-2): Clock I/P A (Pin 14) \(\to Q_A\) (Pin 12)</td>
+            <td>\(\div 2\) (Mod-2): Clock I/P A (Pin 14) \(\to Q_A\) (Pin 12)</td>
+          </tr>
+          <tr>
+            <td><strong>Internal Stage 2</strong></td>
+            <td>\(\div 5\) (Mod-5): Clock I/P B (Pin 1) \(\to Q_B, Q_C, Q_D\)</td>
+            <td>\(\div 8\) (Mod-8): Clock I/P B (Pin 1) \(\to Q_B, Q_C, Q_D\)</td>
+          </tr>
+          <tr>
+            <td><strong>Combined Modulus (Cascaded)</strong></td>
+            <td>\(2 \times 5 = 10\) (Mod-10 / BCD Decade)</td>
+            <td>\(2 \times 8 = 16\) (Mod-16 / 4-Bit Binary)</td>
+          </tr>
+          <tr>
+            <td><strong>Maximum Natural Count Sequence</strong></td>
+            <td>10 States (\(0000_2\) to \(1001_2\), \(0 \to 9\))</td>
+            <td>16 States (\(0000_2\) to \(1111_2\), \(0 \to 15\))</td>
+          </tr>
+          <tr>
+            <td><strong>Master Reset-to-0 Pins</strong></td>
+            <td>\(R_{0(1)}\) (Pin 2) and \(R_{0(2)}\) (Pin 3) &mdash; Active HIGH</td>
+            <td>\(R_{0(1)}\) (Pin 2) and \(R_{0(2)}\) (Pin 3) &mdash; Active HIGH</td>
+          </tr>
+          <tr>
+            <td><strong>Master Set-to-9 (Preset) Pins</strong></td>
+            <td>\(R_{9(1)}\) (Pin 6) and \(R_{9(2)}\) (Pin 7) &mdash; Active HIGH</td>
+            <td><strong>None</strong> (Pins 6 and 7 are NC &mdash; No Connection)</td>
+          </tr>
+          <tr>
+            <td><strong>Power Supply Pins</strong></td>
+            <td><strong>Pin 5 = \(V_{CC}\) (+5V), Pin 10 = \(GND\) (0V)</strong></td>
+            <td><strong>Pin 5 = \(V_{CC}\) (+5V), Pin 10 = \(GND\) (0V)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Primary Target Application</strong></td>
+            <td>Decimal arithmetic, BCD 7-segment LED displays, digital clock units/tens</td>
+            <td>Pure binary computing, byte memory addressing, frequency dividers, power-of-2 systems</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 7: K-MAPS & SYNCHRONOUS COUNTER SYNTHESIS
+         ===================================================================== -->
+    <section class="card" id="kmaps" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">7. Karnaugh Maps (K-Maps) & Synchronous Counter Synthesis</h2>
+
+      <p>
+        While asynchronous ripple counters rely on sequential clocking and reset gating,
+        <strong>Synchronous Modulo Counters</strong> clock all flip-flops simultaneously.
+        To design a synchronous Mod-N counter, we construct the state excitation table using 
+        <strong>JK Flip-Flops</strong> (or T Flip-Flops) and minimize the excitation expressions using 
+        <strong>Karnaugh Maps (K-Maps)</strong>, treating all unused states (\(N\) to \(2^n-1\)) as 
+        <strong>Don't-Care conditions (\(X\))</strong>.
+      </p>
+
+      <div class="formula-box">
+        <strong>JK Flip-Flop Excitation Rule:</strong><br>
+        • Present State \(0 \to\) Next State \(0 \implies J = 0, K = X\)<br>
+        • Present State \(0 \to\) Next State \(1 \implies J = 1, K = X\)<br>
+        • Present State \(1 \to\) Next State \(0 \implies J = X, K = 1\)<br>
+        • Present State \(1 \to\) Next State \(1 \implies J = X, K = 0\)
+      </div>
+
+      <!-- K-MAP PART A: MOD-5 COUNTER -->
+      <h3 style="color: var(--navy); font-size: 18px; margin-top: 28px;">A. Synchronous Mod-5 Counter Design (States 0 to 4)</h3>
+      <p style="font-size: 13.5px;">
+        Requires 3 flip-flops (\(Q_C, Q_B, Q_A\)). State sequence: \(0 \to 1 \to 2 \to 3 \to 4 \to 0\).
+        Unused states are <strong>5, 6, 7</strong> (\(101_2, 110_2, 111_2\)), which become Don't Cares (\(X\)).
+      </p>
+
+      <div class="kmap-container">
+        <!-- K-Map for JA / KA -->
+        <div class="kmap-card">
+          <h4>K-Map for Flip-Flop A (\(J_A, K_A\))</h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">\(Q_B Q_A\)</span><span class="row-var">\(Q_C\)</span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr>
+              <th>0</th>
+              <td class="grp-blue">1 <span class="cell-idx">m0</span></td>
+              <td class="grp-red">X <span class="cell-idx">m1</span></td>
+              <td class="grp-red">X <span class="cell-idx">m3</span></td>
+              <td class="grp-blue">1 <span class="cell-idx">m2</span></td>
+            </tr>
+            <tr>
+              <th>1</th>
+              <td class="grp-green">0 <span class="cell-idx">m4</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m5</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m7</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m6</span></td>
+            </tr>
+          </table>
+          <div class="kmap-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#dbeafe;"></span> \(J_A = \overline{Q_C}\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fee2e2;"></span> \(K_A = 1\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;"></span> Don't-Care (5,6,7)</span>
+          </div>
+          <p style="font-size: 12.5px; margin-top: 10px; font-weight: 700; color: #1e40af;">
+            Minimal: \(J_A = \overline{Q_C}\), \(K_A = 1\)
+          </p>
+        </div>
+
+        <!-- K-Map for JB / KB -->
+        <div class="kmap-card">
+          <h4>K-Map for Flip-Flop B (\(J_B, K_B\))</h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">\(Q_B Q_A\)</span><span class="row-var">\(Q_C\)</span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr>
+              <th>0</th>
+              <td>0 <span class="cell-idx">m0</span></td>
+              <td class="grp-blue">1 <span class="cell-idx">m1</span></td>
+              <td class="grp-red">X <span class="cell-idx">m3</span></td>
+              <td class="grp-red">X <span class="cell-idx">m2</span></td>
+            </tr>
+            <tr>
+              <th>1</th>
+              <td>0 <span class="cell-idx">m4</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m5</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m7</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m6</span></td>
+            </tr>
+          </table>
+          <div class="kmap-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#dbeafe;"></span> \(J_B = Q_A\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fee2e2;"></span> \(K_B = Q_A\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;"></span> Don't-Care (5,6,7)</span>
+          </div>
+          <p style="font-size: 12.5px; margin-top: 10px; font-weight: 700; color: #1e40af;">
+            Minimal: \(J_B = Q_A\), \(K_B = Q_A\)
+          </p>
+        </div>
+
+        <!-- K-Map for JC / KC -->
+        <div class="kmap-card">
+          <h4>K-Map for Flip-Flop C (\(J_C, K_C\))</h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">\(Q_B Q_A\)</span><span class="row-var">\(Q_C\)</span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr>
+              <th>0</th>
+              <td>0 <span class="cell-idx">m0</span></td>
+              <td>0 <span class="cell-idx">m1</span></td>
+              <td class="grp-blue">1 <span class="cell-idx">m3</span></td>
+              <td>0 <span class="cell-idx">m2</span></td>
+            </tr>
+            <tr>
+              <th>1</th>
+              <td class="grp-red">1 <span class="cell-idx">m4</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m5</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m7</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m6</span></td>
+            </tr>
+          </table>
+          <div class="kmap-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#dbeafe;"></span> \(J_C = Q_B \cdot Q_A\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fee2e2;"></span> \(K_C = 1\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;"></span> Don't-Care (5,6,7)</span>
+          </div>
+          <p style="font-size: 12.5px; margin-top: 10px; font-weight: 700; color: #1e40af;">
+            Minimal: \(J_C = Q_B \cdot Q_A\), \(K_C = 1\)
+          </p>
+        </div>
+      </div>
+
+      <!-- K-MAP PART B: MOD-10 BCD DECADE COUNTER -->
+      <h3 style="color: var(--navy); font-size: 18px; margin-top: 36px;">B. Synchronous Mod-10 (BCD / Decade) Counter Design</h3>
+      <p style="font-size: 13.5px;">
+        Requires 4 flip-flops (\(Q_D, Q_C, Q_B, Q_A\)). State sequence: \(0000_2 \to 1001_2\) (\(0 \to 9\)).
+        Unused invalid BCD states are <strong>10, 11, 12, 13, 14, 15</strong> (\(1010_2\) to \(1111_2\)),
+        which are leveraged as <strong>Don't Cares (\(X\))</strong> in 4-variable K-maps to drastically simplify the logic!
+      </p>
+
+      <div class="kmap-container">
+        <!-- K-Map for JB / KB -->
+        <div class="kmap-card">
+          <h4>K-Map for \(J_B\) (Flip-Flop B Input)</h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">\(Q_B Q_A\)</span><span class="row-var">\(Q_D Q_C\)</span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr>
+              <th>00</th>
+              <td>0 <span class="cell-idx">m0</span></td>
+              <td class="grp-blue">1 <span class="cell-idx">m1</span></td>
+              <td>X <span class="cell-idx">m3</span></td>
+              <td>X <span class="cell-idx">m2</span></td>
+            </tr>
+            <tr>
+              <th>01</th>
+              <td>0 <span class="cell-idx">m4</span></td>
+              <td class="grp-blue">1 <span class="cell-idx">m5</span></td>
+              <td>X <span class="cell-idx">m7</span></td>
+              <td>X <span class="cell-idx">m6</span></td>
+            </tr>
+            <tr>
+              <th>11</th>
+              <td class="grp-amber">X <span class="cell-idx">m12</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m13</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m15</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m14</span></td>
+            </tr>
+            <tr>
+              <th>10</th>
+              <td>0 <span class="cell-idx">m8</span></td>
+              <td>0 <span class="cell-idx">m9</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m11</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m10</span></td>
+            </tr>
+          </table>
+          <div class="kmap-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#dbeafe;"></span> Group 1: \(\overline{Q_D} \cdot Q_A\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;"></span> Don't Cares (10..15)</span>
+          </div>
+          <p style="font-size: 12.5px; margin-top: 10px; font-weight: 700; color: #1e40af;">
+            Minimal Expression: \(J_B = \overline{Q_D} \cdot Q_A\) &emsp; \(K_B = Q_A\)
+          </p>
+        </div>
+
+        <!-- K-Map for JC / KC -->
+        <div class="kmap-card">
+          <h4>K-Map for \(J_C\) (Flip-Flop C Input)</h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">\(Q_B Q_A\)</span><span class="row-var">\(Q_D Q_C\)</span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr>
+              <th>00</th>
+              <td>0 <span class="cell-idx">m0</span></td>
+              <td>0 <span class="cell-idx">m1</span></td>
+              <td class="grp-green">1 <span class="cell-idx">m3</span></td>
+              <td>0 <span class="cell-idx">m2</span></td>
+            </tr>
+            <tr>
+              <th>01</th>
+              <td>X <span class="cell-idx">m4</span></td>
+              <td>X <span class="cell-idx">m5</span></td>
+              <td class="grp-green">X <span class="cell-idx">m7</span></td>
+              <td>X <span class="cell-idx">m6</span></td>
+            </tr>
+            <tr>
+              <th>11</th>
+              <td class="grp-amber">X <span class="cell-idx">m12</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m13</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m15</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m14</span></td>
+            </tr>
+            <tr>
+              <th>10</th>
+              <td>0 <span class="cell-idx">m8</span></td>
+              <td>0 <span class="cell-idx">m9</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m11</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m10</span></td>
+            </tr>
+          </table>
+          <div class="kmap-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#dcfce7;"></span> Group: \(Q_B \cdot Q_A\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;"></span> Don't Cares (10..15)</span>
+          </div>
+          <p style="font-size: 12.5px; margin-top: 10px; font-weight: 700; color: #166534;">
+            Minimal Expression: \(J_C = Q_B \cdot Q_A\) &emsp; \(K_C = Q_B \cdot Q_A\)
+          </p>
+        </div>
+
+        <!-- K-Map for JD / KD -->
+        <div class="kmap-card">
+          <h4>K-Map for \(J_D\) (Flip-Flop D - MSB Input)</h4>
+          <table class="kmap-table">
+            <tr>
+              <th class="kmap-diag"><span class="col-var">\(Q_B Q_A\)</span><span class="row-var">\(Q_D Q_C\)</span></th>
+              <th>00</th><th>01</th><th>11</th><th>10</th>
+            </tr>
+            <tr>
+              <th>00</th>
+              <td>0 <span class="cell-idx">m0</span></td>
+              <td>0 <span class="cell-idx">m1</span></td>
+              <td>0 <span class="cell-idx">m3</span></td>
+              <td>0 <span class="cell-idx">m2</span></td>
+            </tr>
+            <tr>
+              <th>01</th>
+              <td>0 <span class="cell-idx">m4</span></td>
+              <td>0 <span class="cell-idx">m5</span></td>
+              <td class="grp-purple">1 <span class="cell-idx">m7</span></td>
+              <td>0 <span class="cell-idx">m6</span></td>
+            </tr>
+            <tr>
+              <th>11</th>
+              <td class="grp-amber">X <span class="cell-idx">m12</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m13</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m15</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m14</span></td>
+            </tr>
+            <tr>
+              <th>10</th>
+              <td>X <span class="cell-idx">m8</span></td>
+              <td>X <span class="cell-idx">m9</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m11</span></td>
+              <td class="grp-amber">X <span class="cell-idx">m10</span></td>
+            </tr>
+          </table>
+          <div class="kmap-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#f3e8ff;"></span> Group: \(Q_C \cdot Q_B \cdot Q_A\)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;"></span> Don't Cares (10..15)</span>
+          </div>
+          <p style="font-size: 12.5px; margin-top: 10px; font-weight: 700; color: #6b21a8;">
+            Minimal Expression: \(J_D = Q_C \cdot Q_B \cdot Q_A\) &emsp; \(K_D = Q_A\)
+          </p>
+        </div>
+      </div>
+
+      <div class="formula-box" style="margin-top: 20px;">
+        <strong>Summary of Synthesized BCD Decade Counter Equations:</strong><br>
+        \[ J_A = 1, \quad K_A = 1 \quad \text{(LSB toggles on every single clock pulse)} \]
+        \[ J_B = \overline{Q_D} \cdot Q_A, \quad K_B = Q_A \]
+        \[ J_C = Q_B \cdot Q_A, \quad K_C = Q_B \cdot Q_A \]
+        \[ J_D = Q_C \cdot Q_B \cdot Q_A, \quad K_D = Q_A \]
+        Notice that when count is at 9 (\(1001_2\)), \(Q_D=1\), which inhibits Flip-Flop B from turning ON (\(J_B = 0 \cdot 1 = 0\)).
+        At the same time, \(K_D = Q_A = 1\) resets \(Q_D\) back to 0 on the 10th clock, cleanly returning the whole system to \(0000_2\)!
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 8: APPLICATIONS & LAB BENCHMARKS
+         ===================================================================== -->
+    <section class="card" id="applications" style="margin-bottom: 32px;">
+      <h2 style="color: var(--navy); margin-top: 0;">8. Real-World Engineering Applications & Lab Experiments</h2>
+
+      <div class="grid-3col">
+        <div class="card">
+          <h4 style="color: var(--navy);">1. Digital Quartz Clocks</h4>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--ink); margin: 0;">
+            Cascaded chains of 74LS90 (Mod-10 for seconds/minutes units) and truncated 74LS90 (Mod-6 for seconds/minutes tens)
+            convert a 1Hz clock directly into 60-second and 60-minute time intervals.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4 style="color: var(--navy);">2. Frequency Division & PLLs</h4>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--ink); margin: 0;">
+            Generates precise sub-harmonics from crystal oscillators (e.g., dividing a 10MHz oscillator down to 1MHz, 100kHz, 10kHz, or 1Hz)
+            for telecommunication baud rates and microcontroller system clocks.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4 style="color: var(--navy);">3. Memory & Address Generators</h4>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--ink); margin: 0;">
+            IC 74LS93 ripple counters serve as automatic sequential address generators for EEPROMs, DACs (waveform synthesizers),
+            and FIFO memory buffers.
+          </p>
+        </div>
+      </div>
+
+      <div class="action-links" style="margin-top: 24px;">
+        <a href="schematic.html?circuit=counter_74ls90" class="btn-action btn-primary">⚡ Open 74LS90 KiCad Schematic</a>
+        <a href="schematic.html?circuit=counter_74ls93" class="btn-action btn-primary">⚡ Open 74LS93 KiCad Schematic</a>
+        <a href="workbench.html" class="btn-action btn-secondary">⚡ Open Virtual IC Workbench Lab</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="background: var(--navy); color: white; padding: 24px; text-align: center; font-size: 13px; font-family: 'DM Mono', monospace; border-top: 1px solid #2b405e;">
+    <p>Digital Electronics Laboratory · Modulo-N Counters & Sequential Logic Reference Guide</p>
+  </footer>
+
+</body>
+</html>

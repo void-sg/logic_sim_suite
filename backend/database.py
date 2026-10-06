@@ -13,19 +13,42 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Users table
+    # Table 1: users (Student & Faculty Profiles)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        roll_number TEXT UNIQUE,
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
-        is_verified INTEGER DEFAULT 0,
+        branch TEXT DEFAULT 'CSE',
+        semester INTEGER DEFAULT 3,
+        role TEXT DEFAULT 'student',
+        is_verified INTEGER DEFAULT 1,
         created_at TEXT NOT NULL
     )
     """)
     
-    # OTP codes table
+    # Run non-destructive schema migrations for existing users database
+    cursor.execute("PRAGMA table_info(users)")
+    existing_columns = {row["name"] for row in cursor.fetchall()}
+    
+    if "roll_number" not in existing_columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN roll_number TEXT")
+    
+    if "branch" not in existing_columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN branch TEXT DEFAULT 'CSE'")
+        cursor.execute("UPDATE users SET branch = 'CSE' WHERE branch IS NULL")
+        
+    if "semester" not in existing_columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN semester INTEGER DEFAULT 3")
+        cursor.execute("UPDATE users SET semester = 3 WHERE semester IS NULL")
+        
+    if "role" not in existing_columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student'")
+        cursor.execute("UPDATE users SET role = 'student' WHERE role IS NULL")
+
+    # OTP codes table for email/security verifications
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS otp_codes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,21 +60,59 @@ def init_db():
     )
     """)
     
+    # Performance & uniqueness indices for query speed and DBeaver inspection
+    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_roll ON users(roll_number)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(lower(email))")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(lower(username))")
+    
     conn.commit()
     conn.close()
 
-def create_user(username: str, email: str, password_hash: str):
+def create_user(
+    username: str, 
+    email: str, 
+    password_hash: str, 
+    roll_number: str = None, 
+    branch: str = "CSE", 
+    semester: int = 3, 
+    role: str = "student"
+):
     conn = get_connection()
     cursor = conn.cursor()
     now_iso = datetime.now(timezone.utc).isoformat()
+    clean_roll = roll_number.strip().upper() if roll_number and str(roll_number).strip() else None
+    clean_branch = branch.strip().upper() if branch and str(branch).strip() else "CSE"
+    clean_role = role.strip().lower() if role and str(role).strip() else "student"
+    clean_sem = int(semester) if semester else 3
+    
     try:
         cursor.execute(
-            "INSERT INTO users (username, email, password_hash, is_verified, created_at) VALUES (?, ?, ?, 1, ?)",
-            (username.strip(), email.strip().lower(), password_hash, now_iso)
+            """INSERT INTO users 
+               (username, email, password_hash, roll_number, branch, semester, role, is_verified, created_at) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)""",
+            (
+                username.strip(),
+                email.strip().lower(),
+                password_hash,
+                clean_roll,
+                clean_branch,
+                clean_sem,
+                clean_role,
+                now_iso
+            )
         )
         conn.commit()
         user_id = cursor.lastrowid
-        return {"id": user_id, "username": username, "email": email, "is_verified": 1}
+        return {
+            "id": user_id,
+            "username": username.strip(),
+            "email": email.strip().lower(),
+            "roll_number": clean_roll,
+            "branch": clean_branch,
+            "semester": clean_sem,
+            "role": clean_role,
+            "is_verified": 1
+        }
     finally:
         conn.close()
 
@@ -76,6 +137,92 @@ def get_user_by_username(username: str):
         if row:
             return dict(row)
         return None
+    finally:
+        conn.close()
+
+def get_user_by_roll_number(roll_number: str):
+    if not roll_number:
+        return None
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT * FROM users WHERE upper(roll_number) = ?", (roll_number.strip().upper(),))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+        return None
+    finally:
+        conn.close()
+
+def get_user_by_identifier(identifier: str):
+    """Query user by email, username, or college roll number."""
+    if not identifier:
+        return None
+    clean = identifier.strip()
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """SELECT * FROM users 
+               WHERE lower(email) = ? 
+                  OR lower(username) = ? 
+                  OR upper(roll_number) = ?""",
+            (clean.lower(), clean.lower(), clean.upper())
+        )
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+        return None
+    finally:
+        conn.close()
+
+def update_user_profile(user_id: int, roll_number: str = None, branch: str = None, semester: int = None, role: str = None):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        updates = []
+        params = []
+        if roll_number is not None:
+            clean_roll = roll_number.strip().upper() if str(roll_number).strip() else None
+            updates.append("roll_number = ?")
+            params.append(clean_roll)
+        if branch is not None:
+            updates.append("branch = ?")
+            params.append(branch.strip().upper())
+        if semester is not None:
+            updates.append("semester = ?")
+            params.append(int(semester))
+        if role is not None:
+            updates.append("role = ?")
+            params.append(role.strip().lower())
+        
+        if updates:
+            params.append(user_id)
+            cursor.execute(f"UPDATE users SET {', '.join(updates)} WHERE id = ?", tuple(params))
+            conn.commit()
+    finally:
+        conn.close()
+
+def list_users(role: str = None, branch: str = None, semester: int = None, limit: int = 100):
+    """Retrieve users list (for faculty/admin roster inspection)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        query = "SELECT id, roll_number, username, email, branch, semester, role, is_verified, created_at FROM users WHERE 1=1"
+        params = []
+        if role:
+            query += " AND role = ?"
+            params.append(role.strip().lower())
+        if branch:
+            query += " AND branch = ?"
+            params.append(branch.strip().upper())
+        if semester:
+            query += " AND semester = ?"
+            params.append(int(semester))
+        query += " ORDER BY id ASC LIMIT ?"
+        params.append(limit)
+        cursor.execute(query, tuple(params))
+        return [dict(r) for r in cursor.fetchall()]
     finally:
         conn.close()
 

@@ -13,6 +13,7 @@ from auth_schemas import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
     ChangePasswordRequest,
+    UpdateProfileRequest,
     TokenResponse,
     UserResponse,
     MessageResponse,
@@ -120,12 +121,30 @@ def get_current_user(authorization: str = Header(None)) -> dict:
 @router.post("/register", response_model=MessageResponse)
 def register(req: RegisterRequest):
     email = req.email.strip().lower()
+    roll_number = req.roll_number.strip().upper() if req.roll_number and str(req.roll_number).strip() else None
+    branch = req.branch.strip().upper() if req.branch else "CSE"
+    semester = req.semester if req.semester else 3
+    role = req.role.strip().lower() if req.role else "student"
+    
+    # Check roll number uniqueness if provided
+    if roll_number:
+        existing_roll_user = database.get_user_by_roll_number(roll_number)
+        if existing_roll_user and existing_roll_user["email"].lower() != email:
+            raise HTTPException(status_code=400, detail=f"Roll number '{roll_number}' is already registered to another student.")
+
     existing_email = database.get_user_by_email(email)
     
     if existing_email:
-        # Update password and ensure user is verified
+        # Update password, academic profile, and ensure user is verified
         password_hash = hash_password(req.password)
         database.update_password(email, password_hash)
+        database.update_user_profile(
+            existing_email["id"],
+            roll_number=roll_number,
+            branch=branch,
+            semester=semester,
+            role=role
+        )
         database.verify_user(email)
     else:
         existing_username = database.get_user_by_username(req.username)
@@ -133,7 +152,15 @@ def register(req: RegisterRequest):
             raise HTTPException(status_code=400, detail="Username is already taken. Please choose another.")
         
         password_hash = hash_password(req.password)
-        database.create_user(req.username, email, password_hash)
+        database.create_user(
+            username=req.username,
+            email=email,
+            password_hash=password_hash,
+            roll_number=roll_number,
+            branch=branch,
+            semester=semester,
+            role=role
+        )
         database.verify_user(email)
     
     # Generate OTP for reference and testing
@@ -152,6 +179,7 @@ def register(req: RegisterRequest):
         message="Registration successful! Your account is active and you can enter the laboratory.",
         details={
             "email": email,
+            "roll_number": roll_number,
             "otp": otp,
             "simulated": email_result.get("simulated", False),
             "auto_verified": True
@@ -160,12 +188,13 @@ def register(req: RegisterRequest):
 
 @router.post("/verify-otp", response_model=TokenResponse)
 def verify_otp(req: VerifyOtpRequest):
-    email = req.email.strip().lower()
-    user = database.get_user_by_email(email)
+    identifier = req.email.strip()
+    user = database.get_user_by_identifier(identifier)
     
     if not user:
-        raise HTTPException(status_code=404, detail="No registered account found for this email.")
+        raise HTTPException(status_code=404, detail="No registered account found for this email or roll number.")
     
+    email = user["email"]
     is_valid = database.validate_and_consume_otp(email, req.otp, "register")
     if not is_valid:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP code. Please try 123456 or request a new code.")
@@ -173,23 +202,33 @@ def verify_otp(req: VerifyOtpRequest):
     # Activate user account
     database.verify_user(email)
     
-    # Issue JWT token
-    token = create_jwt_token({"sub": str(user["id"]), "email": user["email"], "username": user["username"]})
+    token = create_jwt_token({
+        "sub": str(user["id"]),
+        "email": user["email"],
+        "username": user["username"],
+        "roll_number": user.get("roll_number"),
+        "role": user.get("role", "student")
+    })
     
     return TokenResponse(
         access_token=token,
         token_type="bearer",
         username=user["username"],
-        email=user["email"]
+        email=user["email"],
+        roll_number=user.get("roll_number"),
+        branch=user.get("branch", "CSE"),
+        semester=user.get("semester", 3),
+        role=user.get("role", "student")
     )
 
 @router.post("/resend-otp", response_model=MessageResponse)
 def resend_otp(req: ResendOtpRequest):
-    email = req.email.strip().lower()
-    user = database.get_user_by_email(email)
+    identifier = req.email.strip()
+    user = database.get_user_by_identifier(identifier)
     if not user:
-        raise HTTPException(status_code=404, detail="No account found for this email.")
+        raise HTTPException(status_code=404, detail="No account found for this email or roll number.")
     
+    email = user["email"]
     otp = otp_service.generate_otp()
     expires_at = otp_service.get_expiry_iso(minutes=15)
     database.save_otp(email, otp, req.purpose, expires_at)
@@ -207,24 +246,35 @@ def resend_otp(req: ResendOtpRequest):
 
 @router.post("/login", response_model=TokenResponse)
 def login(req: LoginRequest):
-    email = req.email.strip().lower()
-    user = database.get_user_by_email(email)
+    identifier = req.email.strip()
+    # Support sign in via institutional email, roll number (e.g. 23CS012), or username
+    user = database.get_user_by_identifier(identifier)
     
     if not user or not verify_password(req.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid email or password.")
+        raise HTTPException(status_code=401, detail="Invalid email/roll number or password.")
     
     # Auto-verify account upon successful password verification (no OTP blocking)
     if not user.get("is_verified"):
-        database.verify_user(email)
+        database.verify_user(user["email"])
         user["is_verified"] = 1
     
-    token = create_jwt_token({"sub": str(user["id"]), "email": user["email"], "username": user["username"]})
+    token = create_jwt_token({
+        "sub": str(user["id"]),
+        "email": user["email"],
+        "username": user["username"],
+        "roll_number": user.get("roll_number"),
+        "role": user.get("role", "student")
+    })
     
     return TokenResponse(
         access_token=token,
         token_type="bearer",
         username=user["username"],
-        email=user["email"]
+        email=user["email"],
+        roll_number=user.get("roll_number"),
+        branch=user.get("branch", "CSE"),
+        semester=user.get("semester", 3),
+        role=user.get("role", "student")
     )
 
 @router.post("/guest", response_model=TokenResponse)
@@ -233,35 +283,94 @@ def guest_login():
     guest_user = database.get_user_by_email(guest_email)
     if not guest_user:
         guest_hash = hash_password("guest123")
-        database.create_user("Guest Student", guest_email, guest_hash)
+        database.create_user(
+            username="Guest Student",
+            email=guest_email,
+            password_hash=guest_hash,
+            roll_number="GUEST001",
+            branch="CSE",
+            semester=3,
+            role="student"
+        )
         database.verify_user(guest_email)
         guest_user = database.get_user_by_email(guest_email)
+    elif not guest_user.get("roll_number"):
+        database.update_user_profile(guest_user["id"], roll_number="GUEST001", branch="CSE", semester=3, role="student")
+        guest_user = database.get_user_by_email(guest_email)
     
-    token = create_jwt_token({"sub": str(guest_user["id"]), "email": guest_user["email"], "username": guest_user["username"]})
+    token = create_jwt_token({
+        "sub": str(guest_user["id"]),
+        "email": guest_user["email"],
+        "username": guest_user["username"],
+        "roll_number": guest_user.get("roll_number", "GUEST001"),
+        "role": guest_user.get("role", "student")
+    })
     return TokenResponse(
         access_token=token,
         token_type="bearer",
         username=guest_user["username"],
-        email=guest_user["email"]
+        email=guest_user["email"],
+        roll_number=guest_user.get("roll_number", "GUEST001"),
+        branch=guest_user.get("branch", "CSE"),
+        semester=guest_user.get("semester", 3),
+        role=guest_user.get("role", "student")
     )
 
 @router.get("/me", response_model=UserResponse)
 def get_me(user: dict = Depends(get_current_user)):
     return UserResponse(
         id=user["id"],
+        roll_number=user.get("roll_number"),
         username=user["username"],
         email=user["email"],
+        branch=user.get("branch", "CSE"),
+        semester=user.get("semester", 3),
+        role=user.get("role", "student"),
         is_verified=bool(user["is_verified"])
     )
 
+@router.put("/profile", response_model=UserResponse)
+def update_profile(req: UpdateProfileRequest, user: dict = Depends(get_current_user)):
+    if req.roll_number is not None and str(req.roll_number).strip():
+        clean_roll = req.roll_number.strip().upper()
+        existing_roll_user = database.get_user_by_roll_number(clean_roll)
+        if existing_roll_user and existing_roll_user["id"] != user["id"]:
+            raise HTTPException(status_code=400, detail=f"Roll number '{clean_roll}' is already assigned to another student.")
+        database.update_user_profile(user["id"], roll_number=clean_roll)
+
+    if req.branch is not None or req.semester is not None:
+        database.update_user_profile(
+            user["id"],
+            branch=req.branch,
+            semester=req.semester
+        )
+    
+    updated = database.get_user_by_email(user["email"])
+    return UserResponse(
+        id=updated["id"],
+        roll_number=updated.get("roll_number"),
+        username=updated["username"],
+        email=updated["email"],
+        branch=updated.get("branch", "CSE"),
+        semester=updated.get("semester", 3),
+        role=updated.get("role", "student"),
+        is_verified=bool(updated["is_verified"])
+    )
+
+@router.get("/roster")
+def get_roster(role: str = None, branch: str = None, semester: int = None, user: dict = Depends(get_current_user)):
+    """Academic roster view for faculty and testing."""
+    return database.list_users(role=role, branch=branch, semester=semester)
+
 @router.post("/forgot-password", response_model=MessageResponse)
 def forgot_password(req: ForgotPasswordRequest):
-    email = req.email.strip().lower()
-    user = database.get_user_by_email(email)
+    identifier = req.email.strip()
+    user = database.get_user_by_identifier(identifier)
     
     if not user:
-        return MessageResponse(message="If an account with this email exists, a password reset code has been sent.")
+        return MessageResponse(message="If an account with this identifier exists, a password reset code has been sent.")
     
+    email = user["email"]
     otp = otp_service.generate_otp()
     expires_at = otp_service.get_expiry_iso(minutes=15)
     database.save_otp(email, otp, "password_reset", expires_at)
@@ -279,11 +388,12 @@ def forgot_password(req: ForgotPasswordRequest):
 
 @router.post("/reset-password", response_model=MessageResponse)
 def reset_password(req: ResetPasswordRequest):
-    email = req.email.strip().lower()
-    user = database.get_user_by_email(email)
+    identifier = req.email.strip()
+    user = database.get_user_by_identifier(identifier)
     if not user:
         raise HTTPException(status_code=404, detail="User account not found.")
     
+    email = user["email"]
     is_valid = database.validate_and_consume_otp(email, req.otp, "password_reset")
     if not is_valid:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP code for password reset.")

@@ -50,8 +50,8 @@
 
         <form id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group">
-            <label class="form-label" for="loginEmail">EMAIL ADDRESS</label>
-            <input type="email" id="loginEmail" class="form-input" placeholder="student@example.com" required autocomplete="email">
+            <label class="form-label" for="loginEmail">EMAIL ADDRESS OR ROLL NUMBER</label>
+            <input type="text" id="loginEmail" class="form-input" placeholder="e.g. 23CS012 or student@gmail.com" required autocomplete="username">
           </div>
 
           <div class="form-group">
@@ -84,36 +84,80 @@
         <div class="section-title">
           <span class="section-number">00</span>
           <div>
-            <p class="label">ACCOUNT CREATION</p>
-            <h2>Create Account</h2>
+            <p class="label">ACADEMIC REGISTRATION</p>
+            <h2>Create Student / Faculty Account</h2>
           </div>
         </div>
-        <p class="section-desc">Register with your Gmail address to verify your student account via a 6-digit OTP.</p>
+        <p class="section-desc">Register with your college roll number and email to access lab experiments and mock exams.</p>
 
         <form id="registerForm" onsubmit="handleRegister(event)">
-          <div class="form-group">
-            <label class="form-label" for="regUsername">USERNAME</label>
-            <input type="text" id="regUsername" class="form-input" placeholder="e.g. shardul_vlsi" minlength="3" required autocomplete="username">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="regRollNumber">COLLEGE ROLL NUMBER</label>
+              <input type="text" id="regRollNumber" class="form-input" placeholder="e.g. 23CS012" style="text-transform: uppercase;">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regUsername">FULL NAME / DISPLAY NAME</label>
+              <input type="text" id="regUsername" class="form-input" placeholder="e.g. Shardul S" minlength="3" required autocomplete="username">
+            </div>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="regEmail">GMAIL / EMAIL ADDRESS</label>
-            <input type="email" id="regEmail" class="form-input" placeholder="name@gmail.com" required autocomplete="email">
-            <small style="color: #667387; font-size: 11px; margin-top: 4px; display: block;">A 6-digit OTP code will be sent to confirm your email.</small>
+            <input type="email" id="regEmail" class="form-input" placeholder="student@example.com" required autocomplete="email">
+            <small style="color: #667387; font-size: 11px; margin-top: 4px; display: block;">Used for account recovery and verified academic notifications.</small>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="regPassword">PASSWORD</label>
-            <input type="password" id="regPassword" class="form-input" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label" for="regBranch">BRANCH</label>
+              <select id="regBranch" class="form-input" style="padding: 10px;">
+                <option value="CSE" selected>CSE</option>
+                <option value="ECE">ECE</option>
+                <option value="EEE">EEE</option>
+                <option value="IT">IT</option>
+                <option value="MECH">MECH</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regSemester">SEMESTER</label>
+              <select id="regSemester" class="form-input" style="padding: 10px;">
+                <option value="1">Sem 1</option>
+                <option value="2">Sem 2</option>
+                <option value="3" selected>Sem 3</option>
+                <option value="4">Sem 4</option>
+                <option value="5">Sem 5</option>
+                <option value="6">Sem 6</option>
+                <option value="7">Sem 7</option>
+                <option value="8">Sem 8</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regRole">ROLE</label>
+              <select id="regRole" class="form-input" style="padding: 10px;">
+                <option value="student" selected>Student</option>
+                <option value="faculty">Faculty</option>
+              </select>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="regConfirmPassword">CONFIRM PASSWORD</label>
-            <input type="password" id="regConfirmPassword" class="form-input" placeholder="Repeat your password" minlength="6" required autocomplete="new-password">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="regPassword">PASSWORD</label>
+              <input type="password" id="regPassword" class="form-input" placeholder="Min 6 chars" minlength="6" required autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regConfirmPassword">CONFIRM PASSWORD</label>
+              <input type="password" id="regConfirmPassword" class="form-input" placeholder="Repeat password" minlength="6" required autocomplete="new-password">
+            </div>
           </div>
 
           <button type="submit" class="btn-submit" id="btnRegisterSubmit">
-            <span>Send OTP &amp; Create Account</span>
+            <span>Register &amp; Enter Laboratory</span>
             <span>&rarr;</span>
           </button>
         </form>
@@ -353,8 +397,12 @@
     async function handleRegister(e) {
       e.preventDefault();
       hideAlert();
+      const rollNumber = document.getElementById("regRollNumber") ? document.getElementById("regRollNumber").value.trim().toUpperCase() : "";
       const username = document.getElementById("regUsername").value.trim();
       const email = document.getElementById("regEmail").value.trim();
+      const branch = document.getElementById("regBranch") ? document.getElementById("regBranch").value : "CSE";
+      const semester = document.getElementById("regSemester") ? parseInt(document.getElementById("regSemester").value, 10) : 3;
+      const role = document.getElementById("regRole") ? document.getElementById("regRole").value : "student";
       const password = document.getElementById("regPassword").value;
       const confirm = document.getElementById("regConfirmPassword").value;
       const btn = document.getElementById("btnRegisterSubmit");
@@ -368,7 +416,12 @@
       btn.textContent = "Creating Account...";
 
       try {
-        const res = await Auth.register(username, email, password);
+        const res = await Auth.register(username, email, password, {
+          roll_number: rollNumber || null,
+          branch: branch,
+          semester: semester,
+          role: role
+        });
         // Direct auto-login! Account is immediately active
         try {
           await Auth.login(email, password);
@@ -388,7 +441,7 @@
         showAlert(err.message || "Failed to register. Please try again.", "error");
       } finally {
         btn.disabled = false;
-        btn.innerHTML = "<span>Send OTP &amp; Create Account</span><span>&rarr;</span>";
+        btn.innerHTML = "<span>Register &amp; Enter Laboratory</span><span>&rarr;</span>";
       }
     }
 

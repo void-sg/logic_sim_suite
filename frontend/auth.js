@@ -28,10 +28,18 @@ const Auth = {
     }
   },
 
-  setSession(token, username, email, remember = true) {
+  setSession(token, username, email, remember = true, extra = {}) {
     const storage = remember ? localStorage : sessionStorage;
     storage.setItem("auth_token", token);
-    storage.setItem("auth_user", JSON.stringify({ username, email }));
+    const userObj = {
+      username,
+      email,
+      roll_number: extra.roll_number || null,
+      branch: extra.branch || "CSE",
+      semester: extra.semester || 3,
+      role: extra.role || "student"
+    };
+    storage.setItem("auth_user", JSON.stringify(userObj));
   },
 
   clearSession() {
@@ -66,11 +74,19 @@ const Auth = {
     }
   },
 
-  async register(username, email, password) {
+  async register(username, email, password, profile = {}) {
     return await this.handleFetch(`${this.getBaseUrl()}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password })
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        roll_number: profile.roll_number || null,
+        branch: profile.branch || "CSE",
+        semester: profile.semester ? parseInt(profile.semester, 10) : 3,
+        role: profile.role || "student"
+      })
     });
   },
 
@@ -80,7 +96,7 @@ const Auth = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp })
     });
-    this.setSession(data.access_token, data.username, data.email);
+    this.setSession(data.access_token, data.username, data.email, true, data);
     return data;
   },
 
@@ -98,7 +114,7 @@ const Auth = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
     });
-    this.setSession(data.access_token, data.username, data.email, remember);
+    this.setSession(data.access_token, data.username, data.email, remember, data);
     return data;
   },
 
@@ -108,13 +124,14 @@ const Auth = {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
-      this.setSession(data.access_token, data.username, data.email, true);
+      this.setSession(data.access_token, data.username, data.email, true, data);
       return data;
     } catch {
       // Local offline fallback if backend isn't reachable
       const offlineToken = "offline_guest_token_" + Date.now();
-      this.setSession(offlineToken, "Guest Student", "student.guest@logicsim.edu", true);
-      return { access_token: offlineToken, username: "Guest Student", email: "student.guest@logicsim.edu" };
+      const guestExtra = { roll_number: "GUEST001", branch: "CSE", semester: 3, role: "student" };
+      this.setSession(offlineToken, "Guest Student", "student.guest@logicsim.edu", true, guestExtra);
+      return { access_token: offlineToken, username: "Guest Student", email: "student.guest@logicsim.edu", ...guestExtra };
     }
   },
 

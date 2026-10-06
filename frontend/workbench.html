@@ -41,6 +41,18 @@
         <span>Choose Symbol [A]</span>
       </button>
 
+      <button class="wb-btn wb-btn-blank" id="btn-blank-canvas" title="New Blank Canvas / Clear Workstation">
+        <span>✨ Blank Canvas</span>
+      </button>
+
+      <button class="wb-btn wb-btn-save" id="btn-save-exp" title="Save Current Experiment (Title + Objective + Wires)">
+        <span>💾 Save Exp</span>
+      </button>
+
+      <button class="wb-btn wb-btn-library" id="btn-saved-library" title="Open My Saved Experiments Library">
+        <span>📁 Saved Exps</span>
+      </button>
+
       <div class="wb-toolbar-divider"></div>
 
       <button class="wb-btn tool-btn active" id="btn-tool-select" title="Select & Move Tool (Shortcut: S)">
@@ -337,6 +349,19 @@
 
     <!-- KiCad Schematic Canvas -->
     <div class="wb-canvas-wrap tool-select" id="canvas-wrap">
+      <!-- Experiment Title & Objective Metadata Header Banner -->
+      <div class="wb-experiment-banner" id="experiment-banner">
+        <div class="wb-exp-badge">EXPERIMENT</div>
+        <div class="wb-exp-fields">
+          <input type="text" class="wb-exp-title-input" id="exp-banner-title" value="Untitled Experiment" placeholder="Experiment Title (e.g., Half Adder using 7408)..." title="Click to edit experiment title">
+          <span class="wb-exp-divider">•</span>
+          <input type="text" class="wb-exp-obj-input" id="exp-banner-obj" value="" placeholder="Objective / Notes (e.g., Verify truth table of XOR and AND gates)..." title="Click to edit experiment objective">
+        </div>
+        <div class="wb-exp-banner-actions">
+          <button class="wb-exp-quick-save-btn" id="btn-banner-save" title="Save / Update Experiment">💾 Save</button>
+        </div>
+      </div>
+
       <svg id="workbench-svg">
         <!-- Zoom group, wires, components dynamically rendered here -->
       </svg>
@@ -413,6 +438,112 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Save Experiment Modal (Title, Objective, Mode & Stats)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-save-experiment">
+    <div class="save-modal-window">
+      <!-- Modal Header -->
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <h2 class="modal-title">💾 Save Experiment</h2>
+          <span class="modal-badge">Local Storage</span>
+        </div>
+        <button class="modal-close-btn" id="btn-close-save-modal" title="Close">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="save-modal-body">
+        <div class="form-group">
+          <label class="form-label" for="save-exp-title">Experiment Title <span class="required">*</span></label>
+          <input type="text" id="save-exp-title" class="form-control" placeholder="e.g. Practical 4: Full Subtractor using 7486 & 7408" autocomplete="off" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="save-exp-obj">Objective / Lab Notes</label>
+          <textarea id="save-exp-obj" class="form-control form-textarea" rows="3" placeholder="e.g. To implement and verify truth table of 1-bit full subtractor using logic ICs..."></textarea>
+        </div>
+
+        <!-- Component and Wire Statistics Pill Counter -->
+        <div class="save-exp-stats">
+          <span class="stat-pill" id="save-stat-comps">Components: 0</span>
+          <span class="stat-pill" id="save-stat-wires">Wires: 0</span>
+          <span class="stat-pill" id="save-stat-mode">Mode: New Experiment</span>
+        </div>
+
+        <!-- Overwrite vs New Copy Selector (Shown when an existing experiment is loaded) -->
+        <div class="form-group" id="save-overwrite-group" style="display: none;">
+          <label class="form-label">Save Mode</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="save-mode" value="overwrite" checked id="radio-save-overwrite">
+              <span>Update / Overwrite current experiment (<strong id="overwrite-exp-name"></strong>)</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="save-mode" value="new" id="radio-save-new">
+              <span>Save as a new copy</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer-bar">
+        <span class="save-status-msg" id="save-status-msg"></span>
+        <div class="modal-actions">
+          <button class="wb-btn" id="btn-cancel-save-modal">Cancel</button>
+          <button class="wb-btn wb-btn-primary" id="btn-confirm-save-exp">💾 Save Experiment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       My Saved Experiments Manager Modal (Library, Import & Export)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-saved-experiments">
+    <div class="library-modal-window">
+      <!-- Modal Header -->
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <h2 class="modal-title">📁 My Saved Experiments</h2>
+          <span class="modal-badge" id="library-count-badge">0 saved</span>
+        </div>
+        <button class="modal-close-btn" id="btn-close-library-modal" title="Close">&times;</button>
+      </div>
+
+      <!-- Library Action Toolbar -->
+      <div class="library-toolbar">
+        <div class="modal-search-row" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; background: #ffffff;">
+          <span class="modal-search-icon">🔍</span>
+          <input type="text" class="modal-search-input" id="library-search" placeholder="Search saved experiments by title or objective..." autocomplete="off">
+        </div>
+        <button class="wb-btn" id="btn-library-import-trigger" title="Import Experiment from JSON file">
+          <span>📥 Import JSON</span>
+        </button>
+        <input type="file" id="library-file-input" accept=".json,application/json" style="display: none;">
+        <button class="wb-btn" id="btn-library-export-all" title="Backup all saved experiments to a JSON file">
+          <span>📦 Export All</span>
+        </button>
+      </div>
+
+      <!-- Dynamic Experiments List -->
+      <div class="library-cards-scroll" id="saved-experiments-list">
+        <!-- Dynamically rendered via renderSavedExperimentsList() -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer-bar">
+        <div class="modal-desc-text">
+          Experiments are stored locally in your browser (<code>logic_sim_saved_experiments</code>). Export JSON files to submit lab reports or transfer across computers.
+        </div>
+        <div class="modal-actions">
+          <button class="wb-btn" id="btn-close-library">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 

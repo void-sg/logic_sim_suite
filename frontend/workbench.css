@@ -209,6 +209,37 @@
   color: #ffffff;
 }
 
+.wb-btn-blank:hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.wb-btn-save {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+  font-weight: 700;
+}
+
+.wb-btn-save:hover {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #15803d;
+}
+
+.wb-btn-library {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.wb-btn-library:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
 /* Preset Dropdown */
 .wb-select {
   padding: 6px 12px;
@@ -956,4 +987,364 @@
   .modal-preview-panel {
     display: none;
   }
+}
+
+/* =========================================================================
+   Experiment Metadata Banner (Canvas Header Strip)
+   ========================================================================= */
+.wb-experiment-banner {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid #dce1e6;
+  border-radius: 8px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 12;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.wb-exp-badge {
+  background: #e0e7ff;
+  color: #3730a3;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.wb-exp-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.wb-exp-title-input {
+  font-family: "DM Mono", monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f172a;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 3px 8px;
+  outline: none;
+  transition: all 0.15s ease;
+  width: 320px;
+  max-width: 45%;
+}
+
+.wb-exp-title-input:hover,
+.wb-exp-title-input:focus {
+  border-color: #94a3b8;
+  background: #ffffff;
+}
+
+.wb-exp-divider {
+  color: #94a3b8;
+  font-size: 14px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.wb-exp-obj-input {
+  font-size: 12px;
+  color: #475569;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 3px 8px;
+  outline: none;
+  transition: all 0.15s ease;
+  flex: 1;
+  min-width: 150px;
+}
+
+.wb-exp-obj-input:hover,
+.wb-exp-obj-input:focus {
+  border-color: #94a3b8;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.wb-exp-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.wb-exp-quick-save-btn {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wb-exp-quick-save-btn:hover {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+/* =========================================================================
+   Save Experiment Modal
+   ========================================================================= */
+.save-modal-window {
+  background: #ffffff;
+  border-radius: 10px;
+  width: 540px;
+  max-width: 95vw;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.15s ease-out;
+}
+
+.save-modal-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #ffffff;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.form-label .required {
+  color: #dc2626;
+}
+
+.form-control {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  background: #ffffff;
+}
+
+.form-control:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 75px;
+  line-height: 1.45;
+}
+
+.save-exp-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.stat-pill {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+}
+
+.save-status-msg {
+  font-size: 12px;
+  color: #166534;
+  font-weight: 600;
+  font-family: "DM Mono", monospace;
+}
+
+/* =========================================================================
+   My Saved Experiments Library Modal
+   ========================================================================= */
+.library-modal-window {
+  background: #ffffff;
+  border-radius: 10px;
+  width: 820px;
+  max-width: 95vw;
+  height: 620px;
+  max-height: 90vh;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.15s ease-out;
+}
+
+.library-toolbar {
+  padding: 12px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+}
+
+.library-cards-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #faf8f5;
+}
+
+.saved-exp-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.saved-exp-card:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.saved-exp-card.active-exp {
+  border-left: 4px solid #2563eb;
+  background: #fcfdfe;
+}
+
+.saved-exp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-exp-title {
+  font-family: "DM Mono", monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.saved-exp-date {
+  font-size: 11px;
+  color: #64748b;
+  font-family: "DM Mono", monospace;
+  white-space: nowrap;
+}
+
+.saved-exp-obj {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.saved-exp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #f1f5f9;
+}
+
+.saved-exp-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-exp-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.library-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #64748b;
+  margin: auto;
+}
+
+.library-empty-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.library-empty-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.library-empty-desc {
+  font-size: 12px;
+  max-width: 380px;
+  line-height: 1.5;
 }

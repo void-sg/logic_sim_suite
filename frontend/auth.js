@@ -8,6 +8,9 @@ const Auth = {
     if (typeof API_BASE !== "undefined" && API_BASE && !API_BASE.includes("YOUR-APP-NAME")) {
       return API_BASE.replace(/\/+$/, "");
     }
+    if (window.location.port === "8000" || window.location.hostname.endsWith("onrender.com")) {
+      return window.location.origin;
+    }
     // Default local backend port
     return "http://127.0.0.1:8000";
   },
@@ -97,6 +100,22 @@ const Auth = {
     });
     this.setSession(data.access_token, data.username, data.email, remember);
     return data;
+  },
+
+  async guestLogin() {
+    try {
+      const data = await this.handleFetch(`${this.getBaseUrl()}/auth/guest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      this.setSession(data.access_token, data.username, data.email, true);
+      return data;
+    } catch {
+      // Local offline fallback if backend isn't reachable
+      const offlineToken = "offline_guest_token_" + Date.now();
+      this.setSession(offlineToken, "Guest Student", "student.guest@logicsim.edu", true);
+      return { access_token: offlineToken, username: "Guest Student", email: "student.guest@logicsim.edu" };
+    }
   },
 
   async forgotPassword(email) {

@@ -839,8 +839,17 @@
     hasDraggedFar: false,
 
     // Symbol Chooser Modal state
-    selectedModalItem: "7400"
+    selectedModalItem: "7400",
+
+    // Current Experiment Metadata & Local Storage State
+    currentExperiment: {
+      id: null,
+      title: "Untitled Experiment",
+      objective: ""
+    }
   };
+
+  const STORAGE_KEY_EXPERIMENTS = "logic_sim_saved_experiments";
 
   const refCounters = {};
 
@@ -857,6 +866,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     initDOM();
     initToolbar();
+    initExperimentStorage();
     initModal();
     initPanZoom();
     initClock();
@@ -905,7 +915,7 @@
 
     // Keyboard shortcuts
     window.addEventListener("keydown", (e) => {
-      if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT") return;
+      if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT" || document.activeElement.tagName === "TEXTAREA") return;
 
       if (e.key === "a" || e.key === "A") {
         openModal();
@@ -935,6 +945,8 @@
       } else if (e.key === "Escape") {
         cancelActiveWire();
         closeModal();
+        closeSaveModal();
+        closeLibraryModal();
       }
     });
   }
@@ -971,6 +983,9 @@
     document.getElementById("btn-tool-delete")?.addEventListener("click", () => setTool("delete"));
     document.getElementById("btn-add-symbol")?.addEventListener("click", () => openModal());
     document.getElementById("btn-clear-canvas")?.addEventListener("click", () => clearCanvas());
+    document.getElementById("btn-blank-canvas")?.addEventListener("click", () => newBlankCanvas());
+    document.getElementById("btn-save-exp")?.addEventListener("click", () => openSaveModal());
+    document.getElementById("btn-saved-library")?.addEventListener("click", () => openLibraryModal());
 
     // Component Palette Slide / Collapse Controls
     document.getElementById("btn-toggle-palette")?.addEventListener("click", () => togglePalette());
@@ -1550,13 +1565,7 @@
   }
 
   function clearCanvas() {
-    if (confirm("Clear all components and wires from the workbench?")) {
-      state.components = [];
-      state.wires = [];
-      state.selectedItem = null;
-      cancelActiveWire();
-      render();
-    }
+    newBlankCanvas();
   }
 
   // =========================================================================
@@ -3538,11 +3547,73 @@
   // =========================================================================
   // 11. LAB PRESET CIRCUITS FOR CAMPUS PRACTICALS
   // =========================================================================
+  const PRESET_METADATA = {
+    "7400_nand": {
+      title: "Exp 1: 7400 Quad NAND Gate Verification",
+      objective: "Verify the truth table of 2-input NAND logic gates."
+    },
+    "7483_adder": {
+      title: "Exp 2: 7483 4-Bit Binary Full Adder Test",
+      objective: "4-bit parallel binary addition with carry lookahead."
+    },
+    "7485_comparator": {
+      title: "Exp 3: 7485 4-Bit Magnitude Comparator Test",
+      objective: "Compare two 4-bit binary words A and B (A>B, A=B, A<B)."
+    },
+    "74151_mux": {
+      title: "Exp 4: 74151 8:1 Multiplexer Experiment",
+      objective: "Select 1 of 8 data inputs using 3 select lines (S0, S1, S2)."
+    },
+    "74153_mux": {
+      title: "Exp 5: 74153 Dual 4:1 Multiplexer Experiment",
+      objective: "Two independent 4-to-1 data selectors with common select lines."
+    },
+    "74153_case1_3var": {
+      title: "Exp 6: 74153 8:1 MUX: F(C,B,A) = Σm(0,1,3,4,7)",
+      objective: "Implementation of 3-variable Boolean function using 74153 Dual 4:1 MUX."
+    },
+    "74153_8to1_function": {
+      title: "Exp 7: 74153 8:1 MUX: F(A,B,C,D) = Σm(0,1,2,4,7,8,9,11,12,14)",
+      objective: "Implementation of 4-variable Boolean function using 74153 Dual 4:1 MUX."
+    },
+    "diode_or": {
+      title: "Exp 8: Diode OR Logic Gate Circuit",
+      objective: "Discrete diode OR logic implementation and forward voltage verification."
+    },
+    "7490_decade": {
+      title: "Exp 9: 7490 BCD Decade Counter (Mod-10, 0..9)",
+      objective: "Asynchronous BCD decade counter (Mod-10) with QA connected to B input."
+    },
+    "7490_mod6": {
+      title: "Exp 10: 7490 Mod-6 Counter (Reset at 6: QC·QB)",
+      objective: "Mod-6 asynchronous counter with reset feedback at count 6 (0110)."
+    },
+    "7493_mod16": {
+      title: "Exp 11: 7493 4-Bit Binary Counter (Mod-16, 0..15)",
+      objective: "4-bit binary ripple counter (Mod-16) cycling through states 0 to 15."
+    },
+    "7493_mod12": {
+      title: "Exp 12: 7493 Mod-12 Counter (Reset at 12: QD·QC)",
+      objective: "Mod-12 binary counter with reset feedback at count 12 (1100)."
+    }
+  };
+
   function loadLabPreset(presetKey) {
     state.components = [];
     state.wires = [];
     state.selectedItem = null;
     cancelActiveWire();
+
+    const meta = PRESET_METADATA[presetKey] || {
+      title: "Lab Experiment Preset",
+      objective: ""
+    };
+    state.currentExperiment = {
+      id: null,
+      title: meta.title,
+      objective: meta.objective
+    };
+    updateBannerUI();
 
     if (presetKey === "7400_nand") {
       // Preset 1: 7400 NAND Gate Truth Table Verification
@@ -3980,7 +4051,563 @@
   }
 
   // =========================================================================
-  // 12. HELPER FUNCTIONS
+  // 12. LOCAL EXPERIMENT STORAGE, BANNER & LIBRARY ENGINE
+  // =========================================================================
+
+  function initExperimentStorage() {
+    // Toolbar buttons
+    document.getElementById("btn-blank-canvas")?.addEventListener("click", () => newBlankCanvas());
+    document.getElementById("btn-save-exp")?.addEventListener("click", () => openSaveModal());
+    document.getElementById("btn-saved-library")?.addEventListener("click", () => openLibraryModal());
+
+    // Canvas Header Banner
+    const bannerTitle = document.getElementById("exp-banner-title");
+    const bannerObj = document.getElementById("exp-banner-obj");
+    const bannerSave = document.getElementById("btn-banner-save");
+
+    bannerTitle?.addEventListener("input", (e) => {
+      state.currentExperiment.title = e.target.value;
+    });
+    bannerObj?.addEventListener("input", (e) => {
+      state.currentExperiment.objective = e.target.value;
+    });
+    bannerSave?.addEventListener("click", () => openSaveModal());
+
+    // Save Experiment Modal
+    document.getElementById("btn-close-save-modal")?.addEventListener("click", () => closeSaveModal());
+    document.getElementById("btn-cancel-save-modal")?.addEventListener("click", () => closeSaveModal());
+    document.getElementById("modal-save-experiment")?.addEventListener("click", (e) => {
+      if (e.target.id === "modal-save-experiment") closeSaveModal();
+    });
+
+    document.getElementById("btn-confirm-save-exp")?.addEventListener("click", () => {
+      const titleInput = document.getElementById("save-exp-title");
+      const objInput = document.getElementById("save-exp-obj");
+      const title = titleInput ? titleInput.value.trim() : "";
+      const objective = objInput ? objInput.value.trim() : "";
+
+      if (!title) {
+        alert("Please enter an experiment title.");
+        titleInput?.focus();
+        return;
+      }
+
+      const isOverwrite = document.getElementById("radio-save-overwrite")?.checked;
+      const overwriteId = (isOverwrite && state.currentExperiment.id) ? state.currentExperiment.id : null;
+
+      saveCurrentExperiment(title, objective, overwriteId);
+
+      const statusMsg = document.getElementById("save-status-msg");
+      if (statusMsg) {
+        statusMsg.textContent = "✓ Experiment saved successfully!";
+        setTimeout(() => {
+          if (statusMsg) statusMsg.textContent = "";
+          closeSaveModal();
+        }, 500);
+      } else {
+        closeSaveModal();
+      }
+    });
+
+    // Saved Experiments Library Modal
+    document.getElementById("btn-close-library-modal")?.addEventListener("click", () => closeLibraryModal());
+    document.getElementById("btn-close-library")?.addEventListener("click", () => closeLibraryModal());
+    document.getElementById("modal-saved-experiments")?.addEventListener("click", (e) => {
+      if (e.target.id === "modal-saved-experiments") closeLibraryModal();
+    });
+
+    const librarySearch = document.getElementById("library-search");
+    librarySearch?.addEventListener("input", (e) => {
+      renderSavedExperimentsList(e.target.value.trim().toLowerCase());
+    });
+
+    document.getElementById("btn-library-export-all")?.addEventListener("click", () => {
+      exportAllExperimentsJSON();
+    });
+
+    const fileInput = document.getElementById("library-file-input");
+    document.getElementById("btn-library-import-trigger")?.addEventListener("click", () => {
+      if (fileInput) {
+        fileInput.value = "";
+        fileInput.click();
+      }
+    });
+
+    fileInput?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result;
+        if (typeof content === "string") {
+          importExperimentJSON(content);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Initial banner population
+    updateBannerUI();
+  }
+
+  function getSavedExperiments() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_EXPERIMENTS);
+      if (!raw) return [];
+      const list = JSON.parse(raw);
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      console.error("Failed to parse saved experiments from localStorage:", e);
+      return [];
+    }
+  }
+
+  function saveCurrentExperiment(title, objective, overwriteId = null) {
+    const list = getSavedExperiments();
+    const cleanTitle = (title && title.trim()) ? title.trim() : "Untitled Experiment";
+    const cleanObj = (objective && objective.trim()) ? objective.trim() : "";
+
+    const serializedComps = state.components.map((c) => ({
+      id: c.id,
+      type: c.type,
+      ref: c.ref,
+      x: c.x,
+      y: c.y,
+      state: c.state ? JSON.parse(JSON.stringify(c.state)) : {}
+    }));
+
+    const serializedWires = state.wires.map((w) => ({
+      id: w.id,
+      from: { compId: w.from.compId, pinNum: w.from.pinNum },
+      to: { compId: w.to.compId, pinNum: w.to.pinNum },
+      waypoints: w.waypoints ? JSON.parse(JSON.stringify(w.waypoints)) : [],
+      bendMode: w.bendMode || "HV",
+      state: w.state || 0
+    }));
+
+    const now = new Date().toISOString();
+
+    let targetId = overwriteId;
+    if (!targetId && state.currentExperiment && state.currentExperiment.id) {
+      targetId = state.currentExperiment.id;
+    }
+
+    let savedExp = null;
+    if (targetId) {
+      const idx = list.findIndex((e) => e.id === targetId);
+      if (idx !== -1) {
+        list[idx].title = cleanTitle;
+        list[idx].objective = cleanObj;
+        list[idx].components = serializedComps;
+        list[idx].wires = serializedWires;
+        list[idx].timestamp = now;
+        savedExp = list[idx];
+      }
+    }
+
+    if (!savedExp) {
+      targetId = "exp_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+      savedExp = {
+        id: targetId,
+        title: cleanTitle,
+        objective: cleanObj,
+        components: serializedComps,
+        wires: serializedWires,
+        timestamp: now
+      };
+      list.unshift(savedExp);
+    }
+
+    try {
+      localStorage.setItem(STORAGE_KEY_EXPERIMENTS, JSON.stringify(list));
+    } catch (err) {
+      console.error("Error saving to localStorage:", err);
+      alert("Storage quota exceeded or storage disabled!");
+    }
+
+    state.currentExperiment = {
+      id: savedExp.id,
+      title: savedExp.title,
+      objective: savedExp.objective
+    };
+
+    updateBannerUI();
+    return savedExp;
+  }
+
+  function loadExperimentById(expId) {
+    const list = getSavedExperiments();
+    const exp = list.find((e) => e.id === expId);
+    if (!exp) return false;
+
+    state.components = [];
+    state.wires = [];
+    state.selectedItem = null;
+    cancelActiveWire();
+
+    // Reset reference counters
+    Object.keys(refCounters).forEach((k) => delete refCounters[k]);
+
+    if (Array.isArray(exp.components)) {
+      exp.components.forEach((c) => {
+        state.components.push({
+          id: c.id,
+          type: c.type,
+          ref: c.ref || getNextRef(LIBRARY[c.type]?.refPrefix || "U"),
+          x: c.x,
+          y: c.y,
+          state: c.state ? JSON.parse(JSON.stringify(c.state)) : (LIBRARY[c.type]?.initState ? JSON.parse(JSON.stringify(LIBRARY[c.type].initState)) : {})
+        });
+
+        if (c.ref) {
+          const match = c.ref.match(/^([A-Za-z_]+)(\d+)$/);
+          if (match) {
+            const prefix = match[1];
+            const num = parseInt(match[2], 10);
+            if (!refCounters[prefix] || num > refCounters[prefix]) {
+              refCounters[prefix] = num;
+            }
+          }
+        }
+      });
+    }
+
+    if (Array.isArray(exp.wires)) {
+      exp.wires.forEach((w) => {
+        state.wires.push({
+          id: w.id,
+          from: { compId: w.from.compId, pinNum: w.from.pinNum },
+          to: { compId: w.to.compId, pinNum: w.to.pinNum },
+          waypoints: w.waypoints ? JSON.parse(JSON.stringify(w.waypoints)) : [],
+          bendMode: w.bendMode || "HV",
+          state: w.state || 0
+        });
+      });
+    }
+
+    state.currentExperiment = {
+      id: exp.id,
+      title: exp.title || "Untitled Experiment",
+      objective: exp.objective || ""
+    };
+
+    const presetSelect = document.getElementById("preset-select");
+    if (presetSelect) presetSelect.value = "";
+
+    updateBannerUI();
+    resetZoom();
+    render();
+    runSimulation();
+    return true;
+  }
+
+  function deleteSavedExperiment(expId) {
+    let list = getSavedExperiments();
+    list = list.filter((e) => e.id !== expId);
+    try {
+      localStorage.setItem(STORAGE_KEY_EXPERIMENTS, JSON.stringify(list));
+    } catch (e) {
+      console.error(e);
+    }
+    if (state.currentExperiment && state.currentExperiment.id === expId) {
+      state.currentExperiment.id = null;
+    }
+    const filter = document.getElementById("library-search")?.value.trim().toLowerCase() || "";
+    renderSavedExperimentsList(filter);
+  }
+
+  function newBlankCanvas() {
+    if (state.components.length > 0 || state.wires.length > 0) {
+      if (!confirm("Clear workstation and start with a fresh blank canvas? Unsaved changes will be lost.")) {
+        return;
+      }
+    }
+    state.components = [];
+    state.wires = [];
+    state.selectedItem = null;
+    cancelActiveWire();
+
+    Object.keys(refCounters).forEach((k) => delete refCounters[k]);
+
+    state.currentExperiment = {
+      id: null,
+      title: "Untitled Experiment",
+      objective: ""
+    };
+
+    const presetSelect = document.getElementById("preset-select");
+    if (presetSelect) presetSelect.value = "";
+
+    updateBannerUI();
+    resetZoom();
+    render();
+    runSimulation();
+  }
+
+  function exportExperimentJSON(expId) {
+    let exp = null;
+    if (expId) {
+      exp = getSavedExperiments().find((e) => e.id === expId);
+    }
+    if (!exp) {
+      exp = {
+        id: state.currentExperiment.id || ("exp_" + Date.now()),
+        title: state.currentExperiment.title || "Untitled Experiment",
+        objective: state.currentExperiment.objective || "",
+        components: state.components,
+        wires: state.wires,
+        timestamp: new Date().toISOString()
+      };
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exp, null, 2));
+    const dlAnchor = document.createElement("a");
+    const safeName = (exp.title || "experiment").toLowerCase().replace(/[^a-z0-9_-]/g, "_") + ".json";
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", safeName);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  }
+
+  function exportAllExperimentsJSON() {
+    const list = getSavedExperiments();
+    if (list.length === 0) {
+      alert("No saved experiments to export.");
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(list, null, 2));
+    const dlAnchor = document.createElement("a");
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "logic_sim_all_experiments_" + new Date().toISOString().slice(0, 10) + ".json");
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  }
+
+  function importExperimentJSON(jsonString) {
+    try {
+      const parsed = JSON.parse(jsonString);
+      if (Array.isArray(parsed)) {
+        const list = getSavedExperiments();
+        let addedCount = 0;
+        parsed.forEach((item) => {
+          if (item && item.title && Array.isArray(item.components)) {
+            item.id = "exp_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+            if (!item.timestamp) item.timestamp = new Date().toISOString();
+            list.unshift(item);
+            addedCount++;
+          }
+        });
+        localStorage.setItem(STORAGE_KEY_EXPERIMENTS, JSON.stringify(list));
+        renderSavedExperimentsList("");
+        alert(`Successfully imported ${addedCount} experiment(s) into your library!`);
+        return true;
+      } else if (parsed && typeof parsed === "object") {
+        const singleExp = {
+          id: "exp_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6),
+          title: parsed.title || "Imported Experiment",
+          objective: parsed.objective || "",
+          components: Array.isArray(parsed.components) ? parsed.components : [],
+          wires: Array.isArray(parsed.wires) ? parsed.wires : [],
+          timestamp: parsed.timestamp || new Date().toISOString()
+        };
+        const list = getSavedExperiments();
+        list.unshift(singleExp);
+        localStorage.setItem(STORAGE_KEY_EXPERIMENTS, JSON.stringify(list));
+
+        if (confirm(`Experiment "${singleExp.title}" imported! Load it onto the canvas now?`)) {
+          loadExperimentById(singleExp.id);
+          closeLibraryModal();
+        } else {
+          renderSavedExperimentsList("");
+        }
+        return true;
+      } else {
+        alert("Invalid experiment JSON file structure.");
+        return false;
+      }
+    } catch (err) {
+      console.error("JSON parse error:", err);
+      alert("Error importing experiment: Invalid JSON file.");
+      return false;
+    }
+  }
+
+  function updateBannerUI() {
+    const titleInput = document.getElementById("exp-banner-title");
+    const objInput = document.getElementById("exp-banner-obj");
+    if (titleInput && state.currentExperiment) {
+      titleInput.value = state.currentExperiment.title || "Untitled Experiment";
+    }
+    if (objInput && state.currentExperiment) {
+      objInput.value = state.currentExperiment.objective || "";
+    }
+  }
+
+  function openSaveModal() {
+    const modal = document.getElementById("modal-save-experiment");
+    if (!modal) return;
+    modal.classList.add("open");
+
+    const titleInput = document.getElementById("save-exp-title");
+    const objInput = document.getElementById("save-exp-obj");
+    const compsPill = document.getElementById("save-stat-comps");
+    const wiresPill = document.getElementById("save-stat-wires");
+    const modePill = document.getElementById("save-stat-mode");
+    const overwriteGroup = document.getElementById("save-overwrite-group");
+    const overwriteName = document.getElementById("overwrite-exp-name");
+    const statusMsg = document.getElementById("save-status-msg");
+
+    if (statusMsg) statusMsg.textContent = "";
+
+    if (titleInput) {
+      titleInput.value = (state.currentExperiment.title && state.currentExperiment.title !== "Untitled Experiment")
+        ? state.currentExperiment.title
+        : "";
+      if (!titleInput.value) titleInput.value = state.currentExperiment.title || "";
+    }
+    if (objInput) {
+      objInput.value = state.currentExperiment.objective || "";
+    }
+
+    if (compsPill) compsPill.textContent = `Components: ${state.components.length}`;
+    if (wiresPill) wiresPill.textContent = `Wires: ${state.wires.length}`;
+
+    if (state.currentExperiment && state.currentExperiment.id) {
+      if (overwriteGroup) overwriteGroup.style.display = "block";
+      if (overwriteName) overwriteName.textContent = state.currentExperiment.title;
+      const radioOverwrite = document.getElementById("radio-save-overwrite");
+      if (radioOverwrite) radioOverwrite.checked = true;
+      if (modePill) modePill.textContent = "Mode: Existing Experiment";
+    } else {
+      if (overwriteGroup) overwriteGroup.style.display = "none";
+      if (modePill) modePill.textContent = "Mode: New Experiment";
+    }
+
+    setTimeout(() => titleInput?.focus(), 50);
+  }
+
+  function closeSaveModal() {
+    const modal = document.getElementById("modal-save-experiment");
+    modal?.classList.remove("open");
+  }
+
+  function openLibraryModal() {
+    const modal = document.getElementById("modal-saved-experiments");
+    if (!modal) return;
+    modal.classList.add("open");
+    const search = document.getElementById("library-search");
+    if (search) search.value = "";
+    renderSavedExperimentsList("");
+    setTimeout(() => search?.focus(), 50);
+  }
+
+  function closeLibraryModal() {
+    const modal = document.getElementById("modal-saved-experiments");
+    modal?.classList.remove("open");
+  }
+
+  function renderSavedExperimentsList(filter = "") {
+    const listContainer = document.getElementById("saved-experiments-list");
+    const countBadge = document.getElementById("library-count-badge");
+    if (!listContainer) return;
+
+    const allExps = getSavedExperiments();
+    if (countBadge) {
+      countBadge.textContent = `${allExps.length} saved`;
+    }
+
+    const filtered = allExps.filter((exp) => {
+      if (!filter) return true;
+      const t = (exp.title || "").toLowerCase();
+      const o = (exp.objective || "").toLowerCase();
+      return t.includes(filter) || o.includes(filter);
+    });
+
+    listContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = `
+        <div class="library-empty-state">
+          <div class="library-empty-icon">📁</div>
+          <div class="library-empty-title">${allExps.length === 0 ? "No Saved Experiments Yet" : "No Matching Experiments"}</div>
+          <div class="library-empty-desc">
+            ${allExps.length === 0
+              ? "Build your digital logic circuit on the IC Workbench and click <strong>💾 Save Exp</strong> to store it in your browser library."
+              : "Try searching with a different keyword or IC reference (e.g. 7400, Adder, MUX)."}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach((exp) => {
+      const card = document.createElement("div");
+      card.className = "saved-exp-card";
+      if (state.currentExperiment && state.currentExperiment.id === exp.id) {
+        card.classList.add("active-exp");
+      }
+
+      const compCount = Array.isArray(exp.components) ? exp.components.length : 0;
+      const wireCount = Array.isArray(exp.wires) ? exp.wires.length : 0;
+      const dateStr = exp.timestamp ? new Date(exp.timestamp).toLocaleString(undefined, {
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      }) : "Unknown date";
+
+      card.innerHTML = `
+        <div class="saved-exp-header">
+          <span class="saved-exp-title">${escapeHTML(exp.title || "Untitled Experiment")}</span>
+          <span class="saved-exp-date">${dateStr}</span>
+        </div>
+        ${exp.objective ? `<div class="saved-exp-obj">${escapeHTML(exp.objective)}</div>` : ""}
+        <div class="saved-exp-footer">
+          <div class="saved-exp-meta">
+            <span class="stat-pill">${compCount} IC/Comps</span>
+            <span class="stat-pill">${wireCount} Wires</span>
+            ${(state.currentExperiment && state.currentExperiment.id === exp.id) ? `<span class="stat-pill" style="background: #dbeafe; color: #1e40af; border-color: #93c5fd;">Currently Open</span>` : ""}
+          </div>
+          <div class="saved-exp-actions">
+            <button class="wb-btn wb-btn-primary btn-load-exp" title="Load onto Workbench Canvas" data-id="${exp.id}">⚡ Load</button>
+            <button class="wb-btn btn-export-exp" title="Download JSON file" data-id="${exp.id}">💾 Export</button>
+            <button class="wb-btn wb-btn-danger btn-delete-exp" title="Delete experiment" data-id="${exp.id}">🗑</button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector(".btn-load-exp")?.addEventListener("click", () => {
+        loadExperimentById(exp.id);
+        closeLibraryModal();
+      });
+
+      card.querySelector(".btn-export-exp")?.addEventListener("click", () => {
+        exportExperimentJSON(exp.id);
+      });
+
+      card.querySelector(".btn-delete-exp")?.addEventListener("click", () => {
+        if (confirm(`Are you sure you want to delete "${exp.title || 'Untitled Experiment'}"? This cannot be undone.`)) {
+          deleteSavedExperiment(exp.id);
+        }
+      });
+
+      listContainer.appendChild(card);
+    });
+  }
+
+  function escapeHTML(str) {
+    if (!str) return "";
+    return str.replace(/[&<>'"]/g, 
+      tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag)
+    );
+  }
+
+  // =========================================================================
+  // 13. HELPER FUNCTIONS
   // =========================================================================
   function createSVGElement(tag, attrs) {
     const el = document.createElementNS(SVG_NS, tag);

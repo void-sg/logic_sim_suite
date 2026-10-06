@@ -13,7 +13,7 @@ def get_expiry_iso(minutes: int = 5) -> str:
 
 def send_otp_email(to_email: str, otp: str, purpose: str = "register") -> dict:
     smtp_email = os.environ.get("SMTP_EMAIL", "").strip()
-    smtp_password = os.environ.get("SMTP_APP_PASSWORD", "").strip()
+    smtp_password = os.environ.get("SMTP_APP_PASSWORD", "").replace(" ", "").strip()
     
     action_text = "verify your email address and activate your account" if purpose == "register" else "reset your password"
     title_text = "Email Verification" if purpose == "register" else "Password Reset Request"
@@ -83,7 +83,7 @@ def send_otp_email(to_email: str, otp: str, purpose: str = "register") -> dict:
         msg.attach(part_plain)
         msg.attach(part_html)
 
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=6)
         server.starttls()
         server.login(smtp_email, smtp_password)
         server.sendmail(smtp_email, to_email, msg.as_string())

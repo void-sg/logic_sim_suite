@@ -5,3 +5,5 @@ server.log
 .vscode/
 *.egg-info/
 .env
+.venv/
+*.db

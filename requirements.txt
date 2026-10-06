@@ -1,2 +1,4 @@
 fastapi
 uvicorn[standard]
+email-validator
+python-dotenv

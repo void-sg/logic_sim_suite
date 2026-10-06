@@ -1,0 +1,388 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --navy: #14233b;
+  --navy-hover: #1c3150;
+  --blue: #2c6ee8;
+  --paper: #f6f5f1;
+  --white: #ffffff;
+  --ink: #172130;
+  --muted: #667387;
+  --line: #dce1e6;
+  --line-dark: #2b405e;
+  --yellow: #e9bd4f;
+  --hover-bg: #f0f5fe;
+  --font-mono: "DM Mono", monospace;
+  --font-sans: "Manrope", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Site Header (Identical to index.html) */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--navy);
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.nav-wrap {
+  display: flex;
+  max-width: 1240px;
+  min-height: 76px;
+  margin: auto;
+  padding: 0 38px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 37px;
+  height: 37px;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.brand strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.brand small {
+  display: block;
+  margin-top: 2px;
+  color: #aebdd1;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.8px;
+}
+
+.back-home-link {
+  color: #c9d3e1;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+
+.back-home-link:hover {
+  color: var(--yellow);
+}
+
+/* Auth Center Container */
+.auth-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px 60px;
+}
+
+/* Auth Card — Clean White Section Style (like .topic-section in index.html) */
+.auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  padding: 36px 32px;
+  box-shadow: 0 4px 16px rgba(20, 35, 59, 0.05);
+}
+
+/* Section Header Block with Number Badge (Identical to index.html section-title) */
+.section-title {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-number {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.section-title .label {
+  margin: 0 0 4px;
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  font-weight: 700;
+  display: block;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.6px;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+/* Clean Underline Tabs (Matching main-nav in index.html) */
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.auth-tab {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+}
+
+.auth-tab:hover {
+  color: var(--ink);
+}
+
+.auth-tab.active {
+  color: var(--navy);
+  border-bottom-color: var(--navy);
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(20, 35, 59, 0.1);
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.form-link {
+  color: var(--navy);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.form-link:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+/* Deep Navy Primary Button (Matching header & section badges) */
+.btn-submit {
+  width: 100%;
+  padding: 13px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--navy-hover);
+  border-color: var(--navy-hover);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* OTP 6-Digit Grid */
+.otp-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin: 20px 0 16px;
+}
+
+.otp-box-input {
+  width: 100%;
+  height: 52px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  color: var(--navy);
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.otp-box-input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(20, 35, 59, 0.1);
+}
+
+.otp-meta {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+/* Alerts and Notifications */
+.auth-alert {
+  padding: 11px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  display: none;
+  line-height: 1.5;
+}
+
+.auth-alert.error {
+  display: block;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.auth-alert.success {
+  display: block;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.auth-alert.info {
+  display: block;
+  background: #f0f5fe;
+  border: 1px solid #d0e0fd;
+  color: var(--navy);
+}
+
+/* Hidden views */
+.view-panel {
+  display: none;
+}
+
+.view-panel.active {
+  display: block;
+}
+
+/* Footer (Matching index.html footer) */
+.auth-footer {
+  padding: 24px;
+  background: var(--navy);
+  color: #aab9cc;
+  text-align: center;
+  border-top: 1px solid var(--line-dark);
+  font-size: 12px;
+}
+
+.auth-footer p {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .nav-wrap {
+    padding: 14px 18px;
+  }
+  .auth-card {
+    padding: 24px 18px;
+  }
+}

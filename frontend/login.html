@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Electronics | Sign In &amp; Account Portal</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <!-- Site Header (Identical to index.html) -->
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="landing.html">
+        <span class="brand-mark">DE</span>
+        <span>
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </span>
+      </a>
+      <a href="landing.html" class="back-home-link">
+        <span>&larr; Back to Reference Notes</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Auth Main Container -->
+  <main class="auth-container">
+    <div class="auth-card">
+
+      <!-- Alert Banner -->
+      <div id="authAlert" class="auth-alert"></div>
+
+      <!-- Navigation Tabs (Login / Register) -->
+      <div class="auth-tabs" id="tabHeader">
+        <button type="button" class="auth-tab active" id="tabLogin" onclick="switchView('login')">Sign In</button>
+        <button type="button" class="auth-tab" id="tabRegister" onclick="switchView('register')">Create Account</button>
+      </div>
+
+      <!-- VIEW 1: LOGIN -->
+      <div class="view-panel active" id="viewLogin">
+        <div class="section-title">
+          <span class="section-number">00</span>
+          <div>
+            <p class="label">AUTHENTICATION &amp; ACCESS</p>
+            <h2>Laboratory Sign In</h2>
+          </div>
+        </div>
+        <p class="section-desc">Enter your registered email and password to access the digital logic simulation suite.</p>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">EMAIL ADDRESS</label>
+            <input type="email" id="loginEmail" class="form-input" placeholder="student@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">PASSWORD</label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <div class="form-row">
+            <label style="display: flex; align-items: center; gap: 8px; color: #667387; cursor: pointer; font-size: 13px;">
+              <input type="checkbox" id="loginRemember" checked style="accent-color: #14233b;">
+              <span>Remember me</span>
+            </label>
+            <a href="javascript:void(0)" onclick="switchView('forgot')" class="form-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnLoginSubmit">
+            <span>Sign In to Laboratory</span>
+            <span>&rarr;</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- VIEW 2: REGISTER -->
+      <div class="view-panel" id="viewRegister">
+        <div class="section-title">
+          <span class="section-number">00</span>
+          <div>
+            <p class="label">ACCOUNT CREATION</p>
+            <h2>Create Account</h2>
+          </div>
+        </div>
+        <p class="section-desc">Register with your Gmail address to verify your student account via a 6-digit OTP.</p>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label" for="regUsername">USERNAME</label>
+            <input type="text" id="regUsername" class="form-input" placeholder="e.g. shardul_vlsi" minlength="3" required autocomplete="username">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regEmail">GMAIL / EMAIL ADDRESS</label>
+            <input type="email" id="regEmail" class="form-input" placeholder="name@gmail.com" required autocomplete="email">
+            <small style="color: #667387; font-size: 11px; margin-top: 4px; display: block;">A 6-digit OTP code will be sent to confirm your email.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regPassword">PASSWORD</label>
+            <input type="password" id="regPassword" class="form-input" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regConfirmPassword">CONFIRM PASSWORD</label>
+            <input type="password" id="regConfirmPassword" class="form-input" placeholder="Repeat your password" minlength="6" required autocomplete="new-password">
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnRegisterSubmit">
+            <span>Send OTP &amp; Create Account</span>
+            <span>&rarr;</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- VIEW 3: OTP VERIFICATION -->
+      <div class="view-panel" id="viewOtp">
+        <div class="section-title">
+          <span class="section-number">00</span>
+          <div>
+            <p class="label">EMAIL VERIFICATION</p>
+            <h2>Enter 6-Digit OTP</h2>
+          </div>
+        </div>
+        <p class="section-desc" id="otpSubtitle">A verification code has been dispatched to your email address.</p>
+
+        <form id="otpForm" onsubmit="handleVerifyOtp(event)">
+          <div class="otp-inputs-grid">
+            <input type="text" maxlength="1" class="otp-box-input" data-index="0" inputmode="numeric" required autofocus>
+            <input type="text" maxlength="1" class="otp-box-input" data-index="1" inputmode="numeric" required>
+            <input type="text" maxlength="1" class="otp-box-input" data-index="2" inputmode="numeric" required>
+            <input type="text" maxlength="1" class="otp-box-input" data-index="3" inputmode="numeric" required>
+            <input type="text" maxlength="1" class="otp-box-input" data-index="4" inputmode="numeric" required>
+            <input type="text" maxlength="1" class="otp-box-input" data-index="5" inputmode="numeric" required>
+          </div>
+
+          <div class="otp-meta">
+            <span>Didn't receive the code? </span>
+            <a href="javascript:void(0)" id="btnResendOtp" onclick="handleResendOtp()" class="form-link">Resend OTP</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnOtpSubmit">
+            <span>Verify &amp; Enter Laboratory</span>
+            <span>&check;</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- VIEW 4: FORGOT PASSWORD -->
+      <div class="view-panel" id="viewForgot">
+        <div class="section-title">
+          <span class="section-number">00</span>
+          <div>
+            <p class="label">ACCOUNT RECOVERY</p>
+            <h2>Reset Password</h2>
+          </div>
+        </div>
+        <p class="section-desc">We'll dispatch a 6-digit OTP code to your email to verify password reset.</p>
+
+        <form id="forgotForm" onsubmit="handleForgot(event)">
+          <div class="form-group">
+            <label class="form-label" for="forgotEmail">YOUR REGISTERED EMAIL</label>
+            <input type="email" id="forgotEmail" class="form-input" placeholder="student@example.com" required>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnForgotSubmit">
+            <span>Send Reset OTP Code</span>
+            <span>&rarr;</span>
+          </button>
+
+          <div style="text-align: center; margin-top: 18px;">
+            <a href="javascript:void(0)" onclick="switchView('login')" class="form-link">&larr; Back to Sign In</a>
+          </div>
+        </form>
+      </div>
+
+      <!-- VIEW 5: RESET PASSWORD WITH OTP -->
+      <div class="view-panel" id="viewResetPassword">
+        <div class="section-title">
+          <span class="section-number">00</span>
+          <div>
+            <p class="label">NEW CREDENTIALS</p>
+            <h2>Set New Password</h2>
+          </div>
+        </div>
+        <p class="section-desc" id="resetSubtitle">Enter the OTP sent to your email and your new password.</p>
+
+        <form id="resetForm" onsubmit="handleResetPassword(event)">
+          <div class="form-group">
+            <label class="form-label">6-DIGIT RESET OTP CODE</label>
+            <input type="text" id="resetOtp" class="form-input" placeholder="e.g. 123456" maxlength="6" minlength="6" required style="font-family: 'DM Mono', monospace; font-size: 18px; letter-spacing: 4px; text-align: center;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="resetNewPassword">NEW PASSWORD</label>
+            <input type="password" id="resetNewPassword" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="resetConfirmPassword">CONFIRM NEW PASSWORD</label>
+            <input type="password" id="resetConfirmPassword" class="form-input" placeholder="Repeat new password" minlength="6" required>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnResetSubmit">
+            <span>Update Password</span>
+            <span>&check;</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer (Matching index.html) -->
+  <footer class="auth-footer">
+    <p>Digital Electronics Laboratory &bull; Study Reference Portal</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    let activeEmail = "";
+    let otpPurpose = "register";
+
+    function showAlert(msg, type = "error") {
+      const el = document.getElementById("authAlert");
+      el.className = `auth-alert ${type}`;
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+
+    function hideAlert() {
+      const el = document.getElementById("authAlert");
+      el.style.display = "none";
+    }
+
+    function switchView(viewName) {
+      hideAlert();
+      const views = ["login", "register", "otp", "forgot", "resetPassword"];
+      views.forEach(v => {
+        const el = document.getElementById("view" + v.charAt(0).toUpperCase() + v.slice(1));
+        if (el) el.classList.remove("active");
+      });
+
+      const tabHeader = document.getElementById("tabHeader");
+      const tabLogin = document.getElementById("tabLogin");
+      const tabReg = document.getElementById("tabRegister");
+
+      if (viewName === "login") {
+        tabHeader.style.display = "flex";
+        tabLogin.classList.add("active");
+        tabReg.classList.remove("active");
+        document.getElementById("viewLogin").classList.add("active");
+        window.location.hash = "login";
+      } else if (viewName === "register") {
+        tabHeader.style.display = "flex";
+        tabReg.classList.add("active");
+        tabLogin.classList.remove("active");
+        document.getElementById("viewRegister").classList.add("active");
+        window.location.hash = "register";
+      } else if (viewName === "otp") {
+        tabHeader.style.display = "none";
+        document.getElementById("viewOtp").classList.add("active");
+        setupOtpInputs();
+      } else if (viewName === "forgot") {
+        tabHeader.style.display = "none";
+        document.getElementById("viewForgot").classList.add("active");
+      } else if (viewName === "resetPassword") {
+        tabHeader.style.display = "none";
+        document.getElementById("viewResetPassword").classList.add("active");
+      }
+    }
+
+    function setupOtpInputs() {
+      const inputs = document.querySelectorAll(".otp-box-input");
+      inputs.forEach((input, index) => {
+        input.value = "";
+        input.oninput = (e) => {
+          if (input.value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          }
+        };
+        input.onkeydown = (e) => {
+          if (e.key === "Backspace" && !input.value && index > 0) {
+            inputs[index - 1].focus();
+          }
+        };
+      });
+      if (inputs.length > 0) inputs[0].focus();
+    }
+
+    function getEnteredOtp() {
+      const inputs = document.querySelectorAll(".otp-box-input");
+      return Array.from(inputs).map(i => i.value.trim()).join("");
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideAlert();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const remember = document.getElementById("loginRemember").checked;
+      const btn = document.getElementById("btnLoginSubmit");
+
+      btn.disabled = true;
+      btn.textContent = "Signing In...";
+
+      try {
+        await Auth.login(email, password, remember);
+        showAlert("Login successful! Redirecting to Laboratory...", "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 500);
+      } catch (err) {
+        if (err.message && err.message.includes("Account not verified")) {
+          activeEmail = email;
+          otpPurpose = "register";
+          document.getElementById("otpSubtitle").textContent = `Please verify your account. Code sent to ${email}`;
+          switchView("otp");
+          showAlert(err.message, "info");
+        } else {
+          showAlert(err.message || "Invalid credentials. Please try again.", "error");
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Sign In to Laboratory</span><span>&rarr;</span>";
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      hideAlert();
+      const username = document.getElementById("regUsername").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      const confirm = document.getElementById("regConfirmPassword").value;
+      const btn = document.getElementById("btnRegisterSubmit");
+
+      if (password !== confirm) {
+        showAlert("Passwords do not match.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Generating OTP Code...";
+
+      try {
+        const res = await Auth.register(username, email, password);
+        activeEmail = email;
+        otpPurpose = "register";
+        document.getElementById("otpSubtitle").textContent = `Enter the 6-digit OTP code sent to ${email}`;
+        switchView("otp");
+        if (res.details && res.details.simulated) {
+          showAlert("OTP dispatched! (Consult backend terminal console for code)", "info");
+        } else {
+          showAlert("Verification code sent to your email! Please check your inbox.", "info");
+        }
+      } catch (err) {
+        showAlert(err.message || "Failed to register. Please try again.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Send OTP &amp; Create Account</span><span>&rarr;</span>";
+      }
+    }
+
+    async function handleVerifyOtp(e) {
+      e.preventDefault();
+      hideAlert();
+      const otp = getEnteredOtp();
+      if (otp.length !== 6) {
+        showAlert("Please enter the complete 6-digit code.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnOtpSubmit");
+      btn.disabled = true;
+      btn.textContent = "Verifying Code...";
+
+      try {
+        await Auth.verifyOtp(activeEmail, otp);
+        showAlert("Account verified successfully! Entering laboratory...", "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 700);
+      } catch (err) {
+        showAlert(err.message || "Invalid or expired OTP code.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Verify &amp; Enter Laboratory</span><span>&check;</span>";
+      }
+    }
+
+    async function handleResendOtp() {
+      if (!activeEmail) {
+        showAlert("Email address missing. Please register again.", "error");
+        return;
+      }
+      try {
+        await Auth.resendOtp(activeEmail, otpPurpose);
+        showAlert("A fresh OTP code has been sent to your email.", "info");
+        setupOtpInputs();
+      } catch (err) {
+        showAlert(err.message || "Could not resend OTP.", "error");
+      }
+    }
+
+    async function handleForgot(e) {
+      e.preventDefault();
+      hideAlert();
+      const email = document.getElementById("forgotEmail").value.trim();
+      const btn = document.getElementById("btnForgotSubmit");
+
+      btn.disabled = true;
+      btn.textContent = "Sending OTP...";
+
+      try {
+        await Auth.forgotPassword(email);
+        activeEmail = email;
+        otpPurpose = "password_reset";
+        document.getElementById("resetSubtitle").textContent = `Code sent to ${email}. Set your new password below:`;
+        switchView("resetPassword");
+        showAlert("Password reset code sent! Please check your email.", "info");
+      } catch (err) {
+        showAlert(err.message || "Failed to send reset code.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Send Reset OTP Code</span><span>&rarr;</span>";
+      }
+    }
+
+    async function handleResetPassword(e) {
+      e.preventDefault();
+      hideAlert();
+      const otp = document.getElementById("resetOtp").value.trim();
+      const newPass = document.getElementById("resetNewPassword").value;
+      const confirmPass = document.getElementById("resetConfirmPassword").value;
+      const btn = document.getElementById("btnResetSubmit");
+
+      if (newPass !== confirmPass) {
+        showAlert("New passwords do not match.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Updating Password...";
+
+      try {
+        await Auth.resetPassword(activeEmail, otp, newPass);
+        showAlert("Password reset successful! You can now log in.", "success");
+        setTimeout(() => {
+          switchView("login");
+        }, 1000);
+      } catch (err) {
+        showAlert(err.message || "Failed to reset password. Check your OTP.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Update Password</span><span>&check;</span>";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (Auth.isLoggedIn()) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      if (window.location.hash === "#register") {
+        switchView("register");
+      } else {
+        switchView("login");
+      }
+    });
+  </script>
+</body>
+</html>

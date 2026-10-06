@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Logic Simulation Suite | Interactive EDA &amp; Virtual Lab</title>
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+  <!-- Sticky Header (Matching index.html site-header) -->
+  <header class="landing-header">
+    <div class="nav-container">
+      <a href="landing.html" class="brand-link">
+        <div class="brand-badge">DE</div>
+        <div class="brand-text">
+          <strong>Digital Electronics</strong>
+          <small>LOGIC SIMULATION</small>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#modules" class="nav-link">Modules</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+      </nav>
+
+      <div class="auth-nav-group">
+        <a href="login.html#login" class="btn-secondary">Log In</a>
+        <a href="login.html#register" class="btn-primary">
+          <span>Get Started</span>
+          <span>&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span class="hero-tag-pulse"></span>
+          <span>COMBINATIONAL &amp; SEQUENTIAL LOGIC</span>
+        </div>
+
+        <h1 class="hero-title">
+          Master Digital Logic with <span class="gradient-text">Interactive Circuits</span> &amp; <span class="gradient-yellow">Real-time EDA</span>
+        </h1>
+
+        <p class="hero-desc">
+          Experience an interactive simulation suite built for students and engineers. Explore code converters, multiplexers, magnitude comparators, arithmetic adders, and virtual IC breadboard labs with live waveform and truth table telemetry.
+        </p>
+
+        <div class="hero-actions">
+          <a href="login.html#register" class="btn-primary" style="padding: 12px 24px; font-size: 14px;">
+            <span>⚡ Launch Free Simulator</span>
+            <span>&rarr;</span>
+          </a>
+          <a href="login.html#login" class="btn-hero-secondary">
+            <span>Sign In to Your Account</span>
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <strong>74LSxx</strong>
+            <span>Standard TTL ICs</span>
+          </div>
+          <div class="stat-item">
+            <strong>5+</strong>
+            <span>Core Simulators</span>
+          </div>
+          <div class="stat-item">
+            <strong>100%</strong>
+            <span>Live Bit Tracing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Interactive Card -->
+      <div class="hero-visual">
+        <div class="sim-preview-card">
+          <div class="preview-header">
+            <div class="preview-chip-title">
+              <span>⚡ IC 74LS153 / 74LS85 / 74LS90</span>
+            </div>
+            <span class="status-badge">&bull; LIVE SIM</span>
+          </div>
+
+          <div class="gate-visual-demo">
+            <div class="gate-box">
+              <h4>INPUT BUS (A, B)</h4>
+              <div class="gate-value" id="demoInput">1011 : 0110</div>
+            </div>
+            <div class="gate-box">
+              <h4>COMPARATOR (A &gt; B)</h4>
+              <div class="gate-value" style="color: #16a34a;" id="demoOutput">HIGH (1)</div>
+            </div>
+          </div>
+
+          <div class="chip-diagram-svg">
+            <svg viewBox="0 0 320 120" width="100%" height="100%" style="overflow: visible;">
+              <!-- IC Body -->
+              <rect x="60" y="20" width="200" height="80" rx="6" fill="#ffffff" stroke="#14233b" stroke-width="2"/>
+              <circle cx="60" cy="60" r="7" fill="#f6f5f1" stroke="#14233b" stroke-width="1.5"/>
+              <text x="160" y="65" fill="#14233b" font-size="13" font-weight="700" text-anchor="middle" font-family="'DM Mono', monospace">IC 74LS85 MAG-COMP</text>
+              
+              <!-- Pins Left -->
+              <line x1="30" y1="40" x2="60" y2="40" stroke="#2c6ee8" stroke-width="2" stroke-dasharray="2,2"/>
+              <line x1="30" y1="60" x2="60" y2="60" stroke="#2c6ee8" stroke-width="2"/>
+              <line x1="30" y1="80" x2="60" y2="80" stroke="#2c6ee8" stroke-width="2"/>
+
+              <!-- Pins Right -->
+              <line x1="260" y1="40" x2="290" y2="40" stroke="#16a34a" stroke-width="2.5"/>
+              <line x1="260" y1="60" x2="290" y2="60" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="260" y1="80" x2="290" y2="80" stroke="#94a3b8" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Floating Badges -->
+        <div class="floating-badge badge-top-right">
+          <span style="color: #e9bd4f; font-size: 15px;">⚡</span>
+          <div>
+            <div style="color: #172130; font-size: 11px;">IC Workbench Lab</div>
+            <div style="color: #667387; font-size: 9px; font-family: var(--font-mono);">DIP-14 &amp; Power Rails</div>
+          </div>
+        </div>
+
+        <div class="floating-badge badge-bottom-left">
+          <span style="color: #2c6ee8; font-size: 15px;">📊</span>
+          <div>
+            <div style="color: #172130; font-size: 11px;">KiCad Schematics</div>
+            <div style="color: #667387; font-size: 9px; font-family: var(--font-mono);">Logic Tracing</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section (Pure White Box like index.html .topic-section) -->
+    <section class="section" id="features">
+      <div class="section-head">
+        <span class="section-label">ADVANCED CAPABILITIES</span>
+        <h2 class="section-title">Everything You Need to Master Digital Logic</h2>
+        <p class="section-subtitle">
+          From fundamental truth tables and K-Maps to hardware-accurate circuit schematics and breadboard wiring labs.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🔄</div>
+          <h3>Universal Code Converters</h3>
+          <p>
+            Simulate forward and reverse translations across Binary, Gray Code, 8421 BCD, and Excess-3 with gate-level logic schematics, truth tables, and don't-care condition handling.
+          </p>
+          <div class="feature-tags">
+            <span class="feature-pill">Binary ↔ Gray</span>
+            <span class="feature-pill">BCD ↔ Excess-3</span>
+            <span class="feature-pill">K-Maps</span>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🔀</div>
+          <h3>Multiplexers &amp; Data Selectors</h3>
+          <p>
+            Interact with n:1 MUX architectures (2:1, 4:1, 8:1) powered by IC 74LS153 dual multiplexers with active-low strobe enables and multi-channel data routing.
+          </p>
+          <div class="feature-tags">
+            <span class="feature-pill">IC 74153</span>
+            <span class="feature-pill">Strobe Control</span>
+            <span class="feature-pill">8:1 Expansion</span>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">⚖️</div>
+          <h3>4-Bit Magnitude Comparators</h3>
+          <p>
+            Compare 4-bit binary words with real-time bitwise A &gt; B, A = B, and A &lt; B cascade logic matching the IC 74LS85 industry specification.
+          </p>
+          <div class="feature-tags">
+            <span class="feature-pill">IC 7485</span>
+            <span class="feature-pill">Cascade Inputs</span>
+            <span class="feature-pill">Bitwise Decisions</span>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">➕</div>
+          <h3>Adder &amp; Subtractor Units</h3>
+          <p>
+            4-bit arithmetic operations using 2's complement logic and cascaded Full Adders (IC 74LS83) with carry-in/borrow propagation tracing.
+          </p>
+          <div class="feature-tags">
+            <span class="feature-pill">IC 7483</span>
+            <span class="feature-pill">2's Complement</span>
+            <span class="feature-pill">Carry Propagation</span>
+          </div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">⏱️</div>
+          <h3>Modulo Counter Simulators</h3>
+          <p>
+            Explore IC 74LS90 Decade and IC 74LS93 4-Bit Binary Ripple Counters with natural sequences, truncated Mod-N resets, and clock division.
+          </p>
+          <div class="feature-tags">
+            <span class="feature-pill">IC 7490 Decade</span>
+            <span class="feature-pill">IC 7493 Binary</span>
+            <span class="feature-pill">Mod-6 / Mod-12</span>
+          </div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">⚡</div>
+          <h3>Interactive IC Breadboard Lab</h3>
+          <p>
+            Place DIP-14 chips on a virtual breadboard, connect VCC (+5V) and GND rails, toggle input switches, and observe 8-bit LED bus outputs live.
+          </p>
+          <div class="feature-tags">
+            <span class="feature-pill">Virtual Breadboard</span>
+            <span class="feature-pill">DIP Pinouts</span>
+            <span class="feature-pill">LED Bus Telemetry</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modules List Section -->
+    <section class="section" id="modules">
+      <div class="section-head">
+        <span class="section-label">CURRICULUM ALIGNED</span>
+        <h2 class="section-title">Comprehensive Lab Modules</h2>
+        <p class="section-subtitle">
+          Step into fully verified circuit designs with mathematical rigor and hardware parity.
+        </p>
+      </div>
+
+      <div class="modules-grid">
+        <div class="module-card">
+          <div class="module-num">01</div>
+          <div class="module-info">
+            <h4>Code Converter Laboratory</h4>
+            <p>Truth tables, Boolean expressions (SOP/POS), and real-time conversion for Binary, BCD, Excess-3, and Gray code systems.</p>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-num">02</div>
+          <div class="module-info">
+            <h4>Multiplexing &amp; Signal Routing</h4>
+            <p>Data routing with select lines, active-LOW enable strobes, and KiCad-style live schematic logic flow.</p>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-num">03</div>
+          <div class="module-info">
+            <h4>Magnitude Comparison Engine</h4>
+            <p>Bit-by-bit cascading comparison of 4-bit numbers with visual stage indicators and equality tie-off behavior.</p>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-num">04</div>
+          <div class="module-info">
+            <h4>Binary Arithmetic Processor</h4>
+            <p>Controlled addition and subtraction with XOR inverter modes, overflow detection, and carry generation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="section" id="how-it-works">
+      <div class="section-head">
+        <span class="section-label">GETTING STARTED</span>
+        <h2 class="section-title">Start Simulating in 3 Simple Steps</h2>
+        <p class="section-subtitle">
+          Onboard into the digital simulation lab within seconds.
+        </p>
+      </div>
+
+      <div class="steps-wrap">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <h4>Create Your Account</h4>
+          <p>Sign up with your email and verify via a secure 6-digit OTP code.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <h4>Select a Simulator</h4>
+          <p>Choose from Code Converters, MUX, Comparators, Adders, or the IC Workbench.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <h4>Simulate &amp; Analyze</h4>
+          <p>Toggle inputs, inspect real-time waveforms, truth tables, and KiCad schematics.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Banner -->
+    <div class="cta-banner">
+      <h2>Ready to Explore Digital Electronics?</h2>
+      <p>Join students and engineers learning digital design through interactive visual simulations and EDA tooling.</p>
+      <a href="login.html#register" class="btn-primary" style="padding: 12px 28px; font-size: 14px; background: #ffffff; color: #14233b; border-color: #ffffff;">
+        <span>⚡ Create Free Account</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer (Identical to index.html footer) -->
+  <footer class="landing-footer">
+    <div class="footer-content">
+      <div class="footer-text">
+        &copy; 2026 Digital Logic Simulation Suite. Digital Electronics Laboratory &bull; Study Reference Page
+      </div>
+      <div class="footer-links">
+        <a href="login.html#login" class="footer-link">Log In</a>
+        <a href="login.html#register" class="footer-link">Register</a>
+        <a href="#features" class="footer-link">Features</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const demoInputs = [
+      { in: "1011 : 0110", out: "A > B (HIGH)", color: "#16a34a" },
+      { in: "0100 : 0100", out: "A = B (HIGH)", color: "#e9bd4f" },
+      { in: "0010 : 1101", out: "A < B (HIGH)", color: "#2c6ee8" },
+      { in: "1111 : 0000", out: "A > B (HIGH)", color: "#16a34a" }
+    ];
+    let demoIdx = 0;
+    setInterval(() => {
+      demoIdx = (demoIdx + 1) % demoInputs.length;
+      const elIn = document.getElementById("demoInput");
+      const elOut = document.getElementById("demoOutput");
+      if (elIn && elOut) {
+        elIn.textContent = demoInputs[demoIdx].in;
+        elOut.textContent = demoInputs[demoIdx].out;
+        elOut.style.color = demoInputs[demoIdx].color;
+      }
+    }, 2800);
+  </script>
+</body>
+</html>

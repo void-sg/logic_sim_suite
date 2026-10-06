@@ -1,7 +1,13 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
-import convert, arithmetic, compare, mux_router, circuit_router
+import convert, arithmetic, compare, mux_router, circuit_router, auth_router
+import database
+
+# Initialize SQLite database schema
+database.init_db()
 
 app = FastAPI(title="Digital Logic Simulation Suite API")
 
@@ -31,6 +37,7 @@ app.include_router(arithmetic.router)
 app.include_router(compare.router)
 app.include_router(mux_router.router)
 app.include_router(circuit_router.router)
+app.include_router(auth_router.router)
 
 
 @app.get("/")
@@ -48,3 +55,8 @@ def root():
             "/circuit/adder-subtractor-4bit",
         ],
     }
+
+# Serve frontend files — MUST be last so API routes take priority
+frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
+if frontend_dir.is_dir():
+    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")

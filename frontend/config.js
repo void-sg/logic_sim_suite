@@ -8,5 +8,5 @@
  * Replace with your deployed backend URL from Render or Railway:
  * Example: const API_BASE = "https://logic-sim-api.onrender.com";
  */
-const API_BASE = "";
+const API_BASE = "https://logic-sim-suite.onrender.com";
 window.API_BASE = API_BASE;

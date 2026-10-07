@@ -21,16 +21,8 @@ from auth_schemas import (
 import database
 import otp_service
 
-# Load environment variables if dotenv is available
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
-JWT_SECRET = os.environ.get("JWT_SECRET", "logic_sim_suite_super_secret_jwt_key_2026")
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_SECONDS = 60 * 60 * 24 * 7  # 7 days
+from config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRATION_SECONDS
+from rate_limiter import check_auth_rate_limit
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -118,7 +110,7 @@ def get_current_user(authorization: str = Header(None)) -> dict:
 
 # --- Routes ---
 
-@router.post("/register", response_model=MessageResponse)
+@router.post("/register", response_model=MessageResponse, dependencies=[Depends(check_auth_rate_limit)])
 def register(req: RegisterRequest):
     email = req.email.strip().lower()
     roll_number = req.roll_number.strip().upper() if req.roll_number and str(req.roll_number).strip() else None
@@ -221,7 +213,7 @@ def verify_otp(req: VerifyOtpRequest):
         role=user.get("role", "student")
     )
 
-@router.post("/resend-otp", response_model=MessageResponse)
+@router.post("/resend-otp", response_model=MessageResponse, dependencies=[Depends(check_auth_rate_limit)])
 def resend_otp(req: ResendOtpRequest):
     identifier = req.email.strip()
     user = database.get_user_by_identifier(identifier)
@@ -244,7 +236,7 @@ def resend_otp(req: ResendOtpRequest):
         details={"email": email, "otp": otp, "simulated": email_result.get("simulated", False)}
     )
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse, dependencies=[Depends(check_auth_rate_limit)])
 def login(req: LoginRequest):
     identifier = req.email.strip()
     # Support sign in via institutional email, roll number (e.g. 23CS012), or username
@@ -362,7 +354,7 @@ def get_roster(role: str = None, branch: str = None, semester: int = None, user:
     """Academic roster view for faculty and testing."""
     return database.list_users(role=role, branch=branch, semester=semester)
 
-@router.post("/forgot-password", response_model=MessageResponse)
+@router.post("/forgot-password", response_model=MessageResponse, dependencies=[Depends(check_auth_rate_limit)])
 def forgot_password(req: ForgotPasswordRequest):
     identifier = req.email.strip()
     user = database.get_user_by_identifier(identifier)

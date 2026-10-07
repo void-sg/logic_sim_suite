@@ -844,6 +844,7 @@
     // Current Experiment Metadata & Local Storage State
     currentExperiment: {
       id: null,
+      cloudId: null,
       title: "Untitled Experiment",
       objective: ""
     }
@@ -3610,6 +3611,7 @@
     };
     state.currentExperiment = {
       id: null,
+      cloudId: null,
       title: meta.title,
       objective: meta.objective
     };
@@ -4080,7 +4082,7 @@
       if (e.target.id === "modal-save-experiment") closeSaveModal();
     });
 
-    document.getElementById("btn-confirm-save-exp")?.addEventListener("click", () => {
+    document.getElementById("btn-confirm-save-exp")?.addEventListener("click", async () => {
       const titleInput = document.getElementById("save-exp-title");
       const objInput = document.getElementById("save-exp-obj");
       const title = titleInput ? titleInput.value.trim() : "";
@@ -4093,17 +4095,33 @@
       }
 
       const isOverwrite = document.getElementById("radio-save-overwrite")?.checked;
-      const overwriteId = (isOverwrite && state.currentExperiment.id) ? state.currentExperiment.id : null;
+      const overwriteId = (isOverwrite && state.currentExperiment.id && !String(state.currentExperiment.id).startsWith("cloud_")) ? state.currentExperiment.id : null;
+      const overwriteCloudId = (isOverwrite && state.currentExperiment.cloudId) ? state.currentExperiment.cloudId : null;
 
-      saveCurrentExperiment(title, objective, overwriteId);
+      const confirmBtn = document.getElementById("btn-confirm-save-exp");
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Saving...";
+      }
+
+      const saveRes = await saveCurrentExperiment(title, objective, overwriteId, overwriteCloudId);
+
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "💾 Save Experiment";
+      }
 
       const statusMsg = document.getElementById("save-status-msg");
       if (statusMsg) {
-        statusMsg.textContent = "✓ Experiment saved successfully!";
+        if (saveRes && saveRes.cloudSaved) {
+          statusMsg.textContent = "✓ Saved to Cloud & Local Storage!";
+        } else {
+          statusMsg.textContent = "✓ Experiment saved locally!";
+        }
         setTimeout(() => {
           if (statusMsg) statusMsg.textContent = "";
           closeSaveModal();
-        }, 500);
+        }, 600);
       } else {
         closeSaveModal();
       }
@@ -4116,9 +4134,22 @@
       if (e.target.id === "modal-saved-experiments") closeLibraryModal();
     });
 
+    // Cloud vs Local Tab Toggle
+    document.getElementById("tab-cloud-projects")?.addEventListener("click", () => {
+      setActiveLibraryTab("cloud");
+    });
+    document.getElementById("tab-local-projects")?.addEventListener("click", () => {
+      setActiveLibraryTab("local");
+    });
+
     const librarySearch = document.getElementById("library-search");
     librarySearch?.addEventListener("input", (e) => {
-      renderSavedExperimentsList(e.target.value.trim().toLowerCase());
+      const query = e.target.value.trim().toLowerCase();
+      if (currentLibraryTab === "cloud") {
+        renderCloudProjectsList(query);
+      } else {
+        renderSavedExperimentsList(query);
+      }
     });
 
     document.getElementById("btn-library-export-all")?.addEventListener("click", () => {
@@ -4162,7 +4193,7 @@
     }
   }
 
-  function saveCurrentExperiment(title, objective, overwriteId = null) {
+  async function saveCurrentExperiment(title, objective, overwriteId = null, overwriteCloudId = null) {
     const list = getSavedExperiments();
     const cleanTitle = (title && title.trim()) ? title.trim() : "Untitled Experiment";
     const cleanObj = (objective && objective.trim()) ? objective.trim() : "";
@@ -4188,7 +4219,7 @@
     const now = new Date().toISOString();
 
     let targetId = overwriteId;
-    if (!targetId && state.currentExperiment && state.currentExperiment.id) {
+    if (!targetId && state.currentExperiment && state.currentExperiment.id && !String(state.currentExperiment.id).startsWith("cloud_")) {
       targetId = state.currentExperiment.id;
     }
 
@@ -4225,14 +4256,56 @@
       alert("Storage quota exceeded or storage disabled!");
     }
 
+    // Attempt Cloud Save if user has auth session
+    let cloudSaved = false;
+    let cloudId = overwriteCloudId || state.currentExperiment.cloudId || null;
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+
+    if (token) {
+      try {
+        const apiBase = window.Auth?.getBaseUrl ? Auth.getBaseUrl() : "http://127.0.0.1:8000";
+        const payload = {
+          id: cloudId ? parseInt(cloudId, 10) : null,
+          title: cleanTitle,
+          description: cleanObj,
+          circuit_data: {
+            components: serializedComps,
+            wires: serializedWires
+          }
+        };
+
+        const res = await fetch(`${apiBase}/api/circuits`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData?.project?.id) {
+            cloudId = resData.project.id;
+            cloudSaved = true;
+          }
+        } else {
+          console.warn("Cloud save response status:", res.status);
+        }
+      } catch (err) {
+        console.warn("Could not sync circuit with cloud backend:", err);
+      }
+    }
+
     state.currentExperiment = {
       id: savedExp.id,
+      cloudId: cloudId,
       title: savedExp.title,
       objective: savedExp.objective
     };
 
     updateBannerUI();
-    return savedExp;
+    return { savedExp, cloudSaved };
   }
 
   function loadExperimentById(expId) {
@@ -4287,6 +4360,7 @@
 
     state.currentExperiment = {
       id: exp.id,
+      cloudId: null,
       title: exp.title || "Untitled Experiment",
       objective: exp.objective || ""
     };
@@ -4331,6 +4405,7 @@
 
     state.currentExperiment = {
       id: null,
+      cloudId: null,
       title: "Untitled Experiment",
       objective: ""
     };
@@ -4444,6 +4519,47 @@
     }
   }
 
+  let currentLibraryTab = "cloud";
+  let cachedCloudProjects = [];
+
+  function setActiveLibraryTab(tab) {
+    currentLibraryTab = tab;
+    const tabCloud = document.getElementById("tab-cloud-projects");
+    const tabLocal = document.getElementById("tab-local-projects");
+    const searchInput = document.getElementById("library-search");
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+    if (tab === "cloud") {
+      if (tabCloud) {
+        tabCloud.style.background = "#2563eb";
+        tabCloud.style.color = "#ffffff";
+        tabCloud.style.borderColor = "#2563eb";
+        tabCloud.style.fontWeight = "700";
+      }
+      if (tabLocal) {
+        tabLocal.style.background = "#f8fafc";
+        tabLocal.style.color = "#475569";
+        tabLocal.style.borderColor = "#cbd5e1";
+        tabLocal.style.fontWeight = "600";
+      }
+      renderCloudProjectsList(query);
+    } else {
+      if (tabLocal) {
+        tabLocal.style.background = "#2563eb";
+        tabLocal.style.color = "#ffffff";
+        tabLocal.style.borderColor = "#2563eb";
+        tabLocal.style.fontWeight = "700";
+      }
+      if (tabCloud) {
+        tabCloud.style.background = "#f8fafc";
+        tabCloud.style.color = "#475569";
+        tabCloud.style.borderColor = "#cbd5e1";
+        tabCloud.style.fontWeight = "600";
+      }
+      renderSavedExperimentsList(query);
+    }
+  }
+
   function openSaveModal() {
     const modal = document.getElementById("modal-save-experiment");
     if (!modal) return;
@@ -4457,8 +4573,32 @@
     const overwriteGroup = document.getElementById("save-overwrite-group");
     const overwriteName = document.getElementById("overwrite-exp-name");
     const statusMsg = document.getElementById("save-status-msg");
+    const cloudIndicator = document.getElementById("save-cloud-indicator");
+    const cloudText = document.getElementById("save-cloud-text");
 
     if (statusMsg) statusMsg.textContent = "";
+
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    let user = null;
+    try {
+      const uStr = localStorage.getItem("auth_user") || sessionStorage.getItem("auth_user");
+      user = uStr ? JSON.parse(uStr) : null;
+    } catch { user = null; }
+
+    if (cloudIndicator && cloudText) {
+      if (token && user) {
+        cloudIndicator.style.background = "#f0fdf4";
+        cloudIndicator.style.borderColor = "#bbf7d0";
+        cloudIndicator.style.color = "#166534";
+        const rollBadge = user.roll_number ? ` (${escapeHTML(user.roll_number)})` : "";
+        cloudText.innerHTML = `☁️ Saving to <strong>${escapeHTML(user.username || 'Student')}</strong>'s Cloud Account${rollBadge} &bull; Synced across devices`;
+      } else {
+        cloudIndicator.style.background = "#fffbeb";
+        cloudIndicator.style.borderColor = "#fef3c7";
+        cloudIndicator.style.color = "#92400e";
+        cloudText.innerHTML = `💻 Saving locally to browser cache (Sign in to sync circuits across computers)`;
+      }
+    }
 
     if (titleInput) {
       titleInput.value = (state.currentExperiment.title && state.currentExperiment.title !== "Untitled Experiment")
@@ -4473,7 +4613,7 @@
     if (compsPill) compsPill.textContent = `Components: ${state.components.length}`;
     if (wiresPill) wiresPill.textContent = `Wires: ${state.wires.length}`;
 
-    if (state.currentExperiment && state.currentExperiment.id) {
+    if (state.currentExperiment && (state.currentExperiment.id || state.currentExperiment.cloudId)) {
       if (overwriteGroup) overwriteGroup.style.display = "block";
       if (overwriteName) overwriteName.textContent = state.currentExperiment.title;
       const radioOverwrite = document.getElementById("radio-save-overwrite");
@@ -4498,7 +4638,13 @@
     modal.classList.add("open");
     const search = document.getElementById("library-search");
     if (search) search.value = "";
-    renderSavedExperimentsList("");
+
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    if (token) {
+      setActiveLibraryTab("cloud");
+    } else {
+      setActiveLibraryTab("local");
+    }
     setTimeout(() => search?.focus(), 50);
   }
 
@@ -4514,7 +4660,7 @@
 
     const allExps = getSavedExperiments();
     if (countBadge) {
-      countBadge.textContent = `${allExps.length} saved`;
+      countBadge.textContent = `${allExps.length} local saved`;
     }
 
     const filtered = allExps.filter((exp) => {
@@ -4530,10 +4676,10 @@
       listContainer.innerHTML = `
         <div class="library-empty-state">
           <div class="library-empty-icon">📁</div>
-          <div class="library-empty-title">${allExps.length === 0 ? "No Saved Experiments Yet" : "No Matching Experiments"}</div>
+          <div class="library-empty-title">${allExps.length === 0 ? "No Saved Experiments in Local Cache" : "No Matching Experiments"}</div>
           <div class="library-empty-desc">
             ${allExps.length === 0
-              ? "Build your digital logic circuit on the IC Workbench and click <strong>💾 Save Exp</strong> to store it in your browser library."
+              ? "Build your digital logic circuit on the IC Workbench and click <strong>💾 Save Exp</strong> to store it in your browser."
               : "Try searching with a different keyword or IC reference (e.g. 7400, Adder, MUX)."}
           </div>
         </div>
@@ -4544,7 +4690,8 @@
     filtered.forEach((exp) => {
       const card = document.createElement("div");
       card.className = "saved-exp-card";
-      if (state.currentExperiment && state.currentExperiment.id === exp.id) {
+      const isCurrentlyOpen = (state.currentExperiment && state.currentExperiment.id === exp.id);
+      if (isCurrentlyOpen) {
         card.classList.add("active-exp");
       }
 
@@ -4564,7 +4711,8 @@
           <div class="saved-exp-meta">
             <span class="stat-pill">${compCount} IC/Comps</span>
             <span class="stat-pill">${wireCount} Wires</span>
-            ${(state.currentExperiment && state.currentExperiment.id === exp.id) ? `<span class="stat-pill" style="background: #dbeafe; color: #1e40af; border-color: #93c5fd;">Currently Open</span>` : ""}
+            <span class="stat-pill" style="background: #f1f5f9; color: #475569; border-color: #cbd5e1;">💻 Local Cache</span>
+            ${isCurrentlyOpen ? `<span class="stat-pill" style="background: #dbeafe; color: #1e40af; border-color: #93c5fd;">Currently Open</span>` : ""}
           </div>
           <div class="saved-exp-actions">
             <button class="wb-btn wb-btn-primary btn-load-exp" title="Load onto Workbench Canvas" data-id="${exp.id}">⚡ Load</button>
@@ -4591,6 +4739,335 @@
 
       listContainer.appendChild(card);
     });
+  }
+
+  async function renderCloudProjectsList(filter = "") {
+    const listContainer = document.getElementById("saved-experiments-list");
+    const countBadge = document.getElementById("library-count-badge");
+    if (!listContainer) return;
+
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    if (!token) {
+      if (countBadge) countBadge.textContent = "Not logged in";
+      listContainer.innerHTML = `
+        <div class="library-empty-state">
+          <div class="library-empty-icon">☁️</div>
+          <div class="library-empty-title">Sign In to Access Cloud Projects</div>
+          <div class="library-empty-desc">
+            Sign in with your roll number or student account to access your saved circuits from any computer, tablet, or college lab PC.
+            <div style="margin-top: 14px;">
+              <a href="login.html" class="wb-btn wb-btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; text-decoration: none; border-radius: 6px;">
+                <span>🔑 Sign In / Register</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    listContainer.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #64748b; font-size: 13px;">
+        <div style="font-size: 28px; margin-bottom: 8px;">⏳</div>
+        <span>Loading your cloud projects from database...</span>
+      </div>
+    `;
+
+    try {
+      const apiBase = window.Auth?.getBaseUrl ? Auth.getBaseUrl() : "http://127.0.0.1:8000";
+      const res = await fetch(`${apiBase}/api/circuits`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          listContainer.innerHTML = `
+            <div class="library-empty-state">
+              <div class="library-empty-icon">🔒</div>
+              <div class="library-empty-title">Session Expired</div>
+              <div class="library-empty-desc">Please sign in again to view your cloud projects.<br><br>
+                <a href="login.html" class="wb-btn wb-btn-primary" style="display: inline-block;">Log In</a>
+              </div>
+            </div>
+          `;
+          return;
+        }
+        throw new Error(`Server returned HTTP ${res.status}`);
+      }
+
+      cachedCloudProjects = await res.json();
+    } catch (err) {
+      console.error("Failed to load cloud projects:", err);
+      listContainer.innerHTML = `
+        <div class="library-empty-state">
+          <div class="library-empty-icon">⚠️</div>
+          <div class="library-empty-title">Cannot Connect to Cloud Server</div>
+          <div class="library-empty-desc">
+            Make sure your backend server is running. You can still access local browser experiments via the <strong>Local Browser Cache</strong> tab above.
+            <div style="margin-top: 12px;">
+              <button class="wb-btn" id="btn-retry-cloud-load">🔄 Retry Connection</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("btn-retry-cloud-load")?.addEventListener("click", () => {
+        renderCloudProjectsList(filter);
+      });
+      return;
+    }
+
+    if (countBadge) {
+      countBadge.textContent = `${cachedCloudProjects.length} cloud saved`;
+    }
+
+    const filtered = cachedCloudProjects.filter((p) => {
+      if (!filter) return true;
+      const t = (p.title || "").toLowerCase();
+      const d = (p.description || "").toLowerCase();
+      return t.includes(filter) || d.includes(filter);
+    });
+
+    listContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = `
+        <div class="library-empty-state">
+          <div class="library-empty-icon">☁️</div>
+          <div class="library-empty-title">${cachedCloudProjects.length === 0 ? "No Cloud Projects Yet" : "No Matching Cloud Projects"}</div>
+          <div class="library-empty-desc">
+            ${cachedCloudProjects.length === 0
+              ? "Design your digital logic circuit on the IC Workbench and click <strong>💾 Save Exp</strong> to save it directly to your cloud account."
+              : "Try searching with a different keyword or title."}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach((proj) => {
+      const card = document.createElement("div");
+      card.className = "saved-exp-card";
+      const isCurrentlyOpen = (state.currentExperiment && state.currentExperiment.cloudId === proj.id);
+      if (isCurrentlyOpen) {
+        card.classList.add("active-exp");
+      }
+
+      const dateStr = proj.updated_at ? new Date(proj.updated_at).toLocaleString(undefined, {
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      }) : (proj.created_at ? new Date(proj.created_at).toLocaleString(undefined, {
+        month: "short", day: "numeric"
+      }) : "Unknown date");
+
+      card.innerHTML = `
+        <div class="saved-exp-header">
+          <span class="saved-exp-title" style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 14px;">☁️</span>
+            <span>${escapeHTML(proj.title || "Untitled Project")}</span>
+          </span>
+          <span class="saved-exp-date">${dateStr}</span>
+        </div>
+        ${proj.description ? `<div class="saved-exp-obj">${escapeHTML(proj.description)}</div>` : ""}
+        <div class="saved-exp-footer">
+          <div class="saved-exp-meta">
+            <span class="stat-pill" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">☁️ Cloud Synced</span>
+            ${isCurrentlyOpen ? `<span class="stat-pill" style="background: #dbeafe; color: #1e40af; border-color: #93c5fd;">Currently Open</span>` : ""}
+          </div>
+          <div class="saved-exp-actions">
+            <button class="wb-btn wb-btn-primary btn-load-cloud-exp" title="Load onto Workbench Canvas" data-id="${proj.id}">⚡ Load</button>
+            <button class="wb-btn btn-dup-cloud-exp" title="Duplicate this project" data-id="${proj.id}">📋 Duplicate</button>
+            <button class="wb-btn btn-export-cloud-exp" title="Download JSON file" data-id="${proj.id}">💾 Export</button>
+            <button class="wb-btn wb-btn-danger btn-delete-cloud-exp" title="Delete project from cloud" data-id="${proj.id}">🗑</button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector(".btn-load-cloud-exp")?.addEventListener("click", () => {
+        loadCloudCircuitById(proj.id);
+      });
+
+      card.querySelector(".btn-dup-cloud-exp")?.addEventListener("click", () => {
+        duplicateCloudCircuit(proj.id);
+      });
+
+      card.querySelector(".btn-export-cloud-exp")?.addEventListener("click", () => {
+        exportCloudCircuitJSON(proj.id, proj.title);
+      });
+
+      card.querySelector(".btn-delete-cloud-exp")?.addEventListener("click", () => {
+        if (confirm(`Are you sure you want to delete "${proj.title || 'Untitled Project'}" from your cloud account? This cannot be undone.`)) {
+          deleteCloudCircuit(proj.id);
+        }
+      });
+
+      listContainer.appendChild(card);
+    });
+  }
+
+  async function loadCloudCircuitById(circuitId) {
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    if (!token) {
+      alert("Please sign in to load cloud projects.");
+      return;
+    }
+
+    try {
+      const apiBase = window.Auth?.getBaseUrl ? Auth.getBaseUrl() : "http://127.0.0.1:8000";
+      const res = await fetch(`${apiBase}/api/circuits/${circuitId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch circuit (${res.status})`);
+      }
+
+      const proj = await res.json();
+      let cData = proj.circuit_data;
+      if (typeof cData === "string") {
+        try { cData = JSON.parse(cData); } catch (e) { cData = {}; }
+      }
+
+      state.components = [];
+      state.wires = [];
+      state.selectedItem = null;
+      cancelActiveWire();
+
+      Object.keys(refCounters).forEach((k) => delete refCounters[k]);
+
+      if (cData && Array.isArray(cData.components)) {
+        cData.components.forEach((c) => {
+          state.components.push({
+            id: c.id,
+            type: c.type,
+            ref: c.ref || getNextRef(LIBRARY[c.type]?.refPrefix || "U"),
+            x: c.x,
+            y: c.y,
+            state: c.state ? JSON.parse(JSON.stringify(c.state)) : (LIBRARY[c.type]?.initState ? JSON.parse(JSON.stringify(LIBRARY[c.type].initState)) : {})
+          });
+
+          if (c.ref) {
+            const match = c.ref.match(/^([A-Za-z_]+)(\d+)$/);
+            if (match) {
+              const prefix = match[1];
+              const num = parseInt(match[2], 10);
+              if (!refCounters[prefix] || num > refCounters[prefix]) {
+                refCounters[prefix] = num;
+              }
+            }
+          }
+        });
+      }
+
+      if (cData && Array.isArray(cData.wires)) {
+        cData.wires.forEach((w) => {
+          state.wires.push({
+            id: w.id,
+            from: { compId: w.from.compId, pinNum: w.from.pinNum },
+            to: { compId: w.to.compId, pinNum: w.to.pinNum },
+            waypoints: w.waypoints ? JSON.parse(JSON.stringify(w.waypoints)) : [],
+            bendMode: w.bendMode || "HV",
+            state: w.state || 0
+          });
+        });
+      }
+
+      state.currentExperiment = {
+        id: "cloud_" + proj.id,
+        cloudId: proj.id,
+        title: proj.title || "Untitled Experiment",
+        objective: proj.description || ""
+      };
+
+      const presetSelect = document.getElementById("preset-select");
+      if (presetSelect) presetSelect.value = "";
+
+      updateBannerUI();
+      resetZoom();
+      render();
+      runSimulation();
+      closeLibraryModal();
+    } catch (err) {
+      console.error("Error loading cloud circuit:", err);
+      alert("Failed to load circuit from cloud: " + err.message);
+    }
+  }
+
+  async function duplicateCloudCircuit(circuitId) {
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    if (!token) return;
+
+    try {
+      const apiBase = window.Auth?.getBaseUrl ? Auth.getBaseUrl() : "http://127.0.0.1:8000";
+      const res = await fetch(`${apiBase}/api/circuits/${circuitId}/duplicate`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Could not duplicate project.");
+
+      const filter = document.getElementById("library-search")?.value.trim().toLowerCase() || "";
+      renderCloudProjectsList(filter);
+    } catch (err) {
+      alert("Failed to duplicate circuit: " + err.message);
+    }
+  }
+
+  async function deleteCloudCircuit(circuitId) {
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    if (!token) return;
+
+    try {
+      const apiBase = window.Auth?.getBaseUrl ? Auth.getBaseUrl() : "http://127.0.0.1:8000";
+      const res = await fetch(`${apiBase}/api/circuits/${circuitId}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Could not delete project.");
+
+      if (state.currentExperiment && state.currentExperiment.cloudId === circuitId) {
+        state.currentExperiment.cloudId = null;
+      }
+      const filter = document.getElementById("library-search")?.value.trim().toLowerCase() || "";
+      renderCloudProjectsList(filter);
+    } catch (err) {
+      alert("Failed to delete circuit: " + err.message);
+    }
+  }
+
+  async function exportCloudCircuitJSON(circuitId, title) {
+    const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+    if (!token) return;
+
+    try {
+      const apiBase = window.Auth?.getBaseUrl ? Auth.getBaseUrl() : "http://127.0.0.1:8000";
+      const res = await fetch(`${apiBase}/api/circuits/${circuitId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Could not fetch circuit data.");
+      const proj = await res.json();
+      let cData = proj.circuit_data;
+      if (typeof cData === "string") {
+        try { cData = JSON.parse(cData); } catch (e) { cData = {}; }
+      }
+
+      const exportObj = {
+        id: "cloud_" + proj.id,
+        title: proj.title,
+        objective: proj.description,
+        components: cData.components || [],
+        wires: cData.wires || [],
+        timestamp: proj.updated_at || proj.created_at || new Date().toISOString()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+      const dlAnchor = document.createElement("a");
+      const safeName = (proj.title || "cloud_project").toLowerCase().replace(/[^a-z0-9_-]/g, "_") + ".json";
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", safeName);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+    } catch (err) {
+      alert("Failed to export circuit: " + err.message);
+    }
   }
 
   function escapeHTML(str) {

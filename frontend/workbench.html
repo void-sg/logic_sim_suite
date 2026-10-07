@@ -467,6 +467,11 @@
           <textarea id="save-exp-obj" class="form-control form-textarea" rows="3" placeholder="e.g. To implement and verify truth table of 1-bit full subtractor using logic ICs..."></textarea>
         </div>
 
+        <!-- Cloud Storage Sync Indicator -->
+        <div id="save-cloud-indicator" style="display: flex; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; font-size: 12px; color: #166534;">
+          <span id="save-cloud-text">☁️ Saving to your Cloud Account (Synced across devices)</span>
+        </div>
+
         <!-- Component and Wire Statistics Pill Counter -->
         <div class="save-exp-stats">
           <span class="stat-pill" id="save-stat-comps">Components: 0</span>
@@ -509,17 +514,27 @@
       <!-- Modal Header -->
       <div class="modal-header-bar">
         <div class="modal-title-group">
-          <h2 class="modal-title">📁 My Saved Experiments</h2>
+          <h2 class="modal-title">📁 Project Library</h2>
           <span class="modal-badge" id="library-count-badge">0 saved</span>
         </div>
         <button class="modal-close-btn" id="btn-close-library-modal" title="Close">&times;</button>
+      </div>
+
+      <!-- Cloud vs Local Tab Toggle -->
+      <div class="library-tabs-row" style="display: flex; gap: 8px; margin: 12px 24px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+        <button type="button" class="library-tab-btn active" id="tab-cloud-projects" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; border: 1px solid #2563eb; background: #2563eb; color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer;">
+          <span>☁️ Cloud Projects (My Account)</span>
+        </button>
+        <button type="button" class="library-tab-btn" id="tab-local-projects" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; cursor: pointer;">
+          <span>💻 Local Browser Cache</span>
+        </button>
       </div>
 
       <!-- Library Action Toolbar -->
       <div class="library-toolbar">
         <div class="modal-search-row" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; background: #ffffff;">
           <span class="modal-search-icon">🔍</span>
-          <input type="text" class="modal-search-input" id="library-search" placeholder="Search saved experiments by title or objective..." autocomplete="off">
+          <input type="text" class="modal-search-input" id="library-search" placeholder="Search saved projects by title or notes..." autocomplete="off">
         </div>
         <button class="wb-btn" id="btn-library-import-trigger" title="Import Experiment from JSON file">
           <span>📥 Import JSON</span>

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-import convert, arithmetic, compare, mux_router, circuit_router, auth_router
+import convert, arithmetic, compare, mux_router, circuit_router, auth_router, user_circuits_router
 import database
 
 # Initialize SQLite database schema
@@ -38,6 +38,7 @@ app.include_router(compare.router)
 app.include_router(mux_router.router)
 app.include_router(circuit_router.router)
 app.include_router(auth_router.router)
+app.include_router(user_circuits_router.router)
 
 
 @app.get("/")

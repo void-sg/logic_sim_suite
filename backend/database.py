@@ -60,10 +60,25 @@ def init_db():
     )
     """)
     
+    # Table: user_circuits (Cloud Circuit Projects)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_circuits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        circuit_data TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+    """)
+
     # Performance & uniqueness indices for query speed and DBeaver inspection
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_roll ON users(roll_number)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(lower(email))")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(lower(username))")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_circuits_user ON user_circuits(user_id)")
     
     conn.commit()
     conn.close()
@@ -297,3 +312,122 @@ def validate_and_consume_otp(email: str, otp: str, purpose: str) -> bool:
         return True
     finally:
         conn.close()
+
+# --- Cloud Circuit Projects Management ---
+
+def save_user_circuit(user_id: int, title: str, circuit_data: str, description: str = "", circuit_id: int = None):
+    """Save new circuit project or update existing project owned by user."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    now_iso = datetime.now(timezone.utc).isoformat()
+    clean_title = title.strip() if title and title.strip() else "Untitled Experiment"
+    clean_desc = description.strip() if description else ""
+    try:
+        if circuit_id:
+            cursor.execute("SELECT id FROM user_circuits WHERE id = ? AND user_id = ?", (circuit_id, user_id))
+            existing = cursor.fetchone()
+            if existing:
+                cursor.execute(
+                    """UPDATE user_circuits 
+                       SET title = ?, description = ?, circuit_data = ?, updated_at = ? 
+                       WHERE id = ? AND user_id = ?""",
+                    (clean_title, clean_desc, circuit_data, now_iso, circuit_id, user_id)
+                )
+                conn.commit()
+                return {
+                    "id": circuit_id,
+                    "user_id": user_id,
+                    "title": clean_title,
+                    "description": clean_desc,
+                    "created_at": None,
+                    "updated_at": now_iso
+                }
+
+        cursor.execute(
+            """INSERT INTO user_circuits (user_id, title, description, circuit_data, created_at, updated_at) 
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (user_id, clean_title, clean_desc, circuit_data, now_iso, now_iso)
+        )
+        conn.commit()
+        new_id = cursor.lastrowid
+        return {
+            "id": new_id,
+            "user_id": user_id,
+            "title": clean_title,
+            "description": clean_desc,
+            "created_at": now_iso,
+            "updated_at": now_iso
+        }
+    finally:
+        conn.close()
+
+def list_user_circuits(user_id: int):
+    """List all circuits saved by user (without full JSON blob for fast loading)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """SELECT id, user_id, title, description, created_at, updated_at, length(circuit_data) as data_size 
+               FROM user_circuits 
+               WHERE user_id = ? 
+               ORDER BY updated_at DESC""",
+            (user_id,)
+        )
+        return [dict(r) for r in cursor.fetchall()]
+    finally:
+        conn.close()
+
+def get_user_circuit(circuit_id: int, user_id: int = None):
+    """Retrieve full circuit data by ID."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        if user_id is not None:
+            cursor.execute("SELECT * FROM user_circuits WHERE id = ? AND user_id = ?", (circuit_id, user_id))
+        else:
+            cursor.execute("SELECT * FROM user_circuits WHERE id = ?", (circuit_id,))
+        row = cursor.fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+def delete_user_circuit(circuit_id: int, user_id: int) -> bool:
+    """Delete circuit owned by user."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM user_circuits WHERE id = ? AND user_id = ?", (circuit_id, user_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+def duplicate_user_circuit(circuit_id: int, user_id: int):
+    """Clone circuit with (Copy) appended to title."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    now_iso = datetime.now(timezone.utc).isoformat()
+    try:
+        cursor.execute("SELECT * FROM user_circuits WHERE id = ? AND user_id = ?", (circuit_id, user_id))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        new_title = f"{row['title']} (Copy)"
+        cursor.execute(
+            """INSERT INTO user_circuits (user_id, title, description, circuit_data, created_at, updated_at) 
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (user_id, new_title, row["description"], row["circuit_data"], now_iso, now_iso)
+        )
+        conn.commit()
+        new_id = cursor.lastrowid
+        return {
+            "id": new_id,
+            "user_id": user_id,
+            "title": new_title,
+            "description": row["description"],
+            "created_at": now_iso,
+            "updated_at": now_iso
+        }
+    finally:
+        conn.close()
+

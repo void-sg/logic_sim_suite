@@ -22,7 +22,12 @@ def run_tests():
     database.init_db()
     conn = database.get_connection()
     cursor = conn.cursor()
-    columns = {row["name"]: row["type"] for row in cursor.execute("PRAGMA table_info(users)").fetchall()}
+    if database.is_postgres():
+        cursor.execute("SELECT column_name as name, data_type as type FROM information_schema.columns WHERE table_name = 'users'")
+        columns = {row["name"]: row["type"] for row in cursor.fetchall()}
+    else:
+        cursor.execute("PRAGMA table_info(users)")
+        columns = {row["name"]: row["type"] for row in cursor.fetchall()}
     conn.close()
 
     required_columns = ["id", "roll_number", "username", "email", "password_hash", "branch", "semester", "role", "is_verified", "created_at"]
@@ -39,7 +44,8 @@ def run_tests():
 
     # Clean up test accounts if existing
     conn = database.get_connection()
-    conn.cursor().execute("DELETE FROM users WHERE email = ? OR roll_number = ?", (test_email, test_roll))
+    cursor = conn.cursor()
+    database.execute_query(cursor, "DELETE FROM users WHERE email = ? OR roll_number = ?", (test_email, test_roll))
     conn.commit()
     conn.close()
 
@@ -123,7 +129,8 @@ def run_tests():
 
     # Cleanup test user
     conn = database.get_connection()
-    conn.cursor().execute("DELETE FROM users WHERE email = ? OR roll_number = ?", (test_email, test_roll))
+    cursor = conn.cursor()
+    database.execute_query(cursor, "DELETE FROM users WHERE email = ? OR roll_number = ?", (test_email, test_roll))
     conn.commit()
     conn.close()
 

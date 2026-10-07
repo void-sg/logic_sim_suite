@@ -25,7 +25,12 @@ def run_tests():
     database.init_db()
     conn = database.get_connection()
     cursor = conn.cursor()
-    columns = {row["name"]: row["type"] for row in cursor.execute("PRAGMA table_info(user_circuits)").fetchall()}
+    if database.is_postgres():
+        cursor.execute("SELECT column_name as name, data_type as type FROM information_schema.columns WHERE table_name = 'user_circuits'")
+        columns = {row["name"]: row["type"] for row in cursor.fetchall()}
+    else:
+        cursor.execute("PRAGMA table_info(user_circuits)")
+        columns = {row["name"]: row["type"] for row in cursor.fetchall()}
     conn.close()
 
     expected_cols = ["id", "user_id", "title", "description", "circuit_data", "created_at", "updated_at"]
@@ -42,10 +47,11 @@ def run_tests():
 
     # Cleanup any previous test data
     conn = database.get_connection()
+    cursor = conn.cursor()
     u = database.get_user_by_email(test_email)
     if u:
-        conn.cursor().execute("DELETE FROM user_circuits WHERE user_id = ?", (u["id"],))
-        conn.cursor().execute("DELETE FROM users WHERE id = ?", (u["id"],))
+        database.execute_query(cursor, "DELETE FROM user_circuits WHERE user_id = ?", (u["id"],))
+        database.execute_query(cursor, "DELETE FROM users WHERE id = ?", (u["id"],))
         conn.commit()
     conn.close()
 
@@ -157,7 +163,8 @@ def run_tests():
     print("\n[TEST 9] Cleaning up test data...")
     user_circuits_router.delete_circuit(circuit_id, current_user=current_user)
     conn = database.get_connection()
-    conn.cursor().execute("DELETE FROM users WHERE id = ?", (user_id,))
+    cursor = conn.cursor()
+    database.execute_query(cursor, "DELETE FROM users WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
     print("PASS: Test account and test projects cleaned up cleanly.")

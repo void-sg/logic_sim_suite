@@ -4199,13 +4199,14 @@
       state.wires.push({ id: "w_out_qb", from: { compId: ic.id, pinNum: 9 },  to: { compId: ledRail.id, pinNum: 2 }, state: 0 });
       state.wires.push({ id: "w_out_qc", from: { compId: ic.id, pinNum: 8 },  to: { compId: ledRail.id, pinNum: 3 }, state: 0 });
       state.wires.push({ id: "w_out_qd", from: { compId: ic.id, pinNum: 11 }, to: { compId: ledRail.id, pinNum: 4 }, state: 0 });
-    } finally {
-      isBatchOperation = false;
-      updateUndoRedoUI();
     }
-
-    render();
+  } finally {
+    isBatchOperation = false;
+    updateUndoRedoUI();
   }
+
+  render();
+}
 
   // =========================================================================
   // 12. LOCAL EXPERIMENT STORAGE, BANNER & LIBRARY ENGINE

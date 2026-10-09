@@ -860,6 +860,124 @@
   }
 
   // =========================================================================
+  // 2.5 UNDO / REDO HISTORY ENGINE (Memento Pattern)
+  // =========================================================================
+  const undoStack = [];
+  const redoStack = [];
+  const MAX_HISTORY = 50;
+  let isBatchOperation = false;
+  let preDragSnapshot = null;
+
+  function createSnapshot() {
+    return {
+      components: state.components.map((c) => ({
+        id: c.id,
+        type: c.type,
+        ref: c.ref,
+        x: c.x,
+        y: c.y,
+        state: c.state ? JSON.parse(JSON.stringify(c.state)) : {}
+      })),
+      wires: state.wires.map((w) => ({
+        id: w.id,
+        from: { compId: w.from.compId, pinNum: w.from.pinNum },
+        to: { compId: w.to.compId, pinNum: w.to.pinNum },
+        waypoints: w.waypoints ? JSON.parse(JSON.stringify(w.waypoints)) : [],
+        bendMode: w.bendMode || "HV",
+        state: w.state || 0
+      })),
+      refCounters: JSON.parse(JSON.stringify(refCounters))
+    };
+  }
+
+  function applySnapshot(snap) {
+    if (!snap) return;
+    state.components = snap.components.map((c) => ({
+      id: c.id,
+      type: c.type,
+      ref: c.ref,
+      x: c.x,
+      y: c.y,
+      state: c.state ? JSON.parse(JSON.stringify(c.state)) : {}
+    }));
+    state.wires = snap.wires.map((w) => ({
+      id: w.id,
+      from: { compId: w.from.compId, pinNum: w.from.pinNum },
+      to: { compId: w.to.compId, pinNum: w.to.pinNum },
+      waypoints: w.waypoints ? JSON.parse(JSON.stringify(w.waypoints)) : [],
+      bendMode: w.bendMode || "HV",
+      state: w.state || 0
+    }));
+    state.selectedItem = null;
+    cancelActiveWire();
+
+    // Restore ref counters
+    Object.keys(refCounters).forEach((k) => delete refCounters[k]);
+    if (snap.refCounters) {
+      Object.assign(refCounters, snap.refCounters);
+    }
+
+    render();
+    runSimulation();
+    updateUndoRedoUI();
+  }
+
+  function pushHistory() {
+    if (isBatchOperation) return;
+    undoStack.push(createSnapshot());
+    if (undoStack.length > MAX_HISTORY) {
+      undoStack.shift();
+    }
+    redoStack.length = 0; // Clear redo upon fresh action
+    updateUndoRedoUI();
+  }
+
+  function undo() {
+    if (undoStack.length === 0) return;
+    const current = createSnapshot();
+    redoStack.push(current);
+    const prev = undoStack.pop();
+    applySnapshot(prev);
+    updateUndoRedoUI();
+    showWorkbenchToast("Undo ↩");
+  }
+
+  function redo() {
+    if (redoStack.length === 0) return;
+    const current = createSnapshot();
+    undoStack.push(current);
+    const next = redoStack.pop();
+    applySnapshot(next);
+    updateUndoRedoUI();
+    showWorkbenchToast("Redo ↪");
+  }
+
+  function updateUndoRedoUI() {
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+  }
+
+  function showWorkbenchToast(msg) {
+    let toast = document.getElementById("wb-undo-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "wb-undo-toast";
+      toast.style.cssText = "position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#0f172a;color:#38bdf8;padding:8px 18px;border-radius:24px;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,0.3);z-index:9999;pointer-events:none;transition:opacity 0.2s ease, transform 0.2s ease;opacity:0;border:1px solid #334155;";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = "1";
+    toast.style.transform = "translateX(-50%) translateY(0)";
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateX(-50%) translateY(8px)";
+    }, 1100);
+  }
+
+  // =========================================================================
   // 3. INITIALIZATION & DOM BINDING
   // =========================================================================
   let svgRoot, zoomGroup, gridLayer, wireLayer, junctionLayer, compLayer, tempWireLayer;
@@ -918,7 +1036,17 @@
     window.addEventListener("keydown", (e) => {
       if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT" || document.activeElement.tagName === "TEXTAREA") return;
 
-      if (e.key === "a" || e.key === "A") {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault();
+        redo();
+      } else if (e.key === "a" || e.key === "A") {
         openModal();
       } else if (e.key === "w" || e.key === "W") {
         setTool("wire");
@@ -982,6 +1110,8 @@
     document.getElementById("btn-tool-select")?.addEventListener("click", () => setTool("select"));
     document.getElementById("btn-tool-wire")?.addEventListener("click", () => setTool("wire"));
     document.getElementById("btn-tool-delete")?.addEventListener("click", () => setTool("delete"));
+    document.getElementById("btn-undo")?.addEventListener("click", () => undo());
+    document.getElementById("btn-redo")?.addEventListener("click", () => redo());
     document.getElementById("btn-add-symbol")?.addEventListener("click", () => openModal());
     document.getElementById("btn-clear-canvas")?.addEventListener("click", () => clearCanvas());
     document.getElementById("btn-blank-canvas")?.addEventListener("click", () => newBlankCanvas());
@@ -1509,6 +1639,10 @@
     const spec = LIBRARY[type];
     if (!spec) return;
 
+    if (!isBatchOperation) {
+      pushHistory();
+    }
+
     const gx = Math.round(x / 20) * 20;
     const gy = Math.round(y / 20) * 20;
 
@@ -1549,6 +1683,7 @@
 
   function deleteSelectedItem() {
     if (!state.selectedItem) return;
+    pushHistory();
 
     if (state.selectedItem.type === "comp") {
       const compId = state.selectedItem.id;
@@ -1775,6 +1910,7 @@
       state: 0
     };
 
+    pushHistory();
     state.wires.push(wire);
     setSelectedItem({ type: "wire", id: wire.id });
 
@@ -2325,6 +2461,7 @@
 
         e.stopPropagation();
         setSelectedItem({ type: "comp", id: c.id });
+        preDragSnapshot = createSnapshot();
         state.draggingComp = c;
         const coords = clientToSvgCoords(e.clientX, e.clientY);
         state.dragOffset = { x: coords.x - c.x, y: coords.y - c.y };
@@ -3537,8 +3674,17 @@
       const comp = state.draggingComp;
       state.draggingComp = null;
 
+      if (state.hasDraggedFar && preDragSnapshot) {
+        undoStack.push(preDragSnapshot);
+        if (undoStack.length > MAX_HISTORY) undoStack.shift();
+        redoStack.length = 0;
+        updateUndoRedoUI();
+      }
+      preDragSnapshot = null;
+
       // If user simply clicked a SWITCH without dragging it, flip value!
       if (comp.type === "SWITCH" && !state.hasDraggedFar) {
+        pushHistory();
         comp.state.value = comp.state.value ? 0 : 1;
         runSimulation();
       }
@@ -3600,10 +3746,16 @@
   };
 
   function loadLabPreset(presetKey) {
-    state.components = [];
-    state.wires = [];
-    state.selectedItem = null;
-    cancelActiveWire();
+    if (state.components.length > 0 || state.wires.length > 0) {
+      pushHistory();
+    }
+    isBatchOperation = true;
+
+    try {
+      state.components = [];
+      state.wires = [];
+      state.selectedItem = null;
+      cancelActiveWire();
 
     const meta = PRESET_METADATA[presetKey] || {
       title: "Lab Experiment Preset",
@@ -4047,6 +4199,9 @@
       state.wires.push({ id: "w_out_qb", from: { compId: ic.id, pinNum: 9 },  to: { compId: ledRail.id, pinNum: 2 }, state: 0 });
       state.wires.push({ id: "w_out_qc", from: { compId: ic.id, pinNum: 8 },  to: { compId: ledRail.id, pinNum: 3 }, state: 0 });
       state.wires.push({ id: "w_out_qd", from: { compId: ic.id, pinNum: 11 }, to: { compId: ledRail.id, pinNum: 4 }, state: 0 });
+    } finally {
+      isBatchOperation = false;
+      updateUndoRedoUI();
     }
 
     render();
@@ -4313,6 +4468,10 @@
     const exp = list.find((e) => e.id === expId);
     if (!exp) return false;
 
+    if (state.components.length > 0 || state.wires.length > 0) {
+      pushHistory();
+    }
+
     state.components = [];
     state.wires = [];
     state.selectedItem = null;
@@ -4395,6 +4554,7 @@
       if (!confirm("Clear workstation and start with a fresh blank canvas? Unsaved changes will be lost.")) {
         return;
       }
+      pushHistory();
     }
     state.components = [];
     state.wires = [];
@@ -4924,6 +5084,10 @@
       let cData = proj.circuit_data;
       if (typeof cData === "string") {
         try { cData = JSON.parse(cData); } catch (e) { cData = {}; }
+      }
+
+      if (state.components.length > 0 || state.wires.length > 0) {
+        pushHistory();
       }
 
       state.components = [];
